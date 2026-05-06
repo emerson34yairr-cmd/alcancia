@@ -2903,6 +2903,95 @@ body::before{
 .sm-add-all-btn:active{transform:scale(.97);background:linear-gradient(135deg,rgba(58,170,122,.3),rgba(58,170,122,.2));}
 .sm-add-all-btn:disabled{opacity:.35;cursor:default;}
 
+/* Shop Mode item cards: galaxy product view */
+.sm-item{
+  position:relative !important;
+  gap:12px !important;
+  padding:13px 14px !important;
+  overflow:hidden !important;
+  align-items:center !important;
+  min-height:104px !important;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(100,145,255,.18),transparent 30%),
+    radial-gradient(circle at 88% 110%,rgba(150,92,245,.16),transparent 36%),
+    linear-gradient(150deg,rgba(17,22,44,.98),rgba(7,10,24,.99)) !important;
+  border:1px solid rgba(124,154,255,.14) !important;
+  border-radius:22px !important;
+  box-shadow:0 14px 32px rgba(0,0,0,.38),0 1px 0 rgba(255,255,255,.06) inset !important;
+  cursor:default !important;
+  animation:smCardIn .26s cubic-bezier(.22,1,.36,1) both;
+}
+.sm-item::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.045) 48%,transparent 72%);
+  opacity:.55;
+}
+.sm-item.sm-done{
+  opacity:1 !important;
+  background:
+    radial-gradient(circle at 15% 18%,rgba(58,170,122,.16),transparent 30%),
+    linear-gradient(150deg,rgba(9,20,24,.98),rgba(5,12,18,.99)) !important;
+  border-color:rgba(58,170,122,.24) !important;
+}
+.sm-item.sm-done::after{
+  content:'';position:absolute;left:74px;right:18px;top:50%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(96,210,150,.72),transparent);
+  transform:scaleX(1);transform-origin:left center;
+  animation:smStrike .34s cubic-bezier(.22,1,.36,1) both;
+}
+.sm-check-circle{
+  width:38px !important;height:38px !important;
+  border-color:rgba(150,175,235,.34) !important;
+  background:rgba(255,255,255,.055) !important;
+  color:transparent !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 8px 18px rgba(0,0,0,.24);
+  cursor:pointer;
+  position:relative;z-index:2;
+}
+.sm-check-circle:active{transform:scale(.86) !important;}
+.sm-item.sm-done .sm-check-circle{
+  color:#fff !important;
+  background:linear-gradient(135deg,#35c985,#68e0ad) !important;
+  box-shadow:0 0 0 5px rgba(58,170,122,.12),0 0 20px rgba(58,170,122,.38) !important;
+  animation:smCheckPop .32s cubic-bezier(.34,1.56,.64,1) both;
+}
+.sm-media{
+  width:64px;height:64px;border-radius:18px;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.08);
+  position:relative;z-index:1;
+  box-shadow:0 10px 24px rgba(0,0,0,.28);
+}
+.sm-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.sm-media-emoji{font-size:30px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));}
+.sm-item-info{flex:1;min-width:0;position:relative;z-index:1;}
+.sm-name{
+  font-size:19px !important;font-weight:900 !important;color:#f5f8ff !important;
+  letter-spacing:-.02em !important;line-height:1.08 !important;
+  white-space:normal !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.sm-item.sm-done .sm-name{color:rgba(180,205,195,.48) !important;text-decoration:none !important;}
+.sm-meta-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px;}
+.sm-qty,.sm-price,.sm-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  min-height:23px;padding:4px 9px;border-radius:999px;
+  font-family:'Space Mono',monospace;font-size:10.5px;font-weight:800;line-height:1;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.055);
+}
+.sm-qty{color:rgba(160,195,255,.82) !important;margin-top:0 !important;}
+.sm-price{color:rgba(245,196,82,.9) !important;padding:4px 9px !important;}
+.sm-badge.cat{color:rgba(180,200,255,.82);background:rgba(92,126,255,.11);}
+.sm-badge.pri-urgente{color:#ff9aa8;background:rgba(248,88,88,.13);border-color:rgba(248,88,88,.25);}
+.sm-badge.pri-normal{color:#ffd978;background:rgba(250,200,60,.12);border-color:rgba(250,200,60,.24);}
+.sm-badge.pri-espera{color:#81e6b2;background:rgba(52,211,153,.11);border-color:rgba(52,211,153,.22);}
+.sm-item.sm-done .sm-meta-line{opacity:.45;}
+@keyframes smCardIn{from{opacity:0;transform:translateY(8px) scale(.99);}to{opacity:1;transform:none;}}
+@keyframes smCheckPop{0%{transform:scale(.7);}65%{transform:scale(1.16);}100%{transform:scale(1);}}
+@keyframes smStrike{from{transform:scaleX(0);opacity:0;}to{transform:scaleX(1);opacity:1;}}
+
 /* ══════════════════════════════════════════════════════════════════
    PREMIUM FINANCE DASHBOARD — HOY TAB UPGRADE v2
    ══════════════════════════════════════════════════════════════════ */
@@ -9360,6 +9449,7 @@ function normalizeShopItem(raw,fallbackId){
     qty:qty,
     category:category,
     estPrice:price,
+    productImage:(raw.productImage||raw.image||raw.imageUrl||'').toString(),
     status:status,
     checked:status==='bought',
     spentLogged:raw.spentLogged===true,
@@ -10969,6 +11059,8 @@ function cleanIngredient(amt,name){
 var _shopSuggTimer=null;
 var _shopSuggXhr=null;
 var _shopTranslateXhr=null;
+var _shopSelectedImage='';
+var _shopProductImageByName={};
 var SHOP_PRODUCT_CATALOG=[
   'Leche','Huevos','Pan','Tortillas','Arroz','Frijoles','Pasta','Avena','Cereal','Harina','Azucar','Sal','Aceite',
   'Cafe','Te','Chocolate','Agua','Jugo','Refresco','Yogurt','Queso','Crema','Mantequilla','Jamon','Pollo','Carne',
@@ -11018,11 +11110,12 @@ function _shopRenderSugg(items,msg){
       var name=(p.name||'').trim();
       if(!name) return '';
       var img=p.img||'';
+      if(img) _shopProductImageByName[_shopNormText(name)]=img;
       var imgHtml=img
         ?'<img class="shop-sugg-img" src="'+_shopSuggHtml(img)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
          +'<span class="shop-sugg-placeholder" style="display:none">+</span>'
         :'<span class="shop-sugg-placeholder">+</span>';
-      return '<div class="shop-sugg-item" onclick="_shopSelectSugg(\''+_shopSuggJs(name)+'\')" role="option">'+imgHtml+'<div class="shop-sugg-name">'+_shopSuggHtml(name)+'</div></div>';
+      return '<div class="shop-sugg-item" onclick="_shopSelectSugg(\''+_shopSuggJs(name)+'\',\''+_shopSuggJs(img)+'\')" role="option">'+imgHtml+'<div class="shop-sugg-name">'+_shopSuggHtml(name)+'</div></div>';
     }).join('');
   }
   if(msg) html+='<div class="shop-sugg-loader">'+_shopSuggHtml(msg)+'</div>';
@@ -11089,9 +11182,10 @@ function _shopFetchSugg(q){
   };
   xhr.send();
 }
-function _shopSelectSugg(name){
+function _shopSelectSugg(name,img){
   var inp=$('shopInput');
   if(inp){inp.value=name;inp.focus();}
+  _shopSelectedImage=img||_shopProductImageByName[_shopNormText(name)]||'';
   _shopCloseSugg();
 }
 function _shopCloseSugg(){
@@ -11191,16 +11285,19 @@ function addShopItem(){
   var selectedCategory=normalizeShopCategory(cInp?cInp.value:'general');
   var category=selectedCategory==='general'?inferShopCategory(name):selectedCategory;
   var estPrice=toShopPrice(pInp?pInp.value:0);
+  var productImage=_shopSelectedImage||_shopProductImageByName[_shopNormText(name)]||'';
   shopList.push(normalizeShopItem({
     name:name,
     qty:qty,
     category:category,
     estPrice:estPrice,
+    productImage:productImage,
     status:'pending',
     priority:_shopPriority
   },Date.now()));
   saveShopList();
   inp.value=''; if(qInp) qInp.value=''; if(pInp) pInp.value='';
+  _shopSelectedImage='';
   inp.focus();
   renderShopList();
   showToast('🛒 '+name+' agregado');
@@ -11375,6 +11472,39 @@ function smConfirmAddAll(){
   }
 }
 
+function smPriorityLabel(pri){
+  if(pri==='urgente') return 'Urgente';
+  if(pri==='espera') return 'Puede esperar';
+  return 'Normal';
+}
+
+function smItemMedia(item){
+  var img=(item.productImage||'').toString();
+  if(img){
+    return '<div class="sm-media"><img src="'+_shopSuggHtml(img)+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<span class=&quot;sm-media-emoji&quot;>'+getShopCategoryEmoji(item.category)+'</span>\'"></div>';
+  }
+  return '<div class="sm-media"><span class="sm-media-emoji">'+getShopCategoryEmoji(item.category)+'</span></div>';
+}
+
+function smRenderItem(item,done){
+  var p=toShopPrice(item.estPrice);
+  var pri=item.priority||'normal';
+  var cat=getShopCategoryLabel(item.category);
+  return '<div class="sm-item'+(done?' sm-done':'')+'">'
+    +'<button class="sm-check-circle" onclick="smToggleItem('+item.id+')" aria-label="'+(done?'Marcar pendiente':'Marcar comprado')+'" type="button">'+(done?'✓':'')+'</button>'
+    +smItemMedia(item)
+    +'<div class="sm-item-info">'
+      +'<div class="sm-name">'+_shopSuggHtml(item.name)+'</div>'
+      +'<div class="sm-meta-line">'
+        +(item.qty?'<span class="sm-qty">'+_shopSuggHtml(item.qty)+'</span>':'')
+        +(p>0?'<span class="sm-price">$'+p.toFixed(2)+'</span>':'')
+        +'<span class="sm-badge cat">'+getShopCategoryEmoji(item.category)+' '+_shopSuggHtml(cat)+'</span>'
+        +'<span class="sm-badge pri-'+pri+'">'+_shopSuggHtml(smPriorityLabel(pri))+'</span>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+}
+
 function renderShopMode(){
   var list=$('smList');
   var fill=$('smProgressFill');
@@ -11404,17 +11534,7 @@ function renderShopMode(){
   if(pending.length>0){
     html+='<div class="sm-section-label">Pendientes</div>';
     html+=pending.map(function(item){
-      var p=toShopPrice(item.estPrice);
-      return '<div class="sm-item" onclick="smToggleItem('+item.id+')">'
-        +'<div class="sm-tap">'
-          +'<div class="sm-check-circle"></div>'
-          +'<div class="sm-item-info">'
-            +'<div class="sm-name">'+item.name+'</div>'
-            +(item.qty?'<div class="sm-qty">'+item.qty+'</div>':'')
-          +'</div>'
-        +'</div>'
-        +(p>0?'<div class="sm-price">$'+p.toFixed(2)+'</div>':'')
-      +'</div>';
+      return smRenderItem(item,false);
     }).join('');
   }
 
@@ -11445,6 +11565,49 @@ function renderShopMode(){
 
   list.innerHTML=html;
 }
+
+renderShopMode=function(){
+  var list=$('smList');
+  var fill=$('smProgressFill');
+  var sub=$('smSubtitle');
+  var sDone=$('smStatDone');
+  var sLeft=$('smStatLeft');
+  var sTotal=$('smStatTotal');
+  var addAllBtn=$('smAddAllBtn');
+  if(!list) return;
+
+  var pending=shopList.filter(function(x){return getShopStatus(x)!=='bought';});
+  var done=shopList.filter(function(x){return getShopStatus(x)==='bought';});
+  var total=shopList.length;
+  var pct=total>0?Math.round((done.length/total)*100):0;
+  var estTotal=shopList.reduce(function(s,x){return s+toShopPrice(x.estPrice);},0);
+  var unlogged=done.filter(function(x){return x.spentLogged!==true;});
+
+  if(fill) fill.style.width=pct+'%';
+  if(sub) sub.textContent=pending.length+' PENDIENTE'+(pending.length!==1?'S':'')+' · '+pct+'% LISTO';
+  if(sDone) sDone.textContent=done.length;
+  if(sLeft) sLeft.textContent=pending.length;
+  if(sTotal) sTotal.textContent=currSym()+toActiveCurrency(estTotal).toFixed(2);
+  if(addAllBtn) addAllBtn.disabled=unlogged.length===0;
+
+  var html='';
+  if(pending.length){
+    html+='<div class="sm-section-label">Pendientes</div>';
+    html+=pending.map(function(item){return smRenderItem(item,false);}).join('');
+  }
+  if(done.length){
+    html+='<div class="sm-section-label" style="margin-top:'+(pending.length?'14':'0')+'px">Comprados</div>';
+    html+=done.map(function(item){return smRenderItem(item,true);}).join('');
+  }
+  if(!shopList.length){
+    html='<div style="text-align:center;padding:60px 20px;color:rgba(130,150,200,.45);">'
+      +'<div style="font-size:48px;margin-bottom:16px;opacity:.4;">🛒</div>'
+      +'<div style="font-size:16px;font-weight:700;margin-bottom:8px;">Lista vacia</div>'
+      +'<div style="font-size:13px;">Agrega articulos primero.</div>'
+      +'</div>';
+  }
+  list.innerHTML=html;
+};
 
 function filterShop(f){
   shopFilter=f;
