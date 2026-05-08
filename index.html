@@ -949,6 +949,7 @@ body::before{
   padding-bottom:18px;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
+  position:relative;
 }
 .page-stack::-webkit-scrollbar{display:none;}
 .header{
@@ -7472,6 +7473,12 @@ body { padding-bottom: 0 !important; }
 #page-escanear.sx-page .sx-items-count{font-size:11px;font-weight:700;color:rgba(228,234,255,.55);background:rgba(255,255,255,.06);padding:3px 9px;border-radius:999px;}
 #page-escanear.sx-page .sx-items-card .scan-item-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13.5px;color:#e8eef8;border-bottom:1px solid rgba(255,255,255,.04);}
 #page-escanear.sx-page .sx-items-card .scan-item-row:last-child{border-bottom:0;}
+#page-escanear.sx-page .sx-items-card .scan-item-row{gap:10px;cursor:pointer;border-radius:12px;padding:10px 8px;margin:0 -8px;transition:background .16s,opacity .16s;}
+#page-escanear.sx-page .sx-items-card .scan-item-row:active{background:rgba(122,151,255,.08);}
+#page-escanear.sx-page .scan-item-row.off{opacity:.42;}
+#page-escanear.sx-page .scan-pick{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(122,151,255,.34);background:rgba(255,255,255,.05);color:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;transition:all .18s;}
+#page-escanear.sx-page .scan-item-row.selected .scan-pick{background:linear-gradient(140deg,#34d399,#10b981);border-color:transparent;color:#04140e;box-shadow:0 0 0 4px rgba(52,211,153,.10),0 0 16px rgba(52,211,153,.24);}
+#page-escanear.sx-page .scan-item-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
 #page-escanear.sx-page .sx-items-card .scan-item-name{flex:1;min-width:0;color:rgba(228,234,255,.85);font-weight:500;}
 #page-escanear.sx-page .sx-items-card .scan-item-price{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
 
@@ -7672,6 +7679,240 @@ input[type=number]{font-size:16px !important;}
   transition:opacity .2s;
 }
 
+/* Local fixes: full Activity filter labels, price hints and suggested shopping */
+#page-actividad .activity-filter-row{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;gap:10px !important;overflow:visible !important;}
+#page-actividad .activity-filter-select{width:100% !important;min-width:0 !important;max-width:none !important;padding:12px 12px !important;font-size:13px !important;line-height:1.15 !important;text-overflow:clip !important;white-space:normal !important;border-radius:16px !important;}
+#page-compras .shop-price-hint{display:none;margin:7px 2px 0;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:rgba(122,151,255,.72);line-height:1.35;}
+#page-compras .shop-price-hint.show{display:block;}
+#page-compras .shop-suggested-section{margin-bottom:18px;}
+#page-compras .shop-suggested-list{display:flex;flex-direction:column;gap:9px;}
+#page-compras .shop-suggested-card{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:1px solid rgba(122,151,255,.14);border-radius:17px;padding:12px 13px;background:radial-gradient(circle at 10% 0%,rgba(122,151,255,.14),transparent 38%),linear-gradient(155deg,rgba(18,23,46,.96),rgba(9,12,26,.98));color:#edf3ff;font-family:'Syne',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.05) inset;cursor:pointer;}
+#page-compras .shop-suggested-card:active{transform:scale(.985);}
+#page-compras .shop-suggested-icon{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);font-size:19px;flex-shrink:0;}
+#page-compras .shop-suggested-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+#page-compras .shop-suggested-name{font-size:14px;font-weight:800;color:#f4f7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-compras .shop-suggested-meta{font-family:'Space Mono',monospace;font-size:10px;color:rgba(170,185,225,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-compras .shop-suggested-add{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.22);color:#6ee7b7;font-size:20px;font-weight:800;flex-shrink:0;}
+@media (max-width:360px){#page-actividad .activity-filter-row{grid-template-columns:1fr !important;}}
+
+/* Assistant: keep the floating widget low and reserve scroll space so it does not cover content */
+.page{padding-bottom:calc(154px + var(--safe-bottom)) !important;}
+.ai-fab{width:52px !important;height:52px !important;right:14px !important;bottom:calc(84px + var(--safe-bottom)) !important;z-index:450 !important;}
+.ai-fab-avatar{width:38px !important;height:38px !important;font-size:21px !important;}
+#aiProactiveToast{right:74px !important;bottom:calc(90px + var(--safe-bottom)) !important;max-width:190px !important;}
+#page-recetas.rx-page .rx-featured-fav{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;z-index:3;border:1px solid rgba(255,255,255,.14);background:rgba(7,9,15,.58);backdrop-filter:blur(8px);color:rgba(255,255,255,.72);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+#page-recetas.rx-page .rx-featured-fav.active{color:#ffd166;background:rgba(255,209,102,.18);}
+
+/* ── SMOOTH TAB TRANSITIONS ──────────────────────────────────────── */
+@keyframes _tabLeaveL{from{opacity:1;transform:translateX(0) scale(1);}to{opacity:0;transform:translateX(-20px) scale(.974);}}
+@keyframes _tabLeaveR{from{opacity:1;transform:translateX(0) scale(1);}to{opacity:0;transform:translateX(20px) scale(.974);}}
+@keyframes _tabEnterFromR{from{opacity:0;transform:translateX(24px) scale(.974);}to{opacity:1;transform:translateX(0) scale(1);}}
+@keyframes _tabEnterFromL{from{opacity:0;transform:translateX(-24px) scale(.974);}to{opacity:1;transform:translateX(0) scale(1);}}
+.page-_leaving{position:absolute!important;top:0;left:0;right:0;z-index:2;pointer-events:none!important;width:100%;will-change:transform,opacity;}
+.page-_leaving.dir-l{animation:_tabLeaveL .22s cubic-bezier(.4,0,.8,.2) forwards;}
+.page-_leaving.dir-r{animation:_tabLeaveR .22s cubic-bezier(.4,0,.8,.2) forwards;}
+.page-_entering.dir-l{animation:_tabEnterFromL .3s cubic-bezier(.16,1,.3,1) both;will-change:transform,opacity;}
+.page-_entering.dir-r{animation:_tabEnterFromR .3s cubic-bezier(.16,1,.3,1) both;will-change:transform,opacity;}
+
+/* ── PREMIUM MICRO-INTERACTIONS ──────────────────────────────────── */
+/* Softer, iOS-style press easing on common interactive elements */
+.nav-btn,.save-btn,.work-btn,.fx-qa,.shop-cat,.shop-add-btn,.shop-bulk-btn,
+.shop-clear-btn,.recipe-vid-chip,.yt-btn,.recent-chip,.tab,.cal-nav-btn,
+.bud-modal-save,.bud-modal-cancel,.recipe-close,.ach-popup-btn{
+  transition:transform .18s cubic-bezier(.22,1,.36,1),
+             box-shadow .22s cubic-bezier(.22,1,.36,1),
+             background .22s cubic-bezier(.22,1,.36,1),
+             color .2s ease,opacity .2s ease,filter .2s ease;
+}
+.nav-btn:active,.save-btn:active,.work-btn:active,.fx-qa:active,
+.shop-cat:active,.shop-add-btn:active,.shop-bulk-btn:active,
+.recent-chip:active,.tab:active,.cal-nav-btn:active{
+  transform:scale(.955);
+}
+
+/* Cards: gentle lift / settle on press */
+.day-card,.stat-card,.history-item,.ach-card2,.recipe-card,.mdb-card,
+#page-recetas.rx-page .rx-card,#page-recetas.rx-page .rx-featured,
+.fx-hero,.balance-hero{
+  transition:transform .22s cubic-bezier(.22,1,.36,1),
+             box-shadow .26s cubic-bezier(.22,1,.36,1);
+}
+.day-card:active,.stat-card:active,.history-item:active,
+.ach-card2:active,.recipe-card:active,.mdb-card:active,
+#page-recetas.rx-page .rx-card:active,
+#page-recetas.rx-page .rx-featured:active{
+  transform:scale(.985);
+  filter:brightness(1.03);
+}
+
+/* Subtle piggy idle breathing — premium "alive" feel */
+@keyframes _piggyBreathe{
+  0%,100%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-1.2px) scale(1.012);}
+}
+.piggy-container:not(.wobble){
+  animation:_piggyBreathe 4.2s ease-in-out infinite;
+  transition:transform .18s cubic-bezier(.22,1,.36,1);
+}
+.piggy-container:active{
+  animation:none;
+  transform:scale(.94);
+}
+
+/* Toast: softer spring entrance */
+.toast{transition:opacity .3s cubic-bezier(.22,1,.36,1),
+                  transform .42s cubic-bezier(.18,1.18,.32,1) !important;}
+
+/* Inputs: subtle premium focus */
+input:focus,textarea:focus,select:focus{
+  transition:box-shadow .25s cubic-bezier(.22,1,.36,1),
+             border-color .25s ease,background .25s ease;
+}
+
+/* Honor reduced-motion preference */
+@media (prefers-reduced-motion: reduce){
+  .piggy-container:not(.wobble){animation:none;}
+  .page-_leaving.dir-l,.page-_leaving.dir-r,
+  .page-_entering.dir-l,.page-_entering.dir-r{animation-duration:.001s;}
+}
+
+/* ── PREMIUM ANALYTICS CHARTS ────────────────────────────── */
+#page-hoy.fx-home .fx-analytics{display:flex;flex-direction:column;gap:14px;margin-bottom:16px;}
+#page-hoy.fx-home .fx-analytics .fx-section-title{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(228,234,255,.62);margin-bottom:0;display:flex;align-items:center;justify-content:space-between;}
+.fx-chart-card{background:linear-gradient(160deg,rgba(28,33,58,.85),rgba(14,17,36,.78));border:1px solid rgba(122,151,255,.10);border-radius:22px;padding:18px 18px 16px;box-shadow:0 8px 22px -10px rgba(0,0,0,.45);position:relative;overflow:hidden;}
+.fx-chart-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(97,136,255,.10),transparent 70%);pointer-events:none;}
+.fx-chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1;}
+.fx-chart-title{font-size:13.5px;font-weight:700;color:#edf2ff;letter-spacing:.2px;display:flex;align-items:center;gap:7px;}
+.fx-chart-title-glyph{font-size:14px;opacity:.85;}
+.fx-chart-sub{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:rgba(228,234,255,.55);letter-spacing:.4px;}
+.fx-chart-empty{padding:18px 6px;text-align:center;font-size:12px;color:rgba(228,234,255,.45);font-weight:500;}
+
+/* Savings line chart */
+.fx-line-wrap{position:relative;}
+.fx-line{width:100%;height:140px;display:block;overflow:visible;}
+.fx-line-grid{stroke:rgba(255,255,255,.045);stroke-width:1;stroke-dasharray:2 4;}
+.fx-line-area{opacity:0;transition:opacity .8s ease .55s;}
+.fx-line-area.in{opacity:.45;}
+.fx-line-path{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset 1.4s cubic-bezier(.55,.08,.32,1.02);}
+.fx-line-path.in{stroke-dashoffset:0;}
+.fx-line-dot{opacity:0;transform-origin:center;transition:opacity .35s ease 1.05s,transform .45s cubic-bezier(.34,1.56,.64,1) 1.05s;}
+.fx-line-dot.in{opacity:1;}
+.fx-line-dot-pulse{transform-origin:center;animation:fxDotPulse 2.4s ease-in-out infinite;}
+@keyframes fxDotPulse{0%,100%{opacity:.45;transform:scale(1);}50%{opacity:0;transform:scale(2.4);}}
+.fx-line-axis{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9.5px;color:rgba(228,234,255,.38);font-weight:700;letter-spacing:.4px;margin-top:6px;padding:0 2px;}
+.fx-line-stats{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px;}
+.fx-line-bignum{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:#edf2ff;letter-spacing:-.3px;}
+.fx-line-delta{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;}
+.fx-line-delta.up{background:rgba(61,184,124,.14);color:#5dd49a;}
+.fx-line-delta.down{background:rgba(208,88,120,.14);color:#e07a92;}
+.fx-line-delta.flat{background:rgba(228,234,255,.06);color:rgba(228,234,255,.6);}
+
+/* Donut chart */
+.fx-donut-row{display:flex;align-items:center;gap:18px;}
+.fx-donut-wrap{position:relative;width:128px;height:128px;flex-shrink:0;}
+.fx-donut-svg{width:128px;height:128px;display:block;transform:rotate(-90deg);filter:drop-shadow(0 4px 14px rgba(0,0,0,.35));}
+.fx-donut-bg-ring{fill:none;stroke:rgba(255,255,255,.05);stroke-width:13;}
+.fx-donut-seg{fill:none;stroke-width:13;stroke-linecap:butt;transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.56,.64,1);}
+.fx-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.fx-donut-total{font-family:'Space Mono',monospace;font-size:19px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.3px;}
+.fx-donut-total-lbl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(228,234,255,.45);margin-top:4px;}
+.fx-donut-legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
+.fx-legend-row{display:flex;align-items:center;gap:8px;font-size:12px;opacity:0;transform:translateX(6px);transition:opacity .4s ease,transform .4s ease;}
+.fx-legend-row.in{opacity:1;transform:translateX(0);}
+.fx-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.fx-legend-name{flex:1;color:rgba(228,234,255,.78);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fx-legend-val{font-family:'Space Mono',monospace;font-size:10.5px;color:#fff;font-weight:700;}
+.fx-legend-pct{font-family:'Space Mono',monospace;font-size:10px;color:rgba(228,234,255,.45);font-weight:700;margin-left:6px;}
+
+/* Goal progress */
+.fx-goal-list{display:flex;flex-direction:column;gap:14px;}
+.fx-goal-row{display:flex;flex-direction:column;gap:7px;}
+.fx-goal-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.fx-goal-name{font-size:12.5px;font-weight:700;color:#edf2ff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fx-goal-pct{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:rgba(228,234,255,.7);}
+.fx-goal-pct.complete{color:#5dd49a;}
+.fx-goal-track{height:8px;background:rgba(255,255,255,.045);border-radius:8px;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,.25);}
+.fx-goal-fill{height:100%;width:0;background:linear-gradient(90deg,#6188ff,#8b65f0);border-radius:8px;transition:width 1.2s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(97,136,255,.45);position:relative;overflow:hidden;}
+.fx-goal-fill::after{content:'';position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:fxShimmer 2.6s ease-in-out infinite;}
+.fx-goal-fill.complete{background:linear-gradient(90deg,#3db87c,#4aaac8);box-shadow:0 0 12px rgba(61,184,124,.55),0 0 22px rgba(61,184,124,.28);}
+.fx-goal-fill.near{background:linear-gradient(90deg,#c89030,#c06840);box-shadow:0 0 10px rgba(200,144,48,.45);}
+@keyframes fxShimmer{0%{transform:translateX(-150%);}100%{transform:translateX(350%);}}
+.fx-goal-amount{font-family:'Space Mono',monospace;font-size:10.5px;color:rgba(228,234,255,.55);font-weight:700;letter-spacing:.2px;}
+.fx-goal-amount b{color:#edf2ff;font-weight:700;}
+.fx-goal-milestone{display:flex;justify-content:space-between;font-size:8.5px;color:rgba(228,234,255,.32);font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.4px;margin-top:-2px;}
+.fx-goal-milestone span.hit{color:#5dd49a;text-shadow:0 0 6px rgba(93,212,154,.6);}
+
+/* Activity heatmap (GitHub-style) */
+.fx-heat-wrap{display:flex;flex-direction:column;gap:8px;}
+.fx-heat-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;}
+.fx-heat-col{display:grid;grid-template-rows:repeat(7,1fr);gap:4px;}
+.fx-heat-cell{aspect-ratio:1;background:rgba(255,255,255,.038);border-radius:3px;transform:scale(.5);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,box-shadow .3s ease;}
+.fx-heat-cell.in{transform:scale(1);opacity:1;}
+.fx-heat-cell.l1{background:rgba(97,136,255,.20);}
+.fx-heat-cell.l2{background:rgba(97,136,255,.42);}
+.fx-heat-cell.l3{background:rgba(97,136,255,.68);box-shadow:0 0 4px rgba(97,136,255,.4);}
+.fx-heat-cell.l4{background:linear-gradient(135deg,#6188ff,#8b65f0);box-shadow:0 0 6px rgba(139,101,240,.6),0 0 12px rgba(97,136,255,.3);}
+.fx-heat-cell.today{outline:1.5px solid rgba(255,255,255,.45);outline-offset:1px;}
+.fx-heat-legend{display:flex;align-items:center;justify-content:space-between;font-size:9.5px;color:rgba(228,234,255,.42);font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-top:6px;}
+.fx-heat-legend-scale{display:flex;align-items:center;gap:3px;}
+.fx-heat-legend-scale i{display:block;width:10px;height:10px;border-radius:2px;}
+.fx-heat-streak{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;background:rgba(255,180,90,.12);color:#ffba70;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.3px;}
+
+@media (prefers-reduced-motion: reduce){
+  .fx-line-path,.fx-line-area,.fx-line-dot,.fx-legend-row,.fx-heat-cell,.fx-goal-fill{transition:none !important;animation:none !important;}
+  .fx-line-dot-pulse,.fx-goal-fill::after{animation:none !important;}
+}
+
+/* ── PREMIUM RECIPES ENHANCEMENTS ────────────────────────── */
+/* Savings badge — green coin pill on cards & featured */
+#page-recetas.rx-page .rx-card-savings{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:8px;background:linear-gradient(140deg,rgba(74,222,180,.16),rgba(255,209,102,.10));color:#7afcc7;font-size:10.5px;font-weight:800;letter-spacing:.2px;border:1px solid rgba(74,222,180,.20);white-space:nowrap;}
+#page-recetas.rx-page .rx-featured-savings{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;background:linear-gradient(140deg,rgba(74,222,180,.20),rgba(255,209,102,.14));color:#a3f4d3;font-size:11.5px;font-weight:800;border:1px solid rgba(74,222,180,.28);box-shadow:0 4px 12px rgba(74,222,180,.18);}
+#page-recetas.rx-page .rx-card-meta{flex-wrap:wrap;row-gap:6px;}
+#page-recetas.rx-page .rx-card-body{gap:7px;}
+/* Card image fade-in */
+#page-recetas.rx-page .rx-card-img,#page-recetas.rx-page .rx-featured-img{opacity:0;transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .35s ease;}
+#page-recetas.rx-page .rx-card-img.loaded,#page-recetas.rx-page .rx-featured-img.loaded{opacity:1;}
+/* Small touch feedback for cards */
+#page-recetas.rx-page .rx-card{will-change:transform;}
+#page-recetas.rx-page .rx-card:active{transform:translateY(-1px) scale(.99);transition:transform .12s ease;}
+/* Premium empty state */
+#page-recetas.rx-page .rx-empty.cozy{padding:34px 22px 32px;background:linear-gradient(165deg,rgba(28,33,58,.78),rgba(14,17,36,.62));border:1px solid rgba(122,151,255,.12);border-radius:22px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+#page-recetas.rx-page .rx-empty.cozy .rx-empty-emoji{font-size:46px;margin-bottom:2px;display:block;filter:drop-shadow(0 6px 14px rgba(102,144,255,.22));animation:rxEmptyFloat 4s ease-in-out infinite;}
+#page-recetas.rx-page .rx-empty.cozy .rx-empty-title{font-size:15px;font-weight:800;color:#f4f7ff;letter-spacing:-.01em;}
+#page-recetas.rx-page .rx-empty.cozy .rx-empty-sub{font-size:12.5px;color:rgba(200,212,240,.62);font-weight:500;line-height:1.45;max-width:260px;text-align:center;}
+#page-recetas.rx-page .rx-empty.cozy .rx-empty-cta{margin-top:6px;display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:999px;background:linear-gradient(140deg,#6690ff,#8b68e8);color:#fff;font-size:12.5px;font-weight:700;border:0;cursor:pointer;font-family:inherit;box-shadow:0 8px 18px -6px rgba(102,144,255,.45);transition:transform .15s,filter .15s;}
+#page-recetas.rx-page .rx-empty.cozy .rx-empty-cta:active{transform:scale(.96);}
+@keyframes rxEmptyFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+/* Cost panel inside recipe detail sheet */
+.rx-cost-panel{margin:6px 0 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rx-cost-tile{position:relative;background:linear-gradient(160deg,rgba(28,33,58,.78),rgba(14,17,36,.62));border:1px solid rgba(122,151,255,.12);border-radius:16px;padding:12px 13px;overflow:hidden;}
+.rx-cost-tile::before{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;background:radial-gradient(circle,rgba(102,144,255,.10),transparent 70%);pointer-events:none;}
+.rx-cost-tile.savings::before{background:radial-gradient(circle,rgba(74,222,180,.14),transparent 70%);}
+.rx-cost-lbl{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(200,212,240,.55);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.rx-cost-val{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:#f4f7ff;letter-spacing:-.3px;}
+.rx-cost-tile.savings .rx-cost-val{color:#7afcc7;}
+.rx-cost-sub{font-size:10.5px;font-weight:600;color:rgba(200,212,240,.55);margin-top:2px;}
+
+/* Ingredient checklist — premium, smooth */
+.ing-list.rx-check{list-style:none;margin-top:2px;}
+.ing-list.rx-check li{display:flex;align-items:center;gap:11px;padding:11px 12px;margin-bottom:6px;border-radius:13px;background:linear-gradient(160deg,rgba(28,33,58,.55),rgba(14,17,36,.42));border:1px solid rgba(122,151,255,.07);cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:background .25s ease,border-color .25s ease,transform .12s ease,opacity .35s ease;}
+.ing-list.rx-check li:active{transform:scale(.985);}
+.ing-list.rx-check li.rx-checked{background:linear-gradient(160deg,rgba(74,222,180,.10),rgba(16,185,129,.04));border-color:rgba(74,222,180,.22);opacity:.7;}
+.ing-list.rx-check li.rx-checked .ing-amt,.ing-list.rx-check li.rx-checked .ing-name{text-decoration:line-through;text-decoration-thickness:1.2px;text-decoration-color:rgba(74,222,180,.55);color:rgba(200,212,240,.55);}
+.ing-list.rx-check .rx-tick{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(122,151,255,.30);background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;color:transparent;font-size:13px;font-weight:800;line-height:1;transition:background .25s ease,border-color .25s ease,color .25s ease,transform .25s cubic-bezier(.34,1.56,.64,1);}
+.ing-list.rx-check li.rx-checked .rx-tick{background:linear-gradient(140deg,#3db87c,#2a9060);border-color:rgba(74,222,180,.55);color:#fff;transform:scale(1.06);box-shadow:0 4px 12px rgba(74,222,180,.30);}
+.ing-list.rx-check .ing-amt{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:rgba(200,212,240,.6);min-width:64px;letter-spacing:.2px;}
+.ing-list.rx-check .ing-name{flex:1;font-size:13.5px;color:#edf2ff;font-weight:500;line-height:1.35;}
+.rx-check-progress{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:rgba(200,212,240,.55);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:6px 2px 10px;}
+.rx-check-progress b{font-family:'Space Mono',monospace;color:#a3f4d3;font-size:11.5px;}
+
+/* iOS-style sheet entrance for the recipe detail (works with existing .recipe-overlay) */
+@keyframes rxSheetIn{from{opacity:0;}to{opacity:1;}}
+
+@media (prefers-reduced-motion: reduce){
+  .rx-card-img,.rx-featured-img,.ing-list.rx-check li,.ing-list.rx-check .rx-tick,.rx-empty.cozy .rx-empty-emoji{transition:none !important;animation:none !important;}
+}
 </style>
 </head>
 <body>
@@ -8427,6 +8668,108 @@ input[type=number]{font-size:16px !important;}
     </div>
   </section>
 
+  <!-- 5b. PREMIUM ANALYTICS CHARTS -->
+  <section class="fx-analytics" id="fxAnalytics">
+    <div class="fx-section-title"><span>Análisis</span><span class="fx-chart-sub" id="fxAnalyticsRange">últimos 30 días</span></div>
+
+    <!-- Savings line chart -->
+    <div class="fx-chart-card" id="fxSavingsCard">
+      <div class="fx-chart-head">
+        <span class="fx-chart-title"><span class="fx-chart-title-glyph">📈</span>Ahorro acumulado</span>
+        <span class="fx-chart-sub" id="fxSavingsRange">30 días</span>
+      </div>
+      <div class="fx-line-stats">
+        <span class="fx-line-bignum" id="fxSavingsTotal">$0</span>
+        <span class="fx-line-delta flat" id="fxSavingsDelta"><span>→</span><span>—</span></span>
+      </div>
+      <div class="fx-line-wrap">
+        <svg class="fx-line" id="fxSavingsLine" viewBox="0 0 320 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="fxLineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6188ff"/>
+              <stop offset="50%" stop-color="#8b65f0"/>
+              <stop offset="100%" stop-color="#5dd49a"/>
+            </linearGradient>
+            <linearGradient id="fxLineArea" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#6188ff" stop-opacity=".42"/>
+              <stop offset="100%" stop-color="#6188ff" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="fxLineGlow" x="-10%" y="-30%" width="120%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <line class="fx-line-grid" x1="0" y1="35"  x2="320" y2="35"/>
+          <line class="fx-line-grid" x1="0" y1="70"  x2="320" y2="70"/>
+          <line class="fx-line-grid" x1="0" y1="105" x2="320" y2="105"/>
+          <path class="fx-line-area" id="fxSavingsArea" d=""/>
+          <path class="fx-line-path" id="fxSavingsPath" stroke="url(#fxLineStroke)" filter="url(#fxLineGlow)" d=""/>
+          <g class="fx-line-dot" id="fxSavingsDot">
+            <circle class="fx-line-dot-pulse" cx="0" cy="0" r="6" fill="#8b65f0" opacity=".5"/>
+            <circle cx="0" cy="0" r="3.6" fill="#fff"/>
+            <circle cx="0" cy="0" r="2.2" fill="#8b65f0"/>
+          </g>
+        </svg>
+      </div>
+      <div class="fx-line-axis" id="fxSavingsAxis"><span>—</span><span>—</span><span>hoy</span></div>
+    </div>
+
+    <!-- Spending donut chart -->
+    <div class="fx-chart-card" id="fxSpendingCard">
+      <div class="fx-chart-head">
+        <span class="fx-chart-title"><span class="fx-chart-title-glyph">🏷</span>Gastos por categoría</span>
+        <span class="fx-chart-sub" id="fxSpendingTotal">$0</span>
+      </div>
+      <div class="fx-donut-row">
+        <div class="fx-donut-wrap">
+          <svg class="fx-donut-svg" id="fxSpendingDonut" viewBox="0 0 100 100">
+            <circle class="fx-donut-bg-ring" cx="50" cy="50" r="42"/>
+            <g id="fxSpendingSegs"></g>
+          </svg>
+          <div class="fx-donut-center">
+            <span class="fx-donut-total" id="fxDonutCenter">$0</span>
+            <span class="fx-donut-total-lbl">gastado</span>
+          </div>
+        </div>
+        <div class="fx-donut-legend" id="fxSpendingLegend"></div>
+      </div>
+    </div>
+
+    <!-- Goal progress -->
+    <div class="fx-chart-card" id="fxGoalsCard">
+      <div class="fx-chart-head">
+        <span class="fx-chart-title"><span class="fx-chart-title-glyph">🎯</span>Progreso de metas</span>
+        <span class="fx-chart-sub" id="fxGoalsCount">—</span>
+      </div>
+      <div class="fx-goal-list" id="fxGoalList">
+        <div class="fx-chart-empty">Crea una meta para ver tu progreso aquí.</div>
+      </div>
+    </div>
+
+    <!-- Activity heatmap -->
+    <div class="fx-chart-card" id="fxHeatCard">
+      <div class="fx-chart-head">
+        <span class="fx-chart-title"><span class="fx-chart-title-glyph">🔥</span>Constancia de ahorro</span>
+        <span class="fx-heat-streak" id="fxHeatStreak">0 días</span>
+      </div>
+      <div class="fx-heat-wrap">
+        <div class="fx-heat-grid" id="fxHeatGrid"></div>
+        <div class="fx-heat-legend">
+          <span id="fxHeatActiveLbl">— días activos</span>
+          <span class="fx-heat-legend-scale">
+            <span>Menos</span>
+            <i style="background:rgba(255,255,255,.04);"></i>
+            <i style="background:rgba(97,136,255,.20);"></i>
+            <i style="background:rgba(97,136,255,.42);"></i>
+            <i style="background:rgba(97,136,255,.68);"></i>
+            <i style="background:linear-gradient(135deg,#6188ff,#8b65f0);"></i>
+            <span>Más</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 6. METAS DE AHORRO -->
   <section class="mx-metas-section" id="mxMetasSection">
     <div class="mx-header">
@@ -8583,13 +8926,22 @@ input[type=number]{font-size:16px !important;}
       <span class="rx-pill-ic">✨</span><span>Todo</span>
     </button>
     <button class="rx-pill" data-filter="cheap" onclick="setRecipeFilter('cheap')" type="button">
-      <span class="rx-pill-ic">💵</span><span>Económico</span>
+      <span class="rx-pill-ic">💵</span><span>Baratas</span>
+    </button>
+    <button class="rx-pill" data-filter="budget" onclick="setRecipeFilter('budget')" type="button">
+      <span class="rx-pill-ic">🪙</span><span>Presupuesto</span>
     </button>
     <button class="rx-pill" data-filter="quick" onclick="setRecipeFilter('quick')" type="button">
-      <span class="rx-pill-ic">⚡</span><span>Rápido</span>
+      <span class="rx-pill-ic">⚡</span><span>Rápidas</span>
     </button>
-    <button class="rx-pill" data-filter="healthy" onclick="setRecipeFilter('healthy')" type="button">
-      <span class="rx-pill-ic">🥗</span><span>Saludable</span>
+    <button class="rx-pill" data-filter="mealprep" onclick="setRecipeFilter('mealprep')" type="button">
+      <span class="rx-pill-ic">🍱</span><span>Meal prep</span>
+    </button>
+    <button class="rx-pill" data-filter="gaming" onclick="setRecipeFilter('gaming')" type="button">
+      <span class="rx-pill-ic">🎮</span><span>Gaming night</span>
+    </button>
+    <button class="rx-pill" data-filter="cozy" onclick="setRecipeFilter('cozy')" type="button">
+      <span class="rx-pill-ic">🛋️</span><span>Cozy</span>
     </button>
     <button class="rx-pill" data-filter="fav" onclick="setRecipeFilter('fav')" type="button">
       <span class="rx-pill-ic">★</span><span>Favoritos</span>
@@ -9387,15 +9739,76 @@ function toShopPrice(v){
   var n=parseFloat(v);
   return (isFinite(n)&&n>=0)?Math.round(n*100)/100:0;
 }
+var PRICE_HISTORY_SK='alcancia_price_history';
+function loadPriceHistory(){
+  try{var r=localStorage.getItem(PRICE_HISTORY_SK);if(r)return JSON.parse(r);}catch(e){}
+  return [];
+}
+function savePriceHistory(list){
+  try{localStorage.setItem(PRICE_HISTORY_SK,JSON.stringify((list||[]).slice(0,300)));}catch(e){}
+}
+function normPriceName(name){
+  return String(name||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function recordPriceHistory(name,price,dateKey){
+  price=toShopPrice(price);
+  name=String(name||'').trim();
+  if(!name||price<=0) return;
+  var list=loadPriceHistory();
+  var today=dateKey||TODAY;
+  list.unshift({nombreItem:name,precio:price,fecha:today});
+  savePriceHistory(list);
+}
+function getLastPriceHistory(name){
+  var key=normPriceName(name);
+  if(!key) return null;
+  var list=loadPriceHistory();
+  var best=null,bestTime=-1;
+  for(var i=0;i<list.length;i++){
+    var it=list[i]||{};
+    var itemKey=normPriceName(it.nombreItem);
+    if(itemKey!==key&&itemKey.indexOf(key)!==0&&itemKey.indexOf(key)<0) continue;
+    var t=new Date(it.fecha||0).getTime();
+    if(!isFinite(t)) t=0;
+    if(t>=bestTime){best=it;bestTime=t;}
+  }
+  return best;
+}
+function daysAgoFromDate(dateKey){
+  var d=new Date(dateKey);
+  if(!isFinite(d.getTime())) return 0;
+  var now=new Date(); now.setHours(0,0,0,0);
+  d.setHours(0,0,0,0);
+  return Math.max(0,Math.round((now-d)/86400000));
+}
+function getFrequentPriceSuggestions(){
+  var current={};
+  shopList.forEach(function(item){current[normPriceName(item.name)]=true;});
+  var map={};
+  loadPriceHistory().forEach(function(it){
+    var key=normPriceName(it&&it.nombreItem);
+    if(!key||current[key]) return;
+    if(!map[key]) map[key]={name:it.nombreItem,count:0,lastPrice:toShopPrice(it.precio),lastDate:it.fecha,lastTime:0};
+    map[key].count++;
+    var t=new Date(it.fecha||0).getTime();
+    if(t>map[key].lastTime){map[key].lastTime=t;map[key].lastPrice=toShopPrice(it.precio);map[key].lastDate=it.fecha;}
+  });
+  return Object.keys(map).map(function(k){return map[k];})
+    .filter(function(x){return x.count>=2;})
+    .sort(function(a,b){return b.count-a.count||b.lastTime-a.lastTime;})
+    .slice(0,6);
+}
 function getShopStatus(item){
   if(item&&item.status==='bought') return 'bought';
   if(item&&item.checked===true) return 'bought';
   return 'pending';
 }
 function setShopStatus(item,status){
+  var was=getShopStatus(item);
   var next=status==='bought'?'bought':'pending';
   item.status=next;
   item.checked=next==='bought';
+  if(was!=='bought'&&next==='bought') recordPriceHistory(item.name,item.estPrice,TODAY);
 }
 function initShopCategoryInput(){
   var sel=$('shopCategoryInput');
@@ -10565,29 +10978,54 @@ function closeAchievementPopup(){$('achievementOverlay').classList.remove('show'
 
 // ── TABS ───────────────────────────────────────────────────────────
 var _activeTab='hoy';
+var _TAB_ORDER=['hoy','actividad','logros','calendario','recetas','compras','escanear','insights','presupuesto','consejos','ai'];
+var _tabBusy=false;
 function switchTab(id){
-  if(id===_activeTab) return;
+  if(id===_activeTab||_tabBusy) return;
+  var fromIdx=_TAB_ORDER.indexOf(_activeTab),toIdx=_TAB_ORDER.indexOf(id);
+  // dir: 1 = going right (slide left), -1 = going left (slide right)
+  var dir=(toIdx<0||toIdx>=fromIdx)?1:-1;
+  var leaving=document.querySelector('.page.active');
+  var entering=document.getElementById('page-'+id);
+  if(!entering) return;
+  _tabBusy=true;
   _activeTab=id;
-  // Highlight top-nav tab matching this id; secondary pages (insights, presupuesto, etc.)
-  // have no top tab — leaving them all inactive is intentional.
+  // Update top-tab highlights
   document.querySelectorAll('.tabs .tab').forEach(function(t){
-    t.classList.toggle('active', t.getAttribute('data-tab')===id);
+    t.classList.toggle('active',t.getAttribute('data-tab')===id);
   });
-  // Show only the matching page; hide all others (CSS .page{display:none} + .page.active{display:block}).
-  document.querySelectorAll('.page').forEach(function(p){
-    var on=p.id==='page-'+id;
-    if(on){p.style.animation='none';void p.offsetWidth;p.style.animation='';}
-    p.classList.toggle('active',on);
-  });
-  if(id==='insights') renderInsights();
-  if(id==='calendario') renderCalendar();
-  if(id==='presupuesto') renderBudgetPage();
-  if(id==='consejos') renderConsejos();
-  if(id==='ai') aiInit();
-  if(navigator.vibrate) navigator.vibrate(12);
-  // Scroll the page-stack to the top when switching, so we don't land mid-scroll.
-  var stack=document.querySelector('.page-stack');
-  if(stack) stack.scrollTop=0;
+  var leaveDirCls=dir>0?'dir-l':'dir-r';
+  var enterDirCls=dir>0?'dir-r':'dir-l';
+  // Animate leaving page out (absolute so it doesn't affect layout)
+  if(leaving&&leaving!==entering){
+    leaving.classList.add('page-_leaving',leaveDirCls);
+  }
+  // Show and animate entering page
+  entering.style.display='block';
+  entering.style.pointerEvents='none';
+  void entering.offsetWidth; // force reflow so animation starts from keyframe 0
+  entering.classList.add('page-_entering',enterDirCls);
+  var DURATION=300;
+  setTimeout(function(){
+    // Finalize leaving page
+    if(leaving&&leaving!==entering){
+      leaving.classList.remove('active','page-_leaving',leaveDirCls);
+    }
+    // Finalize entering page
+    entering.classList.remove('page-_entering',enterDirCls);
+    entering.classList.add('active');
+    entering.style.display='';
+    entering.style.pointerEvents='';
+    _tabBusy=false;
+    if(id==='insights') renderInsights();
+    if(id==='calendario') renderCalendar();
+    if(id==='presupuesto') renderBudgetPage();
+    if(id==='consejos') renderConsejos();
+    if(id==='ai') aiInit();
+    if(navigator.vibrate) navigator.vibrate(12);
+    var stack=document.querySelector('.page-stack');
+    if(stack) stack.scrollTop=0;
+  },DURATION);
 }
 
 // ── CALENDARIO ────────────────────────────────────────────────────
@@ -11193,6 +11631,29 @@ function _shopCloseSugg(){
   var drop=$('shopSuggest');
   if(drop){drop.classList.remove('open');}
 }
+function _shopPriceHintEl(){
+  var wrap=document.querySelector('#page-compras .shop-suggest-wrap');
+  if(!wrap) return null;
+  var el=$('shopPriceHint');
+  if(!el){
+    el=document.createElement('div');
+    el.id='shopPriceHint';
+    el.className='shop-price-hint';
+    wrap.appendChild(el);
+  }
+  return el;
+}
+function _shopUpdatePriceHint(q){
+  var el=_shopPriceHintEl();
+  if(!el) return;
+  q=String(q||'').trim();
+  if(q.length<2){el.classList.remove('show');el.textContent='';return;}
+  var last=getLastPriceHistory(q);
+  if(!last){el.classList.remove('show');el.textContent='';return;}
+  var days=daysAgoFromDate(last.fecha);
+  el.textContent='Ultima vez: $'+toShopPrice(last.precio).toFixed(2)+' — hace '+days+' dia'+(days!==1?'s':'');
+  el.classList.add('show');
+}
 /* Close on outside click only — no scroll listener (it fires on keystroke scroll) */
 document.addEventListener('click',function(e){
   var drop=$('shopSuggest');
@@ -11205,6 +11666,7 @@ document.addEventListener('click',function(e){
 _shopOnInput=function(){
   var inp=$('shopInput');
   var q=(inp?inp.value||'':'').trim();
+  _shopUpdatePriceHint(q);
   if(!q||q.length<2){_shopCloseSugg();return;}
   var local=_shopLocalSuggestions(q);
   _shopRenderSugg(local,local.length?'Traduciendo para buscar mas productos...':'Traduciendo busqueda...');
@@ -11298,6 +11760,7 @@ function addShopItem(){
   saveShopList();
   inp.value=''; if(qInp) qInp.value=''; if(pInp) pInp.value='';
   _shopSelectedImage='';
+  _shopUpdatePriceHint('');
   inp.focus();
   renderShopList();
   showToast('🛒 '+name+' agregado');
@@ -11695,6 +12158,39 @@ function renderShopSpentHistory(){
     }).join('')
     +'</div>';
 }
+function addSuggestedShopItem(name,price){
+  name=String(name||'').trim();
+  if(!name) return;
+  shopList.push(normalizeShopItem({
+    name:name,
+    qty:'1',
+    category:inferShopCategory(name),
+    estPrice:toShopPrice(price),
+    status:'pending'
+  },Date.now()+Math.random()));
+  saveShopList();
+  renderShopList();
+  showToast('Agregado: '+name);
+}
+function renderShopSuggestions(){
+  var suggested=getFrequentPriceSuggestions();
+  if(!suggested.length) return '';
+  return '<div class="shop-section shop-suggested-section">'
+    +'<div class="shop-section-hdr pending">Sugeridos <span>'+suggested.length+'</span></div>'
+    +'<div class="shop-suggested-list">'
+    +suggested.map(function(it){
+      var ago=daysAgoFromDate(it.lastDate);
+      return '<button class="shop-suggested-card" onclick="addSuggestedShopItem(\''+_shopSuggJs(it.name)+'\','+toShopPrice(it.lastPrice)+')" type="button">'
+        +'<span class="shop-suggested-icon">'+getShopCategoryEmoji(inferShopCategory(it.name))+'</span>'
+        +'<span class="shop-suggested-main">'
+          +'<span class="shop-suggested-name">'+escapeHtml(it.name)+'</span>'
+          +'<span class="shop-suggested-meta">'+it.count+' veces · $'+toShopPrice(it.lastPrice).toFixed(2)+' · hace '+ago+' dia'+(ago!==1?'s':'')+'</span>'
+        +'</span>'
+        +'<span class="shop-suggested-add">+</span>'
+      +'</button>';
+    }).join('')
+    +'</div></div>';
+}
 function renderShopList(){
   var el=$('shopList'),ctr=$('shopCounter'),clr=$('shopClearBtn');
   if(!el) return;
@@ -11774,6 +12270,16 @@ function renderShopList(){
 }
 
 // ── RECIPES DATA ───────────────────────────────────────────────────
+var _renderShopListBase=renderShopList;
+renderShopList=function(){
+  _renderShopListBase();
+  var el=$('shopList');
+  if(!el||shopFilter!=='all') return;
+  var suggestions=renderShopSuggestions();
+  if(!suggestions) return;
+  el.insertAdjacentHTML(shopList.length?'afterbegin':'beforeend',suggestions);
+};
+
 var RECIPES=[
   {emoji:'🍚',name:'Arroz Blanco Perfecto',cat:'Acompañante',time:'25 min',diff:'Fácil',color:'#ffd60a',yt:'rJENStNAMhw',
    desc:'El arroz básico de toda cocina latina. Suelto, sabroso y siempre a punto.',
@@ -11819,22 +12325,123 @@ var RECIPES=[
 
 // ── RENDER RECIPES ─────────────────────────────────────────────────
 // ── RECIPE HELPERS (modern card UI) ────────────────────────────────
+RECIPES=RECIPES.concat([
+  {emoji:'🫓',name:'Baleadas Hondureñas',cat:'Plato fuerte',time:'35 min',diff:'Fácil',color:'#f6c65b',
+   desc:'Tortilla de harina suave con frijoles, queso y mantequilla crema.',
+   ingredients:[{a:'3 tazas',n:'harina de trigo'},{a:'1 taza',n:'agua tibia'},{a:'2 cdas',n:'aceite'},{a:'1 cdita',n:'sal'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso rallado'},{a:'1/2 taza',n:'mantequilla crema'}],
+   steps:['Mezcla harina, sal, aceite y agua hasta formar masa suave.','Reposa 20 minutos y divide en bolitas.','Estira tortillas y cocina en comal caliente.','Unta frijoles, agrega queso y mantequilla.','Dobla y sirve caliente.'],
+   tip:'Agrega huevo, aguacate o chorizo para hacerla especial.'},
+  {emoji:'🍲',name:'Sopa de Res Hondureña',cat:'Sopa',time:'95 min',diff:'Media',color:'#60c090',
+   desc:'Caldo completo con carne de res, yuca, elote, repollo, platano y verduras.',
+   ingredients:[{a:'1 kg',n:'costilla o carne de res'},{a:'2',n:'elotes en trozos'},{a:'1',n:'yuca pelada'},{a:'2',n:'zanahorias'},{a:'2',n:'papas'},{a:'1/2',n:'repollo'},{a:'1',n:'platano verde'},{a:'al gusto',n:'cilantro, ajo, sal y comino'}],
+   steps:['Hierve la carne con ajo, sal y comino hasta suavizar.','Agrega elote y yuca, cocina 20 minutos.','Anade papa, zanahoria y platano.','Agrega repollo al final.','Termina con cilantro y sirve con arroz o tortillas.'],
+   tip:'Retira espuma del caldo al inicio para que quede limpio.'},
+  {emoji:'🍗',name:'Tajadas con Pollo',cat:'Plato fuerte',time:'60 min',diff:'Media',color:'#ef9a43',
+   desc:'Pollo servido sobre tajadas de platano verde con repollo, salsa y queso.',
+   ingredients:[{a:'3',n:'platanos verdes'},{a:'1 kg',n:'pollo en piezas'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'salsa de tomate casera'},{a:'1/2 taza',n:'queso rallado'},{a:'suficiente',n:'aceite para freir'}],
+   steps:['Sazona y cocina el pollo hasta dorar o guisar.','Corta platanos en tajadas largas y frie.','Prepara repollo con limon y sal.','Sirve tajadas, pollo, repollo, salsa y queso encima.'],
+   tip:'Las tajadas quedan mejor cortadas delgadas.'},
+  {emoji:'🫘',name:'Catrachas',cat:'Aperitivo',time:'20 min',diff:'Fácil',color:'#d99b52',
+   desc:'Tortillas fritas con frijoles molidos y queso rallado.',
+   ingredients:[{a:'8',n:'tortillas de maiz'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso seco rallado'},{a:'suficiente',n:'aceite'}],
+   steps:['Frie las tortillas hasta dorar.','Calienta los frijoles hasta que esten cremosos.','Unta frijoles sobre cada tortilla.','Termina con queso rallado encima.'],
+   tip:'Sirve de inmediato para que la tortilla siga crujiente.'},
+  {emoji:'🫓',name:'Pupusas Revueltas',cat:'Plato fuerte',time:'55 min',diff:'Media',color:'#f1b653',
+   desc:'Masa de maiz rellena de queso, frijol y chicharron.',
+   ingredients:[{a:'3 tazas',n:'masa harina'},{a:'2 1/2 tazas',n:'agua tibia'},{a:'1 taza',n:'quesillo o mozzarella'},{a:'1 taza',n:'frijoles molidos'},{a:'1 taza',n:'chicharron molido'},{a:'al gusto',n:'sal'}],
+   steps:['Mezcla masa con agua y sal.','Forma bolitas y rellena con queso, frijol y chicharron.','Cierra y aplana con cuidado.','Cocina en comal 4 a 5 minutos por lado.','Sirve con curtido y salsa roja.'],
+   tip:'Moja tus manos con agua y aceite para formar pupusas sin romperlas.'},
+  {emoji:'🫔',name:'Tamales Centroamericanos',cat:'Plato fuerte',time:'150 min',diff:'Difícil',color:'#6fc37c',
+   desc:'Tamales de masa suave con carne, arroz, vegetales y recado en hoja.',
+   ingredients:[{a:'4 tazas',n:'masa de maiz'},{a:'3 tazas',n:'caldo'},{a:'1 taza',n:'manteca o aceite'},{a:'2 tazas',n:'pollo o cerdo cocido'},{a:'1 taza',n:'arroz cocido'},{a:'1 taza',n:'recado o salsa'},{a:'varias',n:'hojas de platano'}],
+   steps:['Prepara masa con caldo y grasa hasta cremosa.','Sofrie el recado y mezcla con la carne.','Pasa hojas por calor para suavizarlas.','Coloca masa, carne, arroz y vegetales.','Envuelve y cocina al vapor 1.5 a 2 horas.'],
+   tip:'La masa debe quedar suave, no seca, antes de envolver.'},
+  {emoji:'🍚',name:'Arroz con Leche',cat:'Postre',time:'45 min',diff:'Fácil',color:'#e8d8a8',
+   desc:'Postre cremoso de arroz, leche, canela y vainilla.',
+   ingredients:[{a:'1 taza',n:'arroz'},{a:'4 tazas',n:'leche'},{a:'1 taza',n:'agua'},{a:'1 raja',n:'canela'},{a:'1/2 taza',n:'azucar'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Cocina arroz con agua y canela hasta suavizar.','Agrega leche y cocina moviendo seguido.','Anade azucar y vainilla.','Cocina hasta cremoso.','Sirve tibio o frio con canela.'],
+   tip:'Mover seguido evita que la leche se pegue al fondo.'},
+  {emoji:'🥤',name:'Horchata Centroamericana',cat:'Bebida',time:'25 min',diff:'Fácil',color:'#d8c08a',
+   desc:'Bebida fresca de arroz, canela, vainilla y leche.',
+   ingredients:[{a:'1 taza',n:'arroz remojado'},{a:'1 raja',n:'canela'},{a:'4 tazas',n:'agua'},{a:'1 taza',n:'leche'},{a:'al gusto',n:'azucar'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Remoja arroz con canela varias horas.','Licua con agua hasta fino.','Cuela bien.','Mezcla con leche, azucar y vainilla.','Sirve con hielo.'],
+   tip:'Tuesta ligeramente el arroz antes de remojar para sabor mas profundo.'},
+  {emoji:'🍅',name:'Chimol Hondureño',cat:'Acompañante',time:'12 min',diff:'Muy fácil',color:'#43c78f',
+   desc:'Pico fresco de tomate, cebolla, chile dulce, cilantro y limon.',
+   ingredients:[{a:'3',n:'tomates picados'},{a:'1/2',n:'cebolla picada'},{a:'1',n:'chile dulce picado'},{a:'1 manojo',n:'cilantro'},{a:'2',n:'limones'},{a:'al gusto',n:'sal'}],
+   steps:['Pica todo en cubitos pequenos.','Mezcla tomate, cebolla, chile y cilantro.','Agrega limon y sal.','Reposa 5 minutos antes de servir.'],
+   tip:'Perfecto para carne asada, tajadas, tacos o catrachas.'},
+  {emoji:'🌮',name:'Enchiladas Hondureñas',cat:'Plato fuerte',time:'50 min',diff:'Media',color:'#e85d75',
+   desc:'Tostadas de maiz con carne molida, repollo, salsa, huevo, queso y vegetales.',
+   ingredients:[{a:'8',n:'tortillas de maiz'},{a:'500 g',n:'carne molida'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'salsa de tomate'},{a:'2',n:'huevos cocidos'},{a:'1 taza',n:'queso rallado'},{a:'1',n:'papa en cubitos'}],
+   steps:['Frie las tortillas hasta tostadas.','Cocina carne con papa, ajo, cebolla y especias.','Prepara repollo con limon y sal.','Arma con tortilla, carne, repollo, salsa, huevo y queso.'],
+   tip:'Arma justo antes de comer para que la tostada no se ablande.'}
+]);
+
 var rxFilter='all';
 function rxRecipeMinutes(r){var n=parseInt(r.time,10);return isNaN(n)?60:n;}
-function rxRecipeCost(r){
+function rxRecipeCostNum(r){
+  // Returns mid-point USD numeric estimate of recipe cost to cook at home.
   var min=rxRecipeMinutes(r);
-  if(r.cat==='Aperitivo'||r.cat==='Acompañante') return '$2-3';
-  if(min<25) return '$3-4';
-  if(min<50) return '$5-7';
-  return '$8-10';
+  if(r.cat==='Bebida') return 3;
+  if(r.cat==='Postre') return 4;
+  if(r.cat==='Aperitivo') return 3;
+  if(r.cat==='Acompañante') return 3;
+  if(r.cat==='Sopa') return 7;
+  if(min<25) return 4;
+  if(min<50) return 6;
+  if(min<80) return 9;
+  return 12;
+}
+function rxRecipeCost(r){
+  var n=rxRecipeCostNum(r);
+  // Render as a clean range like "$3–4"
+  var lo=Math.max(1,Math.round(n*0.85));
+  var hi=Math.round(n*1.20);
+  if(hi-lo<1) hi=lo+1;
+  return '$'+lo+'–'+hi;
+}
+function rxRecipeTakeoutNum(r){
+  // Rough takeout / delivery price for the same dish.
+  var c=r.cat||'';
+  if(c==='Bebida') return 6;
+  if(c==='Postre') return 9;
+  if(c==='Aperitivo') return 9;
+  if(c==='Acompañante') return 6;
+  if(c==='Sopa') return 13;
+  if(c==='Plato fuerte') return 17;
+  return 12;
+}
+function rxRecipeSavingsNum(r){
+  return Math.max(0, rxRecipeTakeoutNum(r)-rxRecipeCostNum(r));
+}
+function rxRecipeSavingsLbl(r){
+  var s=rxRecipeSavingsNum(r);
+  if(s<=2) return '';
+  return '💸 Ahorra ~$'+s;
 }
 function rxRecipeTags(r){
   var tags=[],min=rxRecipeMinutes(r);
+  var costN=rxRecipeCostNum(r);
+  var c=r.cat||'';
+  var nameDesc=(r.name+' '+(r.desc||'')).toLowerCase();
+  // Quick: 30 min or less
   if(min<=30) tags.push('quick');
-  if(r.cat==='Acompañante'||r.cat==='Aperitivo') tags.push('cheap');
-  if(rxRecipeMinutes(r)<=30 && (r.cat==='Acompañante'||r.cat==='Aperitivo')) tags.push('cheap');
-  if(r.cat==='Sopa') tags.push('healthy');
-  if(/frijol|verdura|sopa|pollo|maduro/i.test(r.name+' '+r.desc)) tags.push('healthy');
+  // Cheap: very low cost
+  if(costN<=4) tags.push('cheap');
+  // Budget: under $7 — workable for tight budgets
+  if(costN<=7) tags.push('budget');
+  // Meal prep: scales well, longer cooks of mains/soups
+  if((c==='Plato fuerte'||c==='Sopa') && min>=40) tags.push('mealprep');
+  if(/frijol|arroz|guisado|sopa|tamal|picadillo|pollo/.test(nameDesc) && min>=35) tags.push('mealprep');
+  // Gaming night snacks: finger foods, aperitivos, tostadas
+  if(c==='Aperitivo') tags.push('gaming');
+  if(/toston|catracha|baleada|chimol|tajada|enchilada|pupusa/.test(nameDesc)) tags.push('gaming');
+  // Cozy: comfort food — soups, stews, sweet drinks, desserts
+  if(c==='Sopa'||c==='Postre'||c==='Bebida') tags.push('cozy');
+  if(/guisado|arroz con leche|horchata|sopa|frijol/.test(nameDesc)) tags.push('cozy');
+  // Legacy "healthy" still maps to soups & beans for any callers
+  if(c==='Sopa'||/frijol|verdura|maduro/.test(nameDesc)) tags.push('healthy');
   // dedupe
   var out=[],seen={};
   for(var k=0;k<tags.length;k++){if(!seen[tags[k]]){seen[tags[k]]=1;out.push(tags[k]);}}
@@ -11914,6 +12521,7 @@ function rxClearImgCache(){
 function mdbSearch(){
   var q=(document.getElementById('mdbInput').value||'').trim();
   if(!q) return;
+  window._mdbLastLocalQuery=q;
   var statusEl=document.getElementById('mdbStatus');
   var wrapEl=document.getElementById('mdbResultsWrap');
   var gridEl=document.getElementById('mdbGrid');
@@ -11969,6 +12577,49 @@ function _mdbTranslate(text,cb){
   xhr.send();
 }
 
+function _mdbNormText(s){
+  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function _mdbLocalMatches(q){
+  var needle=_mdbNormText(q);
+  if(!needle) return [];
+  var out=[];
+  for(var i=0;i<RECIPES.length;i++){
+    var r=RECIPES[i];
+    var ing='';
+    if(r.ingredients){
+      for(var j=0;j<r.ingredients.length;j++) ing+=' '+(r.ingredients[j].n||'')+' '+(r.ingredients[j].a||'');
+    }
+    var hay=_mdbNormText((r.name||'')+' '+(r.cat||'')+' '+(r.desc||'')+' '+ing);
+    if(hay.indexOf(needle)>=0) out.push(i);
+  }
+  return out.slice(0,8);
+}
+function _mdbRenderLocalResults(q,statusEl,wrapEl,gridEl){
+  var matches=_mdbLocalMatches(q);
+  statusEl.textContent='';
+  if(!matches.length){
+    gridEl.innerHTML='<div class="mdb-empty">No encontramos esa receta 😕</div>';
+    document.getElementById('mdbResultsLabel').textContent='Sin resultados';
+    wrapEl.style.display='block';
+    return;
+  }
+  document.getElementById('mdbResultsLabel').textContent='Recetas locales ('+matches.length+')';
+  var html='';
+  for(var i=0;i<matches.length;i++){
+    var idx=matches[i],r=RECIPES[idx],img=rxRecipeImage(r);
+    html+='<div class="mdb-card" onclick="openRecipe('+idx+')">'
+      +'<img class="mdb-card-img" src="'+img+'" alt="'+_mdbEsc(r.name)+'" loading="lazy" data-rx-idx="'+idx+'">'
+      +'<div class="mdb-card-body">'
+      +'<div class="mdb-card-name">'+_mdbEsc(r.name)+'</div>'
+      +'<div class="mdb-card-cat">'+_mdbEsc(r.cat||'Local')+'</div>'
+      +'</div>'
+      +'</div>';
+  }
+  gridEl.innerHTML=html;
+  wrapEl.style.display='block';
+}
+
 /* ---- MealDB fetch & render ---- */
 function _mdbFetch(q,statusEl,wrapEl,gridEl){
   var xhr=new XMLHttpRequest();
@@ -11986,9 +12637,7 @@ function _mdbFetch(q,statusEl,wrapEl,gridEl){
     try{data=JSON.parse(xhr.responseText);}catch(e){data={};}
     var meals=data.meals||null;
     if(!meals||meals.length===0){
-      gridEl.innerHTML='<div class="mdb-empty">No encontramos esa receta 😕</div>';
-      document.getElementById('mdbResultsLabel').textContent='Sin resultados';
-      wrapEl.style.display='block';
+      _mdbRenderLocalResults(window._mdbLastLocalQuery||q,statusEl,wrapEl,gridEl);
       return;
     }
     document.getElementById('mdbResultsLabel').textContent='Resultados ('+meals.length+')';
@@ -12090,9 +12739,10 @@ function renderRecipeCard(i,delay){
   var isFav=favorites.indexOf(i)>=0;
   var diffCls=/muy f|f[áa]cil/i.test(r.diff)?'easy':(/media|medio/i.test(r.diff)?'medium':'easy');
   var img=rxRecipeImage(r);
+  var savingsLbl=rxRecipeSavingsLbl(r);
   return '<div class="rx-card" style="animation-delay:'+(delay||0)+'ms" onclick="openRecipe('+i+')">'
     +'<div class="rx-card-imgwrap">'
-    +'<img class="rx-card-img" src="'+img+'" alt="'+r.name+'" loading="lazy" data-rx-idx="'+i+'">'
+    +'<img class="rx-card-img" src="'+img+'" alt="'+r.name+'" loading="lazy" data-rx-idx="'+i+'" onload="this.classList.add(\'loaded\')">'
     +'<button class="rx-card-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFavorite('+i+')" title="Favorito" type="button">'+(isFav?'★':'☆')+'</button>'
     +'<span class="rx-card-diff '+diffCls+'">'+r.diff+'</span>'
     +'</div>'
@@ -12102,6 +12752,7 @@ function renderRecipeCard(i,delay){
     +'<div class="rx-card-meta">'
     +'<span class="rx-card-cost">'+rxRecipeCost(r)+'</span>'
     +'<span class="rx-card-time">⏱ '+r.time+'</span>'
+    +(savingsLbl?'<span class="rx-card-savings">'+savingsLbl+'</span>':'')
     +'</div>'
     +'<div class="rx-card-foot">'
     +'<button class="rx-card-cta cook" onclick="event.stopPropagation();openRecipe('+i+')" type="button">Cocinar</button>'
@@ -12113,11 +12764,14 @@ function renderRecipeCard(i,delay){
 }
 function rxRenderFeatured(i){
   var r=RECIPES[i];if(!r) return '';
+  var isFav=favorites.indexOf(i)>=0;
   var img=rxRecipeImage(r);
+  var savingsLbl=rxRecipeSavingsLbl(r);
   return '<div class="rx-featured" onclick="openRecipe('+i+')">'
     +'<div class="rx-featured-imgwrap">'
-    +'<img class="rx-featured-img" src="'+img+'" alt="'+r.name+'" data-rx-idx="'+i+'">'
+    +'<img class="rx-featured-img" src="'+img+'" alt="'+r.name+'" data-rx-idx="'+i+'" onload="this.classList.add(\'loaded\')">'
     +'<span class="rx-featured-badge">★ Recomendado</span>'
+    +'<button class="rx-featured-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFavorite('+i+')" title="Favorito" type="button">'+(isFav?'★':'☆')+'</button>'
     +'</div>'
     +'<div class="rx-featured-content">'
     +'<div class="rx-featured-name">'+r.name+'</div>'
@@ -12127,6 +12781,7 @@ function rxRenderFeatured(i){
     +'<span class="rx-featured-cost">💵 '+rxRecipeCost(r)+'</span>'
     +'<span class="rx-featured-tag">⏱ '+r.time+'</span>'
     +'<span class="rx-featured-tag">'+r.diff+'</span>'
+    +(savingsLbl?'<span class="rx-featured-savings">'+savingsLbl+'</span>':'')
     +'</div>'
     +'<button class="rx-featured-cta" onclick="event.stopPropagation();openRecipe('+i+')" type="button">›</button>'
     +'</div>'
@@ -12158,7 +12813,22 @@ function renderRecipes(){
   }
   html+='<div class="rx-section-label"><span>Más recetas</span></div>';
   if(matches.length===0){
-    html+='<div class="rx-empty"><span class="rx-empty-emoji">🍽️</span>Ninguna receta coincide con este filtro.</div>';
+    var emptyMap={
+      cheap:    {e:'💵',  t:'Sin recetas baratas aún',     s:'Te avisaré cuando haya nuevas recetas que cuesten menos de $4 por porción.'},
+      budget:   {e:'🪙',  t:'Sin opciones de presupuesto', s:'Recetas bajo $7 — perfectas cuando estás cuidando cada peso.'},
+      quick:    {e:'⚡',  t:'Sin recetas rápidas',         s:'Recetas listas en 30 minutos o menos para cuando el tiempo aprieta.'},
+      mealprep: {e:'🍱',  t:'Sin meal prep todavía',       s:'Recetas que rinden varias porciones para preparar la semana.'},
+      gaming:   {e:'🎮',  t:'Sin snacks de gaming',        s:'Tostones, catrachas y bocados perfectos para una noche de juegos con amigos.'},
+      cozy:     {e:'🛋️',  t:'Sin recetas cozy',            s:'Sopas calientitas, arroz con leche y comfort food para días tranquilos.'},
+      fav:      {e:'🌟',  t:'Aún sin favoritos',           s:'Toca el ★ en cualquier receta para guardarla aquí.'}
+    };
+    var em=emptyMap[rxFilter]||{e:'🍽️',t:'Ninguna receta coincide',s:'Prueba con otro filtro o explora todas las recetas.'};
+    html+='<div class="rx-empty cozy">'
+      +'<span class="rx-empty-emoji">'+em.e+'</span>'
+      +'<span class="rx-empty-title">'+em.t+'</span>'
+      +'<span class="rx-empty-sub">'+em.s+'</span>'
+      +'<button class="rx-empty-cta" onclick="setRecipeFilter(\'all\')" type="button">✨ Ver todas las recetas</button>'
+    +'</div>';
   } else {
     html+='<div class="rx-grid">';
     for(var j=0;j<matches.length;j++){
@@ -12180,6 +12850,9 @@ function openRecipe(idx){
   trackRecent(idx);
   var r=RECIPES[idx];
   var isFav=favorites.indexOf(idx)>=0;
+  var costN=rxRecipeCostNum(r);
+  var saveN=rxRecipeSavingsNum(r);
+  var totalN=r.ingredients?r.ingredients.length:0;
   // Always start with only the YouTube button (safe default).
   // The embed button is injected later only if the oEmbed check confirms embedding is allowed.
   var html='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">'
@@ -12193,12 +12866,32 @@ function openRecipe(idx){
     +'<span class="rtag cat">'+r.cat+'</span>'
     +'</div>'
     +'<div class="rdet-desc">'+r.desc+'</div>'
+    +'<div class="rx-cost-panel">'
+      +'<div class="rx-cost-tile">'
+        +'<div class="rx-cost-lbl">💵 Costo casero</div>'
+        +'<div class="rx-cost-val">~$'+costN+'</div>'
+        +'<div class="rx-cost-sub">'+rxRecipeCost(r)+' por porción</div>'
+      +'</div>'
+      +'<div class="rx-cost-tile savings">'
+        +'<div class="rx-cost-lbl">💸 Ahorras</div>'
+        +'<div class="rx-cost-val">~$'+saveN+'</div>'
+        +'<div class="rx-cost-sub">vs pedir delivery</div>'
+      +'</div>'
+    +'</div>'
     +'<div class="recipe-video-actions" id="recipeVideoActions">'
     +'<button class="recipe-video-btn secondary" id="recipeYtBtn" onclick="watchRecipeVideo('+idx+')" style="flex:1;">↗ Abrir en YouTube</button>'
     +'</div>'
     +(r.yt?'<div class="recipe-video-embed hidden" id="recipeVideoEmbed" data-active="false"></div>':'')
-    +'<div class="rsec"><div class="rsec-title">🛒 Ingredientes</div><ul class="ing-list">'
-    +r.ingredients.map(function(g){return '<li><span class="ing-amt">'+g.a+'</span><span>'+g.n+'</span></li>';}).join('')
+    +'<div class="rsec"><div class="rsec-title">🛒 Ingredientes</div>'
+    +'<div class="rx-check-progress"><span>Marca lo que ya tienes</span><span><b id="rxCheckCount">0</b> / '+totalN+'</span></div>'
+    +'<ul class="ing-list rx-check" id="rxIngList">'
+    +r.ingredients.map(function(g,gi){
+      return '<li onclick="rxToggleIng(this)" data-ing="'+gi+'">'
+        +'<span class="rx-tick">✓</span>'
+        +'<span class="ing-amt">'+g.a+'</span>'
+        +'<span class="ing-name">'+g.n+'</span>'
+      +'</li>';
+    }).join('')
     +'</ul><button class="shop-ing-btn" id="shopIngBtn" onclick="addIngredientsToShop('+idx+')">🛒 Agregar todo a compras</button></div>'
     +'<div class="rsec"><div class="rsec-title">👨‍🍳 Preparación</div><ol class="step-list">'
     +r.steps.map(function(s){return '<li>'+s+'</li>';}).join('')
@@ -12208,6 +12901,17 @@ function openRecipe(idx){
   $('recipeOverlay').classList.add('show');
   document.body.style.overflow='hidden';
   if(r.yt) checkYTEmbeddable(r.yt, idx);
+}
+
+// Ingredient checklist toggle — premium tap feel
+function rxToggleIng(el){
+  if(!el) return;
+  el.classList.toggle('rx-checked');
+  var list=document.getElementById('rxIngList');
+  var count=document.getElementById('rxCheckCount');
+  if(list&&count){
+    count.textContent=list.querySelectorAll('li.rx-checked').length;
+  }
 }
 
 // Checks YouTube oEmbed API — returns 200 if embedding allowed, 401 if blocked.
@@ -12345,6 +13049,404 @@ function renderHoyDashboard(){
   renderWeeklyChart();
   renderHoyInsight();
   renderCatBreakdown();
+  try{ fxRenderAnalytics(); }catch(e){}
+}
+
+// ── PREMIUM ANALYTICS CHARTS ──────────────────────────────────────
+function fxRenderAnalytics(){
+  fxRenderSavingsLine();
+  fxRenderSpendingDonut();
+  fxRenderGoalProgress();
+  fxRenderActivityHeatmap();
+}
+
+function fxLast30Series(){
+  var pad2=function(n){return n<10?'0'+n:''+n;};
+  var now=new Date(); now.setHours(0,0,0,0);
+  var byDate={};
+  (state.days||[]).forEach(function(d){byDate[d.date]=d;});
+  var pts=[]; var cum=0;
+  for(var i=29;i>=0;i--){
+    var dt=new Date(now); dt.setDate(dt.getDate()-i);
+    var key=dt.getFullYear()+'-'+pad2(dt.getMonth()+1)+'-'+pad2(dt.getDate());
+    var saved=byDate[key]?daySaved(byDate[key]):0;
+    cum+=saved;
+    pts.push({date:dt,key:key,saved:saved,cum:cum});
+  }
+  return pts;
+}
+
+function fxRenderSavingsLine(){
+  var path=document.getElementById('fxSavingsPath');
+  var area=document.getElementById('fxSavingsArea');
+  var dot=document.getElementById('fxSavingsDot');
+  var totalEl=document.getElementById('fxSavingsTotal');
+  var deltaEl=document.getElementById('fxSavingsDelta');
+  var axisEl=document.getElementById('fxSavingsAxis');
+  if(!path||!area||!totalEl) return;
+
+  var pts=fxLast30Series();
+  var W=320, H=140, padX=4, padY=14;
+  var maxV=0; pts.forEach(function(p){if(p.cum>maxV) maxV=p.cum;});
+  if(maxV<1) maxV=1;
+
+  var coords=pts.map(function(p,i){
+    var x=padX+(W-2*padX)*(i/(pts.length-1));
+    var y=H-padY-(H-2*padY)*(p.cum/maxV);
+    return {x:x,y:y};
+  });
+
+  // smooth path with cubic bezier
+  function buildPath(coords){
+    if(!coords.length) return '';
+    var d='M '+coords[0].x.toFixed(2)+' '+coords[0].y.toFixed(2);
+    for(var i=1;i<coords.length;i++){
+      var p0=coords[i-1], p1=coords[i];
+      var pPrev=coords[i-2]||p0;
+      var pNext=coords[i+1]||p1;
+      var t=0.22;
+      var c1x=p0.x+(p1.x-pPrev.x)*t;
+      var c1y=p0.y+(p1.y-pPrev.y)*t;
+      var c2x=p1.x-(pNext.x-p0.x)*t;
+      var c2y=p1.y-(pNext.y-p0.y)*t;
+      d+=' C '+c1x.toFixed(2)+' '+c1y.toFixed(2)+', '+c2x.toFixed(2)+' '+c2y.toFixed(2)+', '+p1.x.toFixed(2)+' '+p1.y.toFixed(2);
+    }
+    return d;
+  }
+
+  var linePath=buildPath(coords);
+  var areaPath=linePath+' L '+coords[coords.length-1].x.toFixed(2)+' '+(H-padY)+' L '+coords[0].x.toFixed(2)+' '+(H-padY)+' Z';
+
+  path.setAttribute('d', linePath);
+  area.setAttribute('d', areaPath);
+  area.setAttribute('fill','url(#fxLineArea)');
+
+  // approximate path length for stroke draw animation
+  var len=0;
+  for(var k=1;k<coords.length;k++){
+    var dx=coords[k].x-coords[k-1].x, dy=coords[k].y-coords[k-1].y;
+    len+=Math.sqrt(dx*dx+dy*dy);
+  }
+  len=Math.max(len,200);
+  path.style.transition='none';
+  path.style.strokeDasharray=len;
+  path.style.strokeDashoffset=len;
+
+  // last dot position
+  var last=coords[coords.length-1];
+  dot.setAttribute('transform','translate('+last.x.toFixed(2)+' '+last.y.toFixed(2)+')');
+
+  // remove and re-trigger transitions
+  area.classList.remove('in'); dot.classList.remove('in');
+  // reflow
+  void path.getBoundingClientRect();
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      path.style.transition='stroke-dashoffset 1.4s cubic-bezier(.55,.08,.32,1.02)';
+      path.style.strokeDashoffset='0';
+      area.classList.add('in');
+      dot.classList.add('in');
+    });
+  });
+
+  // header stats
+  var totalNow=pts[pts.length-1].cum;
+  var halfIdx=Math.max(0, Math.floor(pts.length/2)-1);
+  var prevHalf=pts[halfIdx].cum;
+  var savedRecent=totalNow-prevHalf;
+  var savedPrev=prevHalf;
+  totalEl.textContent=fmtMoney(totalNow);
+  deltaEl.classList.remove('up','down','flat');
+  if(savedRecent>savedPrev*1.05 && savedRecent>0){
+    deltaEl.classList.add('up');
+    deltaEl.innerHTML='<span>↑</span><span>'+fmtMoney(savedRecent)+' (15d)</span>';
+  } else if(savedRecent<savedPrev*0.95 && savedPrev>0){
+    deltaEl.classList.add('down');
+    deltaEl.innerHTML='<span>↓</span><span>'+fmtMoney(savedRecent)+' (15d)</span>';
+  } else {
+    deltaEl.classList.add('flat');
+    deltaEl.innerHTML='<span>→</span><span>'+fmtMoney(savedRecent)+' (15d)</span>';
+  }
+
+  // axis labels
+  if(axisEl){
+    var first=pts[0].date, mid=pts[14].date, today=pts[pts.length-1].date;
+    var fmtShort=function(d){return d.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];};
+    axisEl.innerHTML='<span>'+fmtShort(first)+'</span><span>'+fmtShort(mid)+'</span><span>hoy</span>';
+  }
+}
+
+// Map app expense categories → 5 user-spec buckets
+function fxBucketForCategory(cat){
+  var c=(cat||'general').toString().toLowerCase();
+  if(c==='food') return 'food';
+  if(c==='entertainment') return 'games';
+  if(c==='shopping') return 'shopping';
+  if(c==='transport') return 'gas';
+  return 'other';
+}
+var FX_BUCKETS=[
+  {id:'food',     label:'Comida',      emoji:'🍔', color:'#c06840'},
+  {id:'games',    label:'Juegos',      emoji:'🎮', color:'#8b65f0'},
+  {id:'shopping', label:'Compras',     emoji:'🛍️', color:'#d05878'},
+  {id:'gas',      label:'Gasolina',    emoji:'⛽', color:'#4aaac8'},
+  {id:'other',    label:'Otros',       emoji:'✨', color:'#3db87c'}
+];
+
+function fxRenderSpendingDonut(){
+  var segs=document.getElementById('fxSpendingSegs');
+  var legend=document.getElementById('fxSpendingLegend');
+  var totalEl=document.getElementById('fxSpendingTotal');
+  var centerEl=document.getElementById('fxDonutCenter');
+  if(!segs||!legend) return;
+
+  // aggregate spending from state.days entries (last 30 days)
+  var pad2=function(n){return n<10?'0'+n:''+n;};
+  var now=new Date(); now.setHours(0,0,0,0);
+  var cutoff=new Date(now); cutoff.setDate(cutoff.getDate()-29);
+  var cutoffKey=cutoff.getFullYear()+'-'+pad2(cutoff.getMonth()+1)+'-'+pad2(cutoff.getDate());
+
+  var totals={food:0,games:0,shopping:0,gas:0,other:0};
+  (state.days||[]).forEach(function(d){
+    if(d.date<cutoffKey) return;
+    (d.entries||[]).forEach(function(e){
+      var sp=+(e.spent||0); if(!sp) return;
+      var bucket=fxBucketForCategory(e.category);
+      totals[bucket]+=sp;
+    });
+  });
+
+  var total=0; FX_BUCKETS.forEach(function(b){total+=totals[b.id];});
+  if(totalEl) totalEl.textContent=total>0?fmtMoney(total):'$0';
+  if(centerEl) centerEl.textContent=total>0?fmtMoney(total):'$0';
+
+  if(total<=0){
+    segs.innerHTML='';
+    legend.innerHTML='<div class="fx-chart-empty">Sin gastos en los últimos 30 días</div>';
+    return;
+  }
+
+  // build segments: stroke-dasharray reveal on a circle of circumference 2πr
+  var r=42, C=2*Math.PI*r;
+  var offset=0;
+  var segHtml='';
+  var legendHtml='';
+  FX_BUCKETS.forEach(function(b,i){
+    var v=totals[b.id]; if(v<=0) return;
+    var pct=v/total;
+    var dash=pct*C;
+    var gap=C-dash;
+    segHtml+='<circle class="fx-donut-seg" data-final-offset="'+(C-dash)+'" cx="50" cy="50" r="'+r+'" stroke="'+b.color+'" stroke-dasharray="'+dash.toFixed(3)+' '+gap.toFixed(3)+'" stroke-dashoffset="'+(-offset).toFixed(3)+'" style="opacity:0;transition:opacity .5s ease '+(i*120+200)+'ms,stroke-width .3s ease;"/>';
+    offset+=dash;
+    legendHtml+='<div class="fx-legend-row" data-delay="'+(i*70+400)+'"><span class="fx-legend-dot" style="background:'+b.color+';box-shadow:0 0 6px '+b.color+'aa;"></span><span class="fx-legend-name">'+b.emoji+' '+b.label+'</span><span class="fx-legend-val">'+fmtMoney(v)+'</span><span class="fx-legend-pct">'+Math.round(pct*100)+'%</span></div>';
+  });
+  segs.innerHTML=segHtml;
+  legend.innerHTML=legendHtml;
+
+  // animate reveal
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var ss=segs.querySelectorAll('.fx-donut-seg');
+      ss.forEach(function(s){s.style.opacity='1';});
+      var rows=legend.querySelectorAll('.fx-legend-row');
+      rows.forEach(function(r){
+        var delay=parseInt(r.getAttribute('data-delay'),10)||0;
+        setTimeout(function(){r.classList.add('in');}, delay);
+      });
+    });
+  });
+
+  // animate counting on center number
+  fxAnimCount(centerEl, total);
+}
+
+function fxAnimCount(el, target){
+  if(!el) return;
+  var startTxt=el.textContent.replace(/[^\d.]/g,'');
+  var start=parseFloat(startTxt)||0;
+  var end=parseFloat(target)||0;
+  if(Math.abs(end-start)<0.5){ el.textContent=fmtMoney(end); return; }
+  var dur=900, t0=performance.now();
+  function step(t){
+    var k=Math.min(1,(t-t0)/dur);
+    var ease=1-Math.pow(1-k,3);
+    el.textContent=fmtMoney(start+(end-start)*ease);
+    if(k<1) requestAnimationFrame(step); else el.textContent=fmtMoney(end);
+  }
+  requestAnimationFrame(step);
+}
+
+function fxRenderGoalProgress(){
+  var listEl=document.getElementById('fxGoalList');
+  var countEl=document.getElementById('fxGoalsCount');
+  if(!listEl) return;
+  var metas=(typeof loadMetas==='function')?loadMetas():[];
+  if(!metas.length){
+    listEl.innerHTML='<div class="fx-chart-empty">Crea una meta para ver tu progreso aquí.</div>';
+    if(countEl) countEl.textContent='0 metas';
+    return;
+  }
+  var totalSaved=(typeof mxTotalSaved==='function')?mxTotalSaved():0;
+  // sort: incomplete + closer to done first, then complete
+  var sorted=metas.slice().sort(function(a,b){
+    var pa=a.goal>0?Math.min(1,totalSaved/a.goal):0;
+    var pb=b.goal>0?Math.min(1,totalSaved/b.goal):0;
+    if((pa>=1)!==(pb>=1)) return (pa>=1)?1:-1;
+    return pb-pa;
+  });
+  var top=sorted.slice(0,3);
+  if(countEl) countEl.textContent=metas.length+' meta'+(metas.length!==1?'s':'');
+
+  var html='';
+  top.forEach(function(m,i){
+    var saved=Math.min(totalSaved,m.goal);
+    var pct=m.goal>0?Math.min(100,(saved/m.goal)*100):0;
+    var done=pct>=100;
+    var fillClass=done?'complete':(pct>=75?'near':'');
+    var pctClass=done?' complete':'';
+    html+='<div class="fx-goal-row">'
+      +'<div class="fx-goal-top"><span class="fx-goal-name">'+(m.name||'Meta')+'</span><span class="fx-goal-pct'+pctClass+'" data-fx-goal-pct="'+pct.toFixed(1)+'">0%</span></div>'
+      +'<div class="fx-goal-track"><div class="fx-goal-fill '+fillClass+'" data-fx-goal-fill="'+pct.toFixed(1)+'" style="width:0%"></div></div>'
+      +'<div class="fx-goal-amount" data-fx-goal-amount="'+saved+'" data-fx-goal-target="'+m.goal+'"><b>'+fmtMoney(0)+'</b> de '+fmtMoney(m.goal)+'</div>'
+      +'<div class="fx-goal-milestone">'
+        +'<span class="'+(pct>=25?'hit':'')+'">25%</span>'
+        +'<span class="'+(pct>=50?'hit':'')+'">50%</span>'
+        +'<span class="'+(pct>=75?'hit':'')+'">75%</span>'
+        +'<span class="'+(pct>=100?'hit':'')+'">100% 🏆</span>'
+      +'</div>'
+      +'</div>';
+  });
+  listEl.innerHTML=html;
+
+  // animate fills + counters
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var fills=listEl.querySelectorAll('[data-fx-goal-fill]');
+      fills.forEach(function(f,i){
+        setTimeout(function(){
+          f.style.width=parseFloat(f.getAttribute('data-fx-goal-fill'))+'%';
+        }, i*120);
+      });
+      var pcts=listEl.querySelectorAll('[data-fx-goal-pct]');
+      pcts.forEach(function(p,i){
+        var target=parseFloat(p.getAttribute('data-fx-goal-pct'))||0;
+        setTimeout(function(){fxAnimPct(p,target);}, i*120+150);
+      });
+      var amounts=listEl.querySelectorAll('[data-fx-goal-amount]');
+      amounts.forEach(function(a,i){
+        var t=parseFloat(a.getAttribute('data-fx-goal-amount'))||0;
+        var goal=parseFloat(a.getAttribute('data-fx-goal-target'))||0;
+        setTimeout(function(){fxAnimAmount(a,t,goal);}, i*120+150);
+      });
+    });
+  });
+}
+
+function fxAnimPct(el, target){
+  var t0=performance.now(), dur=900;
+  function step(t){
+    var k=Math.min(1,(t-t0)/dur);
+    var ease=1-Math.pow(1-k,3);
+    var cur=target*ease;
+    el.textContent=cur.toFixed(0)+'%';
+    if(k<1) requestAnimationFrame(step); else el.textContent=Math.round(target)+'%';
+  }
+  requestAnimationFrame(step);
+}
+function fxAnimAmount(el, target, goal){
+  var t0=performance.now(), dur=900;
+  var goalText=fmtMoney(goal);
+  function step(t){
+    var k=Math.min(1,(t-t0)/dur);
+    var ease=1-Math.pow(1-k,3);
+    el.innerHTML='<b>'+fmtMoney(target*ease)+'</b> de '+goalText;
+    if(k<1) requestAnimationFrame(step); else el.innerHTML='<b>'+fmtMoney(target)+'</b> de '+goalText;
+  }
+  requestAnimationFrame(step);
+}
+
+function fxRenderActivityHeatmap(){
+  var grid=document.getElementById('fxHeatGrid');
+  var streakEl=document.getElementById('fxHeatStreak');
+  var activeEl=document.getElementById('fxHeatActiveLbl');
+  if(!grid) return;
+  var pad2=function(n){return n<10?'0'+n:''+n;};
+  var byDate={};
+  (state.days||[]).forEach(function(d){
+    var s=daySaved(d);
+    if(s>0) byDate[d.date]=s;
+  });
+
+  // 12 weeks × 7 days; align so today is in last column
+  var WEEKS=12;
+  var now=new Date(); now.setHours(0,0,0,0);
+  // start at the Sunday WEEKS-1 weeks ago + adjust so today is in last col
+  var todayDow=now.getDay(); // 0=Sun
+  var totalCells=WEEKS*7;
+  var start=new Date(now); start.setDate(start.getDate() - (totalCells-1) + (6-todayDow));
+  // We'll iterate rows=days(0..6), cols=weeks(0..WEEKS-1)
+  // structure: for each week column, render a column of 7 cells
+  var maxVal=0;
+  var dayList=[];
+  for(var i=0;i<totalCells;i++){
+    var dt=new Date(start); dt.setDate(dt.getDate()+i);
+    var key=dt.getFullYear()+'-'+pad2(dt.getMonth()+1)+'-'+pad2(dt.getDate());
+    var v=byDate[key]||0;
+    if(v>maxVal) maxVal=v;
+    var isToday=(dt.getTime()===now.getTime());
+    var isFuture=(dt.getTime()>now.getTime());
+    dayList.push({key:key,val:v,today:isToday,future:isFuture,dow:dt.getDay()});
+  }
+  // group by week column
+  var html='';
+  var activeCount=0;
+  for(var c=0;c<WEEKS;c++){
+    html+='<div class="fx-heat-col">';
+    for(var r=0;r<7;r++){
+      // map row r=0(Sun)..6(Sat); find day with that dow in this week column
+      var idx=c*7+r;
+      // we built linear: idx 0 corresponds to start (which was offset to align). Find dow:
+      var d=dayList[idx];
+      if(!d){ html+='<div class="fx-heat-cell"></div>'; continue; }
+      if(d.future){ html+='<div class="fx-heat-cell" style="visibility:hidden"></div>'; continue; }
+      var lvl=0;
+      if(d.val>0){
+        activeCount++;
+        if(maxVal>0){
+          var ratio=d.val/maxVal;
+          if(ratio>=0.75) lvl=4;
+          else if(ratio>=0.5) lvl=3;
+          else if(ratio>=0.25) lvl=2;
+          else lvl=1;
+        }
+      }
+      html+='<div class="fx-heat-cell'+(lvl?' l'+lvl:'')+(d.today?' today':'')+'" data-i="'+idx+'" title="'+d.key+(d.val?' • '+fmtMoney(d.val):'')+'"></div>';
+    }
+    html+='</div>';
+  }
+  grid.innerHTML=html;
+
+  // streak: consecutive days saved ending today
+  var streak=0;
+  var cur=new Date(now);
+  while(true){
+    var k=cur.getFullYear()+'-'+pad2(cur.getMonth()+1)+'-'+pad2(cur.getDate());
+    if(byDate[k]) { streak++; cur.setDate(cur.getDate()-1); } else break;
+  }
+  if(streakEl) streakEl.innerHTML='🔥 '+streak+' día'+(streak!==1?'s':'')+' seguidos';
+  if(activeEl) activeEl.textContent=activeCount+' día'+(activeCount!==1?'s':'')+' activos · '+WEEKS+' sem.';
+
+  // staggered cell entrance
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var cells=grid.querySelectorAll('.fx-heat-cell');
+      cells.forEach(function(cell){
+        var i=parseInt(cell.getAttribute('data-i'),10);
+        if(isNaN(i)){ cell.classList.add('in'); return; }
+        setTimeout(function(){cell.classList.add('in');}, 8*i+50);
+      });
+    });
+  });
 }
 
 function renderWeeklyChart(){
@@ -12742,7 +13844,8 @@ function deleteBudget(){
 }
 
 // ── RECEIPT SCANNER ────────────────────────────────────────────────
-var _scanDetected = null; // {total, items:[{name,price}]}
+var _scanDetected = null; // {total, items:[{name,price,selected}]}
+var _scanImageDataUrl = '';
 
 // Sample receipt data pools for simulation
 var _SCAN_POOL = [
@@ -12764,6 +13867,7 @@ function scanFileChosen(input){
     var zone=$('scanUploadZone');
     var actions=document.querySelector('#page-escanear .sx-actions');
     var btn=$('scanBtn');
+    _scanImageDataUrl=e.target.result;
     if(img) img.src=e.target.result;
     if(wrap) wrap.classList.add('visible');
     if(zone) zone.style.display='none';
@@ -12796,6 +13900,7 @@ function scanReset(){
   if(res) res.classList.remove('visible');
   if(load) load.classList.remove('visible');
   _scanDetected=null;
+  _scanImageDataUrl='';
 }
 
 function scanReceipt(){
@@ -12906,6 +14011,184 @@ function scanConfirmShopList(){
 }
 
 // ── CONSEJOS (AI ADVISOR) ──────────────────────────────────────────
+function scanParseGroqJson(raw){
+  raw=String(raw||'').trim();
+  if(!raw) throw new Error('Respuesta vacia');
+  try{return JSON.parse(raw);}catch(e){}
+  var match=raw.match(/\{[\s\S]*\}/);
+  if(match) return JSON.parse(match[0]);
+  throw new Error('JSON invalido');
+}
+
+function scanSelectedItems(){
+  if(!_scanDetected||!Array.isArray(_scanDetected.items)) return [];
+  return _scanDetected.items.filter(function(it){return it.selected!==false;});
+}
+
+function scanToggleItem(idx){
+  if(!_scanDetected||!_scanDetected.items||!_scanDetected.items[idx]) return;
+  _scanDetected.items[idx].selected=_scanDetected.items[idx].selected===false;
+  renderScanResults();
+}
+
+scanReceipt=function(){
+  var btn=$('scanBtn');
+  var load=$('scanLoading');
+  var res=$('scanResults');
+  var txtEl=$('scanLoadingTxt');
+  var apiKey='';
+  try{apiKey=localStorage.getItem('groq_api_key')||'';}catch(e){}
+  if(!apiKey){showToast('Configura localStorage.groq_api_key');return;}
+  if(!_scanImageDataUrl){showToast('Toma o sube una foto del recibo');return;}
+
+  if(btn) btn.disabled=true;
+  if(res) res.classList.remove('visible');
+  if(load) load.classList.add('visible');
+  if(txtEl) txtEl.textContent='Enviando recibo a Groq...';
+
+  var msgs=['Analizando recibo...','Detectando articulos...','Extrayendo precios...','Validando JSON...'];
+  var mi=0;
+  var interval=setInterval(function(){
+    mi=(mi+1)%msgs.length;
+    if(txtEl) txtEl.textContent=msgs[mi];
+  },850);
+
+  var prompt=[
+    'Eres un extractor de recibos.',
+    'Lee la imagen del recibo y extrae todos los productos o servicios comprados.',
+    'Devuelve SOLO JSON valido, sin markdown y sin explicaciones.',
+    'Formato exacto: {"items":[{"name":"nombre del item","price":0.00}],"total":0.00}',
+    'Reglas:',
+    '- name debe estar en espanol si aparece en espanol.',
+    '- price debe ser numero decimal, sin simbolos de moneda.',
+    '- No incluyas subtotal, tax/impuesto, cambio, tarjeta, total ni metodos de pago como items.',
+    '- Si un precio no se ve claro, no inventes ese item.',
+    '- total debe ser la suma de items si el total del recibo no es confiable.'
+  ].join('\n');
+
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{
+      'Authorization':'Bearer '+apiKey,
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      model:'meta-llama/llama-4-scout-17b-16e-instruct',
+      messages:[{
+        role:'user',
+        content:[
+          {type:'text',text:prompt},
+          {type:'image_url',image_url:{url:_scanImageDataUrl}}
+        ]
+      }],
+      temperature:0,
+      max_tokens:1200,
+      response_format:{type:'json_object'}
+    })
+  }).then(function(r){
+    if(!r.ok) return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});
+    return r.json();
+  }).then(function(data){
+    var raw=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
+    var parsed=scanParseGroqJson(raw);
+    var items=(parsed.items||[]).map(function(it){
+      return {
+        name:String(it.name||it.item||it.description||'').trim(),
+        price:toShopPrice(it.price!==undefined?it.price:it.amount),
+        selected:true
+      };
+    }).filter(function(it){return it.name&&it.price>0;});
+    if(!items.length) throw new Error('No se detectaron items con precio.');
+    var sum=items.reduce(function(s,it){return s+it.price;},0);
+    var total=toShopPrice(parsed.total)>0?toShopPrice(parsed.total):sum;
+    _scanDetected={total:+total.toFixed(2),items:items};
+    items.forEach(function(it){recordPriceHistory(it.name,it.price,TODAY);});
+    renderScanResults();
+  }).catch(function(err){
+    console.error('scanReceipt Groq error',err);
+    showToast('No pude leer el recibo. Intenta otra foto.');
+  }).finally(function(){
+    clearInterval(interval);
+    if(load) load.classList.remove('visible');
+    if(btn) btn.disabled=false;
+  });
+};
+
+renderScanResults=function(){
+  if(!_scanDetected) return;
+  var res=$('scanResults');
+  var list=$('scanItemsList');
+  var totalEl=$('scanTotalDisplay');
+  var items=_scanDetected.items||[];
+  var selected=scanSelectedItems();
+  var n=items.length;
+  var selectedTotal=selected.reduce(function(s,it){return s+toShopPrice(it.price);},0);
+  var avg=selected.length>0?(selectedTotal/selected.length):0;
+  if(totalEl) totalEl.textContent=fmtMoney(selectedTotal);
+  setText('scanItemCount', String(selected.length));
+  setText('scanItemAvg', fmtMoney(avg));
+  setText('scanItemsCount', selected.length+' de '+n+' seleccionados');
+  var tally={};
+  for(var i=0;i<selected.length;i++){
+    var c=normalizeShopCategory(inferShopCategory(selected[i].name));
+    tally[c]=(tally[c]||0)+1;
+  }
+  var topCat='general',topN=0;
+  for(var k in tally){if(tally[k]>topN){topN=tally[k];topCat=k;}}
+  setText('scanCategoryEmoji', getShopCategoryEmoji(topCat));
+  setText('scanCategoryName', getShopCategoryLabel(topCat));
+  if(list){
+    list.innerHTML=items.map(function(it,idx){
+      var on=it.selected!==false;
+      return '<div class="scan-item-row '+(on?'selected':'off')+'" onclick="scanToggleItem('+idx+')">'
+        +'<span class="scan-pick">'+(on?'✓':'')+'</span>'
+        +'<span class="scan-item-main">'
+          +'<span class="scan-item-name">'+escapeHtml(it.name)+'</span>'
+          +'<span class="scan-item-price">'+fmtMoney(it.price)+'</span>'
+        +'</span>'
+      +'</div>';
+    }).join('');
+  }
+  if(res) res.classList.add('visible');
+};
+
+scanConfirmExpense=function(){
+  if(!_scanDetected) return;
+  var selected=scanSelectedItems();
+  if(!selected.length){showToast('Selecciona al menos un articulo');return;}
+  var total=selected.reduce(function(s,it){return s+toShopPrice(it.price);},0);
+  var today=new Date();
+  var key=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+  var day=state.days.find(function(d){return d.date===key;});
+  if(!day){day={date:key,entries:[],worked:false};state.days.push(day);}
+  day.entries.push({earned:0,saved:0,spent:total,note:'Recibo escaneado ('+selected.length+' articulos)',source:'scan',entryDate:key});
+  selected.forEach(function(it){
+    var cat=normalizeShopCategory(inferShopCategory(it.name));
+    shopSpentHistory.unshift(normalizeShopSpent({id:Date.now()+Math.random(),name:it.name,category:cat,price:it.price,items:[],date:key},Date.now()+Math.random()));
+  });
+  saveState();
+  saveShopSpentHistory();
+  updateAll();
+  _aiCheckBudgetAfterExpense('general');
+  showToast('Gasto de '+fmtMoney(total)+' registrado');
+  scanReset();
+  switchTab('hoy');
+};
+
+scanConfirmShopList=function(){
+  if(!_scanDetected) return;
+  var selected=scanSelectedItems();
+  if(!selected.length){showToast('Selecciona al menos un articulo');return;}
+  selected.forEach(function(it){
+    shopList.push(normalizeShopItem({name:it.name,qty:'1',category:inferShopCategory(it.name),estPrice:it.price,status:'pending'},Date.now()+Math.random()));
+  });
+  saveShopList();
+  renderShopList();
+  showToast('🛒 '+selected.length+' articulos agregados a tu lista');
+  scanReset();
+  switchTab('compras');
+};
+
 function _getMonthSpentByCategory(){
   var map={};
   var now=new Date();
