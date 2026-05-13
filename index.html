@@ -7913,6 +7913,307 @@ input:focus,textarea:focus,select:focus{
 @media (prefers-reduced-motion: reduce){
   .rx-card-img,.rx-featured-img,.ing-list.rx-check li,.ing-list.rx-check .rx-tick,.rx-empty.cozy .rx-empty-emoji{transition:none !important;animation:none !important;}
 }
+/* Calendar-only visual polish: cozy, lightweight, mobile-friendly */
+#page-calendario{
+  padding:22px 16px calc(132px + var(--safe-bottom)) !important;
+  background:
+    radial-gradient(circle at 18% -4%,rgba(255,209,150,.12),transparent 34%),
+    radial-gradient(circle at 105% 18%,rgba(122,151,255,.12),transparent 30%);
+}
+#page-calendario .section-title{
+  position:relative;
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin:0 0 16px!important;
+  font-size:26px!important;
+  line-height:1!important;
+  letter-spacing:-.045em!important;
+}
+#page-calendario .section-title::after{
+  content:"Vista mensual";
+  flex-shrink:0;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(224,232,255,.56);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+#page-calendario .cal-top{
+  position:relative;
+  display:grid!important;
+  grid-template-columns:42px 1fr 42px;
+  align-items:center!important;
+  gap:10px!important;
+  margin:0 0 14px!important;
+  padding:12px;
+  border-radius:24px;
+  background:linear-gradient(155deg,rgba(28,33,58,.72),rgba(13,17,34,.66));
+  border:1px solid rgba(255,255,255,.075);
+  box-shadow:0 16px 38px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+#page-calendario .cal-month{
+  text-align:center;
+  font-size:20px!important;
+  font-weight:900!important;
+  letter-spacing:-.035em!important;
+  color:#f4f7ff!important;
+}
+#page-calendario .cal-nav-btn{
+  width:42px;
+  height:42px;
+  padding:0!important;
+  border-radius:16px!important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(155deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#f5f7ff!important;
+  font-size:25px!important;
+  line-height:1!important;
+  box-shadow:0 8px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .16s ease,background .18s ease,border-color .18s ease;
+}
+#page-calendario .cal-nav-btn:active{
+  transform:scale(.94)!important;
+  background:rgba(255,255,255,.14)!important;
+  border-color:rgba(255,255,255,.18)!important;
+}
+#page-calendario .cal-summary{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:0 0 14px!important;
+}
+#page-calendario .cal-sum{
+  position:relative;
+  overflow:hidden;
+  min-height:82px;
+  padding:13px 12px 12px!important;
+  border-radius:20px!important;
+  background:linear-gradient(160deg,rgba(28,33,58,.78),rgba(12,16,32,.74))!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.05);
+}
+#page-calendario .cal-sum::before{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  margin-bottom:9px;
+  border-radius:11px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.07);
+  font-size:14px;
+}
+#page-calendario .cal-sum:nth-child(1)::before{content:"💙";background:rgba(122,151,255,.12);}
+#page-calendario .cal-sum:nth-child(2)::before{content:"🌙";background:rgba(208,122,152,.12);}
+#page-calendario .cal-sum:nth-child(3)::before{content:"✨";background:rgba(143,216,200,.12);}
+#page-calendario .cal-sum-l{
+  font-size:9.5px!important;
+  letter-spacing:.11em!important;
+  color:rgba(190,204,236,.52)!important;
+}
+#page-calendario .cal-sum-v{
+  margin-top:5px!important;
+  font-size:16px!important;
+  line-height:1.05!important;
+  letter-spacing:-.02em!important;
+}
+#page-calendario .cal-grid-wrap{
+  padding:14px!important;
+  border-radius:26px!important;
+  background:
+    linear-gradient(160deg,rgba(24,29,54,.82),rgba(9,13,27,.88)),
+    radial-gradient(circle at 50% 0%,rgba(255,209,150,.10),transparent 34%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 20px 46px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.055)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+#page-calendario .cal-weekdays{
+  gap:7px!important;
+  margin:0 0 10px!important;
+  padding:0 2px;
+}
+#page-calendario .cal-wd{
+  font-size:9.5px!important;
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase;
+  color:rgba(210,220,245,.44)!important;
+}
+#page-calendario .cal-grid{
+  gap:7px!important;
+}
+#page-calendario .cal-day{
+  position:relative;
+  height:auto!important;
+  min-height:42px;
+  aspect-ratio:1/1;
+  padding:4px 2px;
+  border-radius:15px!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  background-color:rgba(255,255,255,.035);
+  color:rgba(238,243,255,.92)!important;
+  font-size:11.5px!important;
+  font-weight:800!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 18px rgba(0,0,0,.10);
+  transition:transform .16s ease,box-shadow .18s ease,border-color .18s ease,filter .18s ease;
+}
+#page-calendario .cal-day:not(.empty):active{
+  transform:scale(.94);
+  border-color:rgba(255,255,255,.18)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.18);
+  filter:brightness(1.08);
+}
+#page-calendario .cal-day.empty{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  opacity:.18!important;
+}
+#page-calendario .cal-day.today{
+  color:#fff!important;
+  border-color:rgba(255,209,150,.48)!important;
+  box-shadow:0 0 0 1px rgba(255,209,150,.28) inset,0 0 0 4px rgba(255,209,150,.08),0 10px 24px rgba(0,0,0,.18)!important;
+}
+#page-calendario .cal-day.today::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:5px;
+  width:4px;
+  height:4px;
+  border-radius:999px;
+  transform:translateX(-50%);
+  background:#ffd196;
+  box-shadow:0 0 10px rgba(255,209,150,.85);
+}
+#page-calendario .cal-day-emoji{
+  margin-top:2px;
+  font-size:8px!important;
+  opacity:.92;
+}
+.cal-overlay{
+  background:rgba(5,7,14,.46)!important;
+  backdrop-filter:blur(12px) saturate(130%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(130%)!important;
+}
+.cal-sheet{
+  border-radius:28px 28px 0 0!important;
+  padding:22px 18px calc(28px + var(--safe-bottom))!important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,209,150,.10),transparent 34%),
+    linear-gradient(180deg,rgba(23,28,50,.98),rgba(10,13,25,.99))!important;
+  border:1px solid rgba(255,255,255,.08);
+  border-bottom:0;
+  box-shadow:0 -22px 58px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.cal-sheet::before{
+  content:"";
+  display:block;
+  width:42px;
+  height:4px;
+  margin:0 auto 16px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+}
+.cal-det-date{
+  font-size:19px!important;
+  line-height:1.2!important;
+  letter-spacing:-.035em!important;
+  color:#f4f7ff;
+  margin-bottom:14px!important;
+}
+.cal-det-row{
+  align-items:center;
+  padding:11px 12px!important;
+  margin-bottom:7px;
+  border-radius:16px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.06);
+  color:rgba(210,220,245,.68)!important;
+}
+.cal-det-row b{
+  font-size:15px!important;
+  color:#f4f7ff;
+}
+.cal-det-notes{
+  margin-top:12px!important;
+  padding:13px 14px!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  color:rgba(226,235,255,.76)!important;
+}
+@media(max-width:360px){
+  #page-calendario .cal-summary{gap:8px!important;}
+  #page-calendario .cal-sum{padding:11px 10px!important;min-height:78px;}
+  #page-calendario .cal-grid-wrap{padding:11px!important;}
+  #page-calendario .cal-grid,#page-calendario .cal-weekdays{gap:5px!important;}
+  #page-calendario .cal-day{min-height:38px;border-radius:13px!important;font-size:10.5px!important;}
+}
+
+/* Recipes tab local polish */
+#page-recetas.rx-page{background:radial-gradient(circle at 50% -8%,rgba(102,144,255,.16),transparent 34%),radial-gradient(circle at 100% 18%,rgba(255,77,141,.09),transparent 28%);}
+#page-recetas.rx-page .rx-header{position:relative;padding:18px 18px 16px;border-radius:24px;background:linear-gradient(150deg,rgba(28,34,68,.92),rgba(10,13,30,.86));border:1px solid rgba(122,151,255,.16);box-shadow:0 18px 42px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden;}
+#page-recetas.rx-page .rx-header::after{content:"";position:absolute;right:-26px;top:-36px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,209,102,.18),transparent 68%);pointer-events:none;}
+#page-recetas.rx-page .rx-title{font-size:28px!important;letter-spacing:-.05em!important;}
+#page-recetas.rx-page .rx-sub{color:rgba(228,234,255,.68)!important;}
+#page-recetas.rx-page .rx-mini-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px;}
+#page-recetas.rx-page .rx-mini-stat{border-radius:16px;padding:11px 10px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(122,151,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
+#page-recetas.rx-page .rx-mini-stat b{display:block;font-family:'Space Mono',monospace;font-size:15px;color:#f4f7ff;line-height:1.1;}
+#page-recetas.rx-page .rx-mini-stat span{display:block;margin-top:3px;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(180,200,240,.48);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-recetas.rx-page .rx-filters{position:sticky;top:72px;z-index:10;background:linear-gradient(180deg,rgba(5,7,15,.94),rgba(5,7,15,.78));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:8px 0 10px!important;margin:0 0 12px!important;}
+#page-recetas.rx-page .rx-pill{box-shadow:0 8px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.05);}
+#page-recetas.rx-page .rx-filter-note{margin:0 2px 12px;padding:11px 13px;border-radius:16px;background:rgba(102,144,255,.10);border:1px solid rgba(102,144,255,.18);color:rgba(228,234,255,.72);font-size:12px;font-weight:700;line-height:1.45;}
+#page-recetas.rx-page .rx-pill[data-filter="honduras"].active{background:linear-gradient(140deg,#37b26c,#1d6fd8);box-shadow:0 8px 24px -8px rgba(55,178,108,.58);}
+#page-recetas.rx-page .rx-country-badge{position:absolute;left:9px;top:9px;z-index:3;display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:rgba(5,9,20,.66);border:1px solid rgba(255,255,255,.13);backdrop-filter:blur(9px);color:#eaf2ff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 8px 18px rgba(0,0,0,.24);}
+#page-recetas.rx-page .rx-featured-country{position:absolute;left:14px;bottom:14px;z-index:3;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:rgba(5,9,20,.68);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);color:#eaf2ff;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
+#page-recetas.rx-page .rx-card .rx-card-diff{left:auto!important;right:9px;}
+#page-recetas.rx-page .rx-card-fav{top:48px!important;}
+#page-recetas.rx-page .rx-spotlight{position:relative;border-radius:24px;padding:15px 16px;margin:0 0 16px;background:linear-gradient(135deg,rgba(55,178,108,.18),rgba(29,111,216,.12));border:1px solid rgba(90,210,145,.18);box-shadow:0 14px 32px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.05);}
+#page-recetas.rx-page .rx-spotlight-title{font-size:13px;font-weight:900;color:#f4f7ff;margin-bottom:4px;letter-spacing:-.01em;}
+#page-recetas.rx-page .rx-spotlight-sub{font-size:11.5px;line-height:1.45;color:rgba(218,226,255,.66);}
+#page-recetas.rx-page .rx-card{border-radius:24px!important;background:linear-gradient(160deg,rgba(30,36,70,.98),rgba(10,14,30,.96))!important;}
+#page-recetas.rx-page .rx-card-imgwrap{aspect-ratio:1.15/1!important;}
+#page-recetas.rx-page .rx-card-name{font-size:15px!important;min-height:auto!important;}
+#page-recetas.rx-page .rx-card-desc{font-size:12px!important;color:rgba(218,226,255,.66)!important;}
+#page-recetas.rx-page .rx-featured{border-radius:28px!important;}
+#page-recetas.rx-page .rx-featured-imgwrap{aspect-ratio:16/9!important;}
+#page-recetas.rx-page .recipe-video-actions{display:grid;grid-template-columns:1.15fr .85fr;gap:10px;}
+#page-recetas.rx-page .recipe-video-btn{min-height:46px;border-radius:16px!important;}
+#page-recetas.rx-page .recipe-video-embed{border-radius:22px!important;background:linear-gradient(160deg,rgba(10,13,28,.98),rgba(3,5,12,.98))!important;border:1px solid rgba(122,151,255,.18)!important;padding:10px!important;}
+#page-recetas.rx-page .recipe-video-frame{border-radius:16px!important;box-shadow:0 14px 34px rgba(0,0,0,.36);}
+.recipe-overlay .recipe-video-actions{display:grid!important;grid-template-columns:1.15fr .85fr;gap:10px!important;margin-bottom:16px!important;}
+.recipe-overlay .recipe-video-btn{min-height:46px;border-radius:16px!important;justify-content:center;}
+.recipe-overlay .recipe-video-embed{border-radius:22px!important;background:linear-gradient(160deg,rgba(10,13,28,.98),rgba(3,5,12,.98))!important;border:1px solid rgba(122,151,255,.18)!important;padding:10px!important;}
+.recipe-overlay .recipe-video-frame{border-radius:16px!important;box-shadow:0 14px 34px rgba(0,0,0,.36);}
+#mdbDetailOverlay .mdb-video-actions{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-bottom:14px;}
+#mdbDetailOverlay .mdb-yt-btn{justify-content:center;margin-bottom:0!important;min-height:44px;}
+#mdbDetailOverlay .mdb-yt-btn.secondary{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(228,234,255,.82);}
+#mdbDetailOverlay .recipe-video-embed{margin:0 0 18px;}
+@media(max-width:380px){#page-recetas.rx-page .rx-mini-stats{grid-template-columns:1fr;}#page-recetas.rx-page .recipe-video-actions{grid-template-columns:1fr;}}
+
+/* Local Scan key gate */
+#page-escanear .sx-key-card{background:linear-gradient(155deg,rgba(18,23,46,.96),rgba(9,12,28,.98));border:1px solid rgba(122,151,255,.16);border-radius:22px;padding:18px;margin:14px 0 16px;box-shadow:0 16px 42px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);}
+#page-escanear .sx-key-title{font-size:16px;font-weight:900;color:#f0f5ff;margin-bottom:6px;letter-spacing:-.02em;}
+#page-escanear .sx-key-sub{font-size:12px;line-height:1.5;color:rgba(180,200,240,.62);margin-bottom:14px;}
+#page-escanear .sx-key-row{display:flex;gap:10px;align-items:stretch;}
+#page-escanear .sx-key-input{min-width:0;flex:1;border:1px solid rgba(122,151,255,.18);border-radius:16px;background:rgba(255,255,255,.05);color:#f0f5ff;padding:13px 14px;font:600 13px 'Syne',sans-serif;outline:none;}
+#page-escanear .sx-key-input:focus{border-color:rgba(122,151,255,.5);box-shadow:0 0 0 3px rgba(91,138,255,.1);}
+#page-escanear .sx-key-save{border:none;border-radius:16px;background:linear-gradient(135deg,#6188ff,#8b65f0);color:white;font:800 13px 'Syne',sans-serif;padding:0 16px;white-space:nowrap;cursor:pointer;}
+#page-escanear .sx-key-note{font-size:10.5px;color:rgba(180,200,240,.42);margin-top:10px;}
+@media(max-width:420px){#page-escanear .sx-key-row{flex-direction:column;}#page-escanear .sx-key-save{min-height:44px;}}
 </style>
 </head>
 <body>
@@ -8894,6 +9195,7 @@ input:focus,textarea:focus,select:focus{
       <div class="rx-sub">Cocina sabroso, ahorra dinero</div>
     </div>
   </div>
+  <div class="rx-mini-stats" id="rxMiniStats"></div>
 
   <!-- MEALDB SEARCH -->
   <div class="mdb-search-box">
@@ -8924,6 +9226,9 @@ input:focus,textarea:focus,select:focus{
   <div class="rx-filters" id="rxFilters" role="tablist" aria-label="Filtros de recetas">
     <button class="rx-pill active" data-filter="all" onclick="setRecipeFilter('all')" type="button">
       <span class="rx-pill-ic">✨</span><span>Todo</span>
+    </button>
+    <button class="rx-pill" data-filter="honduras" onclick="setRecipeFilter('honduras')" type="button">
+      <span class="rx-pill-ic">🇭🇳</span><span>Honduras</span>
     </button>
     <button class="rx-pill" data-filter="cheap" onclick="setRecipeFilter('cheap')" type="button">
       <span class="rx-pill-ic">💵</span><span>Baratas</span>
@@ -9148,6 +9453,16 @@ input:focus,textarea:focus,select:focus{
       </div>
     </div>
   </section>
+
+  <div class="sx-key-card" id="scanKeyCard" style="display:none;">
+    <div class="sx-key-title">Conectar Groq</div>
+    <div class="sx-key-sub">Pega tu API key para activar el escaner con vision. La key se guarda solo en este dispositivo.</div>
+    <div class="sx-key-row">
+      <input class="sx-key-input" id="scanGroqKeyInput" type="password" placeholder="Pega tu Groq API key" autocomplete="off" onkeydown="if(event.key==='Enter')saveGroqKey()">
+      <button class="sx-key-save" onclick="saveGroqKey()" type="button">Guardar key</button>
+    </div>
+    <div class="sx-key-note" id="scanKeyMsg">Se guardara en localStorage como groq_api_key.</div>
+  </div>
 
   <!-- 2. UPLOAD ZONE -->
   <div class="sx-upload" id="scanUploadZone">
@@ -9578,8 +9893,13 @@ var SK='alcancia_v4';
 var SHOP_SK='alcancia_shop_v1';
 var SHOP_SPENT_SK='alcancia_shop_spent_v1';
 function loadState(){
-  try{ var r=localStorage.getItem(SK); if(r) return JSON.parse(r); }catch(e){}
-  return {days:[],unlockedAchs:[],achDates:{}};
+  var out=null;
+  try{ var r=localStorage.getItem(SK); if(r) out=JSON.parse(r); }catch(e){}
+  if(!out||typeof out!=='object') out={};
+  if(!Array.isArray(out.days)) out.days=[];
+  if(!Array.isArray(out.unlockedAchs)) out.unlockedAchs=[];
+  if(!out.achDates||typeof out.achDates!=='object'||Array.isArray(out.achDates)) out.achDates={};
+  return out;
 }
 function saveState(){ try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){} }
 var state=loadState();
@@ -10920,8 +11240,11 @@ function renderActivity(){
 
 // ── ACHIEVEMENTS ───────────────────────────────────────────────────
 function checkAchievements(){
+  if(!state||typeof state!=='object') state={days:[],unlockedAchs:[],achDates:{}};
+  if(!Array.isArray(state.days)) state.days=[];
+  if(!Array.isArray(state.unlockedAchs)) state.unlockedAchs=[];
+  if(!state.achDates||typeof state.achDates!=='object'||Array.isArray(state.achDates)) state.achDates={};
   var s=calcStreak(),ul=[];
-  if(!state.achDates) state.achDates={};
   ACHIEVEMENTS.forEach(function(a){
     if(state.unlockedAchs.indexOf(a.id)<0&&a.req(state.days,s)){
       state.unlockedAchs.push(a.id);
@@ -10935,9 +11258,14 @@ function checkAchievements(){
 
 function renderAchievements(){
   var g=$('achievementsGrid'); if(!g) return;
+  if(!state||typeof state!=='object') state={days:[],unlockedAchs:[],achDates:{}};
+  if(!Array.isArray(state.days)) state.days=[];
+  if(!Array.isArray(state.unlockedAchs)) state.unlockedAchs=[];
+  if(!state.achDates||typeof state.achDates!=='object'||Array.isArray(state.achDates)) state.achDates={};
   var s=calcStreak();
-  if(!state.achDates) state.achDates={};
-  var unlockedCount=state.unlockedAchs.length;
+  var unlockedMap={};
+  state.unlockedAchs.forEach(function(id){unlockedMap[id]=1;});
+  var unlockedCount=ACHIEVEMENTS.filter(function(a){return !!unlockedMap[a.id];}).length;
   var hdr=$('achHeader');
   if(hdr){
     var pct=Math.round(unlockedCount/ACHIEVEMENTS.length*100);
@@ -10949,8 +11277,15 @@ function renderAchievements(){
       +'<div class="ach-hdr-sub">'+pct+'% completado'+( unlockedCount===ACHIEVEMENTS.length?' · ¡Todo desbloqueado! 🎉':'')+'</div>';
   }
   g.innerHTML=ACHIEVEMENTS.map(function(a){
-    var ul=state.unlockedAchs.indexOf(a.id)>=0;
-    var p=ul?1:a.progress(state.days,s);
+    var ul=!!unlockedMap[a.id];
+    var p=0;
+    if(ul){
+      p=1;
+    }else{
+      try{p=typeof a.progress==='function'?a.progress(state.days,s):0;}catch(e){p=0;}
+      if(!isFinite(p)||isNaN(p)) p=0;
+      p=Math.max(0,Math.min(1,p));
+    }
     var pct=Math.round(p*100);
     var dateStr=ul&&state.achDates[a.id]?_achFmtDate(state.achDates[a.id]):'';
     return '<div class="ach-card2 '+(ul?'ach-unlocked':'ach-locked')+'" style="--ac:'+a.color+';--acr:'+a.rgb+'">'
@@ -11018,9 +11353,11 @@ function switchTab(id){
     entering.style.pointerEvents='';
     _tabBusy=false;
     if(id==='insights') renderInsights();
+    if(id==='logros') renderAchievements();
     if(id==='calendario') renderCalendar();
     if(id==='presupuesto') renderBudgetPage();
     if(id==='consejos') renderConsejos();
+    if(id==='escanear') updateScanKeyGate();
     if(id==='ai') aiInit();
     if(navigator.vibrate) navigator.vibrate(12);
     var stack=document.querySelector('.page-stack');
@@ -11353,7 +11690,7 @@ function toggleRecipeVideoEmbed(idx){
     watchRecipeVideo(idx);
     return;
   }
-  var embedUrl='https://www.youtube.com/embed/'+r.yt+'?rel=0&playsinline=1&modestbranding=1';
+  var embedUrl='https://www.youtube.com/embed/'+r.yt+'?autoplay=1&rel=0&playsinline=1&modestbranding=1';
   box.innerHTML='<div class="recipe-video-frame">'
     +'<iframe src="'+embedUrl+'" title="'+r.name+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
     +'</div>'
@@ -11363,7 +11700,10 @@ function toggleRecipeVideoEmbed(idx){
   if(btn){btn.textContent='✕ Cerrar video';}
 }
 
-function playRecipeVideo(idx){ watchRecipeVideo(idx); }
+function playRecipeVideo(idx){
+  openRecipe(idx);
+  setTimeout(function(){toggleRecipeVideoEmbed(idx);},80);
+}
 function ytRecipe(idx){ watchRecipeVideo(idx); }
 
 // ── SHOPPING LIST ──────────────────────────────────────────────────
@@ -12378,7 +12718,74 @@ RECIPES=RECIPES.concat([
    tip:'Arma justo antes de comer para que la tostada no se ablande.'}
 ]);
 
+RECIPES=RECIPES.concat([
+  {emoji:'🍗',name:'Pollo Chuco Hondureño',cat:'Plato fuerte',time:'75 min',diff:'Media',color:'#e86f43',country:'HN',
+   desc:'Pollo frito estilo callejero con tajadas, repollo, salsa rosada, chimol y queso.',
+   ingredients:[{a:'1 kg',n:'pollo en piezas'},{a:'3',n:'plátanos verdes'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'chimol'},{a:'1/2 taza',n:'salsa rosada'},{a:'1/2 taza',n:'queso rallado'},{a:'al gusto',n:'ajo, comino, sal y pimienta'}],
+   steps:['Sazona el pollo con ajo, comino, sal y pimienta.','Fríe el pollo hasta dorado y bien cocido.','Corta plátanos en tajadas largas y fríe hasta crujientes.','Sirve las tajadas con pollo encima.','Termina con repollo, chimol, salsa rosada y queso.'],
+   tip:'Para sabor de puesto, deja marinar el pollo al menos 1 hora.'},
+  {emoji:'🐚',name:'Sopa de Caracol',cat:'Sopa',time:'80 min',diff:'Media',color:'#44c2c8',country:'HN',
+   desc:'Sopa costeña cremosa con caracol, leche de coco, yuca, plátano y cilantro.',
+   ingredients:[{a:'500 g',n:'caracol limpio'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'yuca en trozos'},{a:'1',n:'plátano verde'},{a:'1',n:'zanahoria'},{a:'1',n:'chile dulce'},{a:'al gusto',n:'cilantro, ajo, sal y achiote'}],
+   steps:['Sofríe ajo, chile dulce y achiote.','Agrega agua, yuca, zanahoria y plátano.','Cuando las verduras estén suaves, añade leche de coco.','Agrega el caracol al final y cocina pocos minutos.','Termina con cilantro fresco.'],
+   tip:'No cocines demasiado el caracol para que no quede duro.'},
+  {emoji:'🥘',name:'Yuca con Chicharrón',cat:'Plato fuerte',time:'55 min',diff:'Media',color:'#d7a451',country:'HN',
+   desc:'Yuca suave con chicharrón crujiente, repollo curtido, salsa y chimol.',
+   ingredients:[{a:'1 kg',n:'yuca pelada'},{a:'500 g',n:'chicharrón'},{a:'2 tazas',n:'repollo curtido'},{a:'1 taza',n:'salsa de tomate'},{a:'1/2 taza',n:'chimol'},{a:'al gusto',n:'sal y limón'}],
+   steps:['Hierve la yuca con sal hasta que esté suave.','Retira la hebra del centro.','Calienta o fríe el chicharrón hasta crujiente.','Sirve yuca, chicharrón, repollo, salsa y chimol.'],
+   tip:'Un chorrito de limón levanta todo el plato.'},
+  {emoji:'🥟',name:'Pastelitos Hondureños',cat:'Aperitivo',time:'65 min',diff:'Media',color:'#f0b44e',country:'HN',
+   desc:'Pastelitos fritos de masa de maíz rellenos de carne, arroz y papa.',
+   ingredients:[{a:'3 tazas',n:'masa de maíz'},{a:'300 g',n:'carne molida'},{a:'1 taza',n:'arroz cocido'},{a:'1',n:'papa en cubitos'},{a:'1 cdita',n:'achiote'},{a:'suficiente',n:'aceite para freír'},{a:'al gusto',n:'repollo y salsa'}],
+   steps:['Cocina carne con papa, achiote y especias.','Mezcla con arroz cocido.','Forma tortillas de masa, rellena y dobla.','Sella los bordes y fríe hasta dorar.','Sirve con repollo y salsa.'],
+   tip:'No sobrellenes para que no se abran al freír.'},
+  {emoji:'🌽',name:'Montucas Hondureñas',cat:'Plato fuerte',time:'130 min',diff:'Difícil',color:'#e8c85a',country:'HN',
+   desc:'Tamales de elote tierno rellenos de pollo o cerdo, envueltos en tusa.',
+   ingredients:[{a:'8',n:'elotes tiernos desgranados'},{a:'2 tazas',n:'pollo guisado desmenuzado'},{a:'1 taza',n:'recado'},{a:'1/2 taza',n:'manteca o aceite'},{a:'al gusto',n:'sal y azúcar'},{a:'varias',n:'tusas de elote'}],
+   steps:['Muele o licúa el maíz tierno.','Mezcla con manteca, sal y un toque de azúcar.','Coloca masa y relleno en tusas.','Envuelve bien y cocina al vapor hasta firme.'],
+   tip:'La masa debe quedar húmeda, no líquida.'},
+  {emoji:'🍲',name:'Tapado Olanchano',cat:'Sopa',time:'110 min',diff:'Difícil',color:'#8fbf5f',country:'HN',
+   desc:'Guiso hondureño potente con carnes, plátano, yuca, chorizo y verduras.',
+   ingredients:[{a:'500 g',n:'costilla de res'},{a:'300 g',n:'cerdo o chorizo'},{a:'1',n:'yuca'},{a:'2',n:'plátanos verdes'},{a:'2',n:'papas'},{a:'1/2',n:'repollo'},{a:'al gusto',n:'culantro, ajo, cebolla y achiote'}],
+   steps:['Hierve las carnes con ajo, cebolla y sal hasta suavizar.','Agrega yuca, plátano y papa.','Añade chorizo y achiote para dar color.','Termina con repollo y culantro.','Sirve bien caliente.'],
+   tip:'El reposo de 10 minutos mejora el sabor del caldo.'},
+  {emoji:'🥣',name:'Sopa Marinera Hondureña',cat:'Sopa',time:'70 min',diff:'Media',color:'#4aaac8',country:'HN',
+   desc:'Caldo de mariscos con leche de coco, pescado, camarón y verduras.',
+   ingredients:[{a:'400 g',n:'pescado en trozos'},{a:'300 g',n:'camarón'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'yuca'},{a:'1',n:'plátano verde'},{a:'1',n:'chile dulce'},{a:'al gusto',n:'cilantro, ajo y sal'}],
+   steps:['Sofríe ajo y chile dulce.','Agrega agua, yuca y plátano hasta suavizar.','Añade leche de coco.','Incorpora pescado y camarón al final.','Cocina hasta que los mariscos estén listos.'],
+   tip:'Agrega los mariscos al final para que queden jugosos.'},
+  {emoji:'☕',name:'Rosquillas en Miel',cat:'Postre',time:'35 min',diff:'Fácil',color:'#c98a4a',country:'HN',
+   desc:'Rosquillas hondureñas bañadas en miel de rapadura con canela.',
+   ingredients:[{a:'10',n:'rosquillas hondureñas'},{a:'2 tazas',n:'agua'},{a:'1 taza',n:'rapadura o panela'},{a:'1 raja',n:'canela'},{a:'3',n:'clavos de olor'}],
+   steps:['Hierve agua con rapadura, canela y clavos.','Cocina hasta formar miel ligera.','Agrega las rosquillas y deja que absorban.','Sirve tibias con café.'],
+   tip:'Déjalas reposar unos minutos para que se impregnen bien.'},
+  {emoji:'🍞',name:'Semitas Hondureñas',cat:'Postre',time:'120 min',diff:'Media',color:'#b77945',country:'HN',
+   desc:'Pan dulce hondureño con relleno de rapadura, perfecto para café.',
+   ingredients:[{a:'4 tazas',n:'harina de trigo'},{a:'1 taza',n:'rapadura rallada'},{a:'1/2 taza',n:'manteca o mantequilla'},{a:'1 taza',n:'leche tibia'},{a:'2 cditas',n:'levadura'},{a:'1 cdita',n:'canela'}],
+   steps:['Activa la levadura con leche tibia.','Mezcla harina, grasa y forma una masa suave.','Reposa hasta duplicar.','Rellena con rapadura y canela.','Hornea hasta dorar.'],
+   tip:'Sirve con café negro para una merienda bien catracha.'},
+  {emoji:'🌽',name:'Atol de Elote Hondureño',cat:'Bebida',time:'30 min',diff:'Fácil',color:'#f0d06a',country:'HN',
+   desc:'Bebida espesa y dulce de maíz tierno, leche, canela y vainilla.',
+   ingredients:[{a:'4',n:'elotes tiernos'},{a:'3 tazas',n:'leche'},{a:'1 taza',n:'agua'},{a:'1/2 taza',n:'azúcar'},{a:'1 raja',n:'canela'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Desgrana y licúa el maíz con agua.','Cuela y cocina con leche y canela.','Mueve constantemente hasta espesar.','Agrega azúcar y vainilla.','Sirve caliente o tibio.'],
+   tip:'Mover todo el tiempo evita grumos y que se pegue.'},
+  {emoji:'🥩',name:'Carne Asada Catracha',cat:'Plato fuerte',time:'50 min',diff:'Fácil',color:'#d45757',country:'HN',
+   desc:'Carne asada con chimol, frijoles, queso, aguacate y tortillas.',
+   ingredients:[{a:'700 g',n:'carne para asar'},{a:'1 taza',n:'chimol'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso rallado'},{a:'1',n:'aguacate'},{a:'8',n:'tortillas'},{a:'al gusto',n:'sal, pimienta, naranja agria'}],
+   steps:['Sazona la carne con sal, pimienta y naranja agria.','Asa a fuego alto hasta dorar.','Calienta frijoles y tortillas.','Sirve con chimol, queso y aguacate.'],
+   tip:'La naranja agria le da ese toque de parrillada catracha.'},
+  {emoji:'🍌',name:'Machuca Garífuna',cat:'Plato fuerte',time:'75 min',diff:'Media',color:'#61b985',country:'HN',
+   desc:'Plátano majado servido con sopa de coco y pescado al estilo garífuna.',
+   ingredients:[{a:'4',n:'plátanos verdes'},{a:'500 g',n:'pescado'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'chile dulce'},{a:'1',n:'cebolla'},{a:'al gusto',n:'cilantro, ajo y sal'}],
+   steps:['Hierve plátanos verdes hasta suavizar.','Maja hasta formar una masa rústica.','Prepara caldo con leche de coco, ajo, chile y cebolla.','Agrega pescado y cocina hasta listo.','Sirve la machuca con la sopa encima.'],
+   tip:'Majar el plátano caliente facilita lograr buena textura.'}
+]);
+
 var rxFilter='all';
+function rxIsHonduran(r){
+  var hay=_mdbNormText((r&&r.name||'')+' '+(r&&r.desc||'')+' '+(r&&r.cat||''));
+  return (r&&r.country==='HN') || /hondur|catrach|baleada|tajada|montuca|caracol|chuco|tapado|rosquilla|semita|chilate/.test(hay);
+}
 function rxRecipeMinutes(r){var n=parseInt(r.time,10);return isNaN(n)?60:n;}
 function rxRecipeCostNum(r){
   // Returns mid-point USD numeric estimate of recipe cost to cook at home.
@@ -12425,6 +12832,7 @@ function rxRecipeTags(r){
   var costN=rxRecipeCostNum(r);
   var c=r.cat||'';
   var nameDesc=(r.name+' '+(r.desc||'')).toLowerCase();
+  if(rxIsHonduran(r)) tags.push('honduras');
   // Quick: 30 min or less
   if(min<=30) tags.push('quick');
   // Cheap: very low cost
@@ -12671,6 +13079,28 @@ function _mdbTranslateCards(meals){
 function _mdbEsc(s){
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function _ytIdFromUrl(url){
+  var m=String(url||'').match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{6,})/);
+  return m?m[1]:'';
+}
+function mdbToggleVideo(videoId){
+  var box=document.getElementById('mdbVideoEmbed');
+  var btn=document.getElementById('mdbEmbedBtn');
+  if(!box||!videoId) return;
+  if(box.dataset.active==='true'){
+    box.innerHTML='';
+    box.dataset.active='false';
+    box.classList.add('hidden');
+    if(btn) btn.textContent='▶ Ver aquí';
+    return;
+  }
+  box.innerHTML='<div class="recipe-video-frame">'
+    +'<iframe src="https://www.youtube.com/embed/'+videoId+'?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="Video de receta" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+    +'</div>';
+  box.dataset.active='true';
+  box.classList.remove('hidden');
+  if(btn) btn.textContent='✕ Cerrar video';
+}
 function mdbShowDetail(id){
   var xhr=new XMLHttpRequest();
   xhr.open('GET','https://www.themealdb.com/api/json/v1/1/lookup.php?i='+encodeURIComponent(id),true);
@@ -12689,7 +13119,8 @@ function mdbShowDetail(id){
     /* YouTube button */
     var ytEl=document.getElementById('mdbDetYT');
     if(m.strYoutube&&m.strYoutube.trim()){
-      ytEl.innerHTML='<a class="mdb-yt-btn" href="'+_mdbEsc(m.strYoutube)+'" target="_blank" rel="noopener">▶ Ver en YouTube</a>';
+      var vid=_ytIdFromUrl(m.strYoutube);
+      ytEl.innerHTML=(vid?'<div class="mdb-video-actions"><button class="mdb-yt-btn" id="mdbEmbedBtn" onclick="mdbToggleVideo(\''+vid+'\')" type="button">▶ Ver aquí</button><a class="mdb-yt-btn secondary" href="'+_mdbEsc(m.strYoutube)+'" target="_blank" rel="noopener">↗ YouTube</a></div><div class="recipe-video-embed hidden" id="mdbVideoEmbed" data-active="false"></div>':'<a class="mdb-yt-btn" href="'+_mdbEsc(m.strYoutube)+'" target="_blank" rel="noopener">▶ Ver en YouTube</a>');
       ytEl.style.display='block';
     } else {
       ytEl.innerHTML='';
@@ -12740,9 +13171,11 @@ function renderRecipeCard(i,delay){
   var diffCls=/muy f|f[áa]cil/i.test(r.diff)?'easy':(/media|medio/i.test(r.diff)?'medium':'easy');
   var img=rxRecipeImage(r);
   var savingsLbl=rxRecipeSavingsLbl(r);
+  var hn=rxIsHonduran(r);
   return '<div class="rx-card" style="animation-delay:'+(delay||0)+'ms" onclick="openRecipe('+i+')">'
     +'<div class="rx-card-imgwrap">'
     +'<img class="rx-card-img" src="'+img+'" alt="'+r.name+'" loading="lazy" data-rx-idx="'+i+'" onload="this.classList.add(\'loaded\')">'
+    +(hn?'<span class="rx-country-badge">🇭🇳 Catracha</span>':'')
     +'<button class="rx-card-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFavorite('+i+')" title="Favorito" type="button">'+(isFav?'★':'☆')+'</button>'
     +'<span class="rx-card-diff '+diffCls+'">'+r.diff+'</span>'
     +'</div>'
@@ -12767,10 +13200,12 @@ function rxRenderFeatured(i){
   var isFav=favorites.indexOf(i)>=0;
   var img=rxRecipeImage(r);
   var savingsLbl=rxRecipeSavingsLbl(r);
+  var hn=rxIsHonduran(r);
   return '<div class="rx-featured" onclick="openRecipe('+i+')">'
     +'<div class="rx-featured-imgwrap">'
     +'<img class="rx-featured-img" src="'+img+'" alt="'+r.name+'" data-rx-idx="'+i+'" onload="this.classList.add(\'loaded\')">'
     +'<span class="rx-featured-badge">★ Recomendado</span>'
+    +(hn?'<span class="rx-featured-country">🇭🇳 Sabor catracho</span>':'')
     +'<button class="rx-featured-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFavorite('+i+')" title="Favorito" type="button">'+(isFav?'★':'☆')+'</button>'
     +'</div>'
     +'<div class="rx-featured-content">'
@@ -12796,6 +13231,20 @@ function setRecipeFilter(f){
   }
   renderRecipes();
 }
+function renderRxMiniStats(visibleCount){
+  var el=$('rxMiniStats');
+  if(!el) return;
+  var favCount=favorites.length;
+  var videoCount=0,hnCount=0;
+  for(var i=0;i<RECIPES.length;i++){
+    if(RECIPES[i].yt) videoCount++;
+    if(rxIsHonduran(RECIPES[i])) hnCount++;
+  }
+  el.innerHTML='<div class="rx-mini-stat"><b>'+visibleCount+'</b><span>en pantalla</span></div>'
+    +'<div class="rx-mini-stat"><b>'+hnCount+'</b><span>catrachas</span></div>'
+    +'<div class="rx-mini-stat"><b>'+videoCount+'</b><span>con video</span></div>'
+    +'<div class="rx-mini-stat"><b>'+favCount+'</b><span>favoritas</span></div>';
+}
 function renderRecipes(){
   var el=$('recipesList'); if(!el) return;
   var html='';
@@ -12811,6 +13260,17 @@ function renderRecipes(){
     if(i===featuredIdx) continue;
     if(rxFilterMatches(RECIPES[i])) matches.push(i);
   }
+  var filterNote='';
+  if(featuredIdx<0&&matches.length===0&&rxFilter!=='fav'){
+    filterNote='No encontré coincidencias exactas para ese filtro, así que te muestro todas para que no se desaparezcan las recetas.';
+    featuredIdx=0;
+    html=rxRenderFeatured(featuredIdx);
+    matches=[];
+    for(var ai=0;ai<RECIPES.length;ai++){if(ai!==featuredIdx) matches.push(ai);}
+  }
+  renderRxMiniStats((featuredIdx>=0?1:0)+matches.length);
+  if(rxFilter==='honduras') html+='<div class="rx-spotlight"><div class="rx-spotlight-title">🇭🇳 Cocina hondureña</div><div class="rx-spotlight-sub">Baleadas, sopas, antojitos, panes y platos de casa con estilo catracho.</div></div>';
+  if(filterNote) html+='<div class="rx-filter-note">'+filterNote+'</div>';
   html+='<div class="rx-section-label"><span>Más recetas</span></div>';
   if(matches.length===0){
     var emptyMap={
@@ -12820,6 +13280,7 @@ function renderRecipes(){
       mealprep: {e:'🍱',  t:'Sin meal prep todavía',       s:'Recetas que rinden varias porciones para preparar la semana.'},
       gaming:   {e:'🎮',  t:'Sin snacks de gaming',        s:'Tostones, catrachas y bocados perfectos para una noche de juegos con amigos.'},
       cozy:     {e:'🛋️',  t:'Sin recetas cozy',            s:'Sopas calientitas, arroz con leche y comfort food para días tranquilos.'},
+      honduras: {e:'🇭🇳',  t:'Sin recetas hondureñas',      s:'Prueba ver todas las recetas mientras agregamos más sabor catracho.'},
       fav:      {e:'🌟',  t:'Aún sin favoritos',           s:'Toca el ★ en cualquier receta para guardarla aquí.'}
     };
     var em=emptyMap[rxFilter]||{e:'🍽️',t:'Ninguna receta coincide',s:'Prueba con otro filtro o explora todas las recetas.'};
@@ -12879,7 +13340,8 @@ function openRecipe(idx){
       +'</div>'
     +'</div>'
     +'<div class="recipe-video-actions" id="recipeVideoActions">'
-    +'<button class="recipe-video-btn secondary" id="recipeYtBtn" onclick="watchRecipeVideo('+idx+')" style="flex:1;">↗ Abrir en YouTube</button>'
+    +(r.yt?'<button class="recipe-video-btn primary" id="recipeEmbedBtn" onclick="toggleRecipeVideoEmbed('+idx+')" type="button">▶ Ver aquí</button>':'')
+    +'<button class="recipe-video-btn secondary" id="recipeYtBtn" onclick="watchRecipeVideo('+idx+')" type="button">'+(r.yt?'↗ YouTube':'↗ Buscar video')+'</button>'
     +'</div>'
     +(r.yt?'<div class="recipe-video-embed hidden" id="recipeVideoEmbed" data-active="false"></div>':'')
     +'<div class="rsec"><div class="rsec-title">🛒 Ingredientes</div>'
@@ -12900,7 +13362,6 @@ function openRecipe(idx){
   $('recipeContent').innerHTML=html;
   $('recipeOverlay').classList.add('show');
   document.body.style.overflow='hidden';
-  if(r.yt) checkYTEmbeddable(r.yt, idx);
 }
 
 // Ingredient checklist toggle — premium tap feel
@@ -13847,6 +14308,53 @@ function deleteBudget(){
 var _scanDetected = null; // {total, items:[{name,price,selected}]}
 var _scanImageDataUrl = '';
 
+function hasGroqKey(){
+  try{return !!(localStorage.getItem('groq_api_key')||'').trim();}catch(e){return false;}
+}
+function saveGroqKey(){
+  var input=$('scanGroqKeyInput');
+  var msg=$('scanKeyMsg');
+  var key=input?(input.value||'').trim():'';
+  if(!key){
+    if(msg) msg.textContent='Pega una key valida antes de guardar.';
+    showToast('Pega tu API key de Groq');
+    return;
+  }
+  try{localStorage.setItem('groq_api_key',key);}catch(e){}
+  if(input) input.value='';
+  if(msg) msg.textContent='Key guardada. Ya puedes escanear recibos.';
+  updateScanKeyGate();
+  showToast('Key de Groq guardada');
+}
+function updateScanKeyGate(){
+  var ok=hasGroqKey();
+  var card=$('scanKeyCard');
+  var zone=$('scanUploadZone');
+  var actions=document.querySelector('#page-escanear .sx-actions');
+  var preview=$('scanPreviewWrap');
+  var btn=$('scanBtn');
+  var load=$('scanLoading');
+  var res=$('scanResults');
+  if(card) card.style.display=ok?'none':'block';
+  if(!ok){
+    if(zone) zone.style.display='none';
+    if(actions) actions.style.display='none';
+    if(preview) preview.style.display='none';
+    if(btn) btn.style.display='none';
+    if(load) load.style.display='none';
+    if(res) res.style.display='none';
+    return;
+  }
+  if(preview) preview.style.display='';
+  if(btn) btn.style.display='';
+  if(load) load.style.display='';
+  if(res) res.style.display='';
+  if(!_scanImageDataUrl){
+    if(zone) zone.style.display='';
+    if(actions) actions.style.display='';
+  }
+}
+
 // Sample receipt data pools for simulation
 var _SCAN_POOL = [
   [{name:'Leche entera 1L',price:1.85},{name:'Pan integral',price:2.30},{name:'Huevos x12',price:3.20},{name:'Mantequilla',price:2.75},{name:'Jugo naranja',price:3.50}],
@@ -13858,6 +14366,11 @@ var _SCAN_POOL = [
 ];
 
 function scanFileChosen(input){
+  if(!hasGroqKey()){
+    updateScanKeyGate();
+    showToast('Primero guarda tu API key de Groq');
+    return;
+  }
   var file=input.files&&input.files[0];
   if(!file) return;
   var reader=new FileReader();
@@ -13901,6 +14414,7 @@ function scanReset(){
   if(load) load.classList.remove('visible');
   _scanDetected=null;
   _scanImageDataUrl='';
+  updateScanKeyGate();
 }
 
 function scanReceipt(){
@@ -14038,7 +14552,7 @@ scanReceipt=function(){
   var txtEl=$('scanLoadingTxt');
   var apiKey='';
   try{apiKey=localStorage.getItem('groq_api_key')||'';}catch(e){}
-  if(!apiKey){showToast('Configura localStorage.groq_api_key');return;}
+  if(!apiKey){updateScanKeyGate();showToast('Pega y guarda tu API key de Groq');return;}
   if(!_scanImageDataUrl){showToast('Toma o sube una foto del recibo');return;}
 
   if(btn) btn.disabled=true;
@@ -15159,6 +15673,7 @@ renderShopList();
 renderCalendar();
 updateAiFabDot();
 updateAiFabVisibility();
+updateScanKeyGate();
 setTimeout(_aiProactiveCheck, 2200);
 </script>
 
