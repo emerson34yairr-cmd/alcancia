@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+npm-debug.log*
+ios/App/Pods/
+ios/App/build/
+ios/App/DerivedData/
+ios/App/*.xcworkspace/xcuserdata/
+ios/App/*.xcodeproj/xcuserdata/
+ios/App/*.xcodeproj/project.xcworkspace/xcuserdata/

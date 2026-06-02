@@ -1,0 +1,19 @@
+{
+  "name": "mi-alcancia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mi Alcancia web app prepared for an iOS Capacitor wrapper.",
+  "scripts": {
+    "cap:add:ios": "cap add ios",
+    "cap:sync:ios": "cap sync ios",
+    "cap:copy": "cap copy",
+    "validate": "node scripts/validate-html-scripts.js"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.4"
+  }
+}
