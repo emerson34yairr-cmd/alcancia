@@ -7,8 +7,17 @@ This workspace now includes a Capacitor iOS wrapper for the single-file Mi Alcan
 - Original app file: `index.html.html`
 - Capacitor web bundle: `www/index.html`
 - iOS copied bundle: `ios/App/App/public/index.html`
+- PWA manifest: `www/app.webmanifest`
+- Offline/service worker: `www/sw.js`
+- App icon: `www/assets/app-icon.svg`
 
 The current copied files match the original HTML by SHA256.
+
+## Current iOS Wrapper State
+
+The Xcode workspace is present at `ios/App/App.xcworkspace`, with scheme `App` and bundle id `com.emerson34yairr.alcancia`.
+
+On June 4, 2026, XcodeBuildMCP discovered the local workspace successfully, but build/run could not execute on this Windows machine because `xcodebuild` is not installed here.
 
 ## Build On macOS
 
