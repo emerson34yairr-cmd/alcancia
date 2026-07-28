@@ -5155,7 +5155,12 @@ body::before{
   94%, 96% { transform: scaleY(.08); }
 }
 #piggyEye {
-  transform-origin: 110px 106px;
+  /* transform-box:fill-box measures transform-origin from this group's OWN
+     bounding box, which is only ~26px tall. The old value (110px 106px) was
+     written in viewBox coordinates, so it put the pivot ~80px BELOW the eyes
+     and the blink threw them down onto the belly. Percentages are relative to
+     the box, so 50% 50% is the centre of the eyes whatever their size. */
+  transform-origin: 50% 50%;
   transform-box: fill-box;
   animation: piggyBlink 5.5s ease-in-out infinite;
 }
