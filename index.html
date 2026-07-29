@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#05070f">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Mi Alcancia: finanzas personales, lista de compras, recetas y escaner de recibos en una app movil.">
 <meta name="format-detection" content="telephone=no">
@@ -7144,7 +7144,7 @@ body { padding-bottom: 0 !important; }
 #page-hoy.fx-home .fx-hero-piggy-wrap .piggy-svg{filter:drop-shadow(0 14px 22px rgba(0,0,0,.45)) drop-shadow(0 0 18px rgba(124,151,255,.35));}
 #page-hoy.fx-home .fx-hero-piggy-wrap .piggy-container{position:relative;width:220px;height:210px;cursor:pointer;}
 #page-hoy.fx-home .fx-hero-piggy-wrap canvas#coinCanvas{position:absolute;top:0;left:0;}
-#page-hoy.fx-home .fx-hero-piggy-wrap .piggy-label{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:1.6px;color:rgba(228,234,255,.55);z-index:2;white-space:nowrap;}
+#page-hoy.fx-home .fx-hero-piggy-wrap .piggy-label{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:1.6px;color:rgba(240,245,255,.86);z-index:2;white-space:nowrap;max-width:132px;overflow:hidden;text-overflow:ellipsis;}
 
 #page-hoy.fx-home .fx-hero-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 #page-hoy.fx-home .fx-qa{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 6px;border-radius:18px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;font-family:inherit;}
@@ -7712,9 +7712,9 @@ input[type=number]{font-size:16px !important;}
 
 /* Assistant: keep the floating widget low and reserve scroll space so it does not cover content */
 .page{padding-bottom:calc(154px + var(--safe-bottom)) !important;}
-.ai-fab{width:52px !important;height:52px !important;right:14px !important;bottom:calc(84px + var(--safe-bottom)) !important;z-index:450 !important;}
+.ai-fab{width:52px !important;height:52px !important;right:14px !important;bottom:calc(84px + var(--safe-bottom)) !important;z-index:450 !important;animation:none !important;background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 46%),linear-gradient(135deg,#3D5BFF 0%,#5B4BF5 52%,#7A3FE0 100%) !important;border:1px solid rgba(255,255,255,.16) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 22px rgba(93,110,255,.34),0 2px 8px rgba(0,0,0,.6) !important;transition:opacity .22s ease,transform .22s ease !important;}
 .ai-fab-avatar{width:38px !important;height:38px !important;font-size:21px !important;}
-#aiProactiveToast{right:74px !important;bottom:calc(90px + var(--safe-bottom)) !important;max-width:190px !important;}
+#aiProactiveToast,#aiActionToast{position:fixed !important;left:0 !important;right:0 !important;margin:0 auto !important;bottom:calc(12px + var(--safe-bottom)) !important;top:auto !important;width:calc(100vw - 28px) !important;width:min(492px, calc(100vw - 28px)) !important;max-width:none !important;box-sizing:border-box !important;z-index:9990 !important;display:flex !important;align-items:flex-start !important;gap:10px !important;padding:12px 12px 12px 14px !important;border-radius:18px !important;background:linear-gradient(180deg,rgba(216,226,255,.145) 0%,rgba(216,226,255,.06) 42%,rgba(216,226,255,.05) 100%),rgba(0,0,0,.84) !important;border:1px solid rgba(255,255,255,.10) !important;border-top-color:rgba(255,255,255,.22) !important;border-bottom-color:rgba(255,255,255,.05) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 14px 38px rgba(0,0,0,.72) !important;color:#F2F5FF !important;font-size:13px !important;line-height:1.45 !important;text-align:left !important;cursor:pointer !important;}#aiProactiveToast .ai-toast-body,#aiActionToast .ai-toast-body{flex:1 1 auto !important;min-width:0 !important;text-align:left !important;}#aiProactiveToast .ai-toast-kicker,#aiActionToast .ai-toast-kicker{display:block !important;margin-bottom:3px !important;font-size:10.5px !important;font-weight:700 !important;letter-spacing:.06em !important;color:#8792AB !important;}#aiProactiveToast .ai-toast-x,#aiActionToast .ai-toast-x{flex:0 0 auto !important;width:30px !important;height:30px !important;padding:0 !important;margin:-2px -2px 0 0 !important;border-radius:50% !important;border:1px solid rgba(255,255,255,.10) !important;border-top-color:rgba(255,255,255,.22) !important;background:linear-gradient(180deg,rgba(226,234,255,.13) 0%,rgba(226,234,255,.055) 55%,rgba(226,234,255,.045) 100%) !important;color:#AEB9D4 !important;font-size:17px !important;line-height:1 !important;display:flex !important;align-items:center !important;justify-content:center !important;cursor:pointer !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14) !important;}#aiProactiveToast .ai-toast-x:active,#aiActionToast .ai-toast-x:active{transform:scale(.9) !important;color:#F2F5FF !important;background:rgba(255,255,255,.18) !important;}@keyframes aiDockIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}@media (prefers-reduced-motion:reduce){#aiProactiveToast,#aiActionToast{animation:none !important;}}.bud-fab{transition:transform .18s ease,opacity .22s ease !important;}body.ai-toast-open .ai-fab,body.ai-toast-open .bud-fab{opacity:0 !important;pointer-events:none !important;transform:translateY(14px) scale(.92) !important;}body.ai-toast-open #toast{bottom:calc(136px + var(--safe-bottom)) !important;}
 #page-recetas.rx-page .rx-featured-fav{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;z-index:3;border:1px solid rgba(255,255,255,.14);background:rgba(7,9,15,.58);backdrop-filter:blur(8px);color:rgba(255,255,255,.72);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 #page-recetas.rx-page .rx-featured-fav.active{color:#ffd166;background:rgba(255,209,102,.18);}
 
@@ -9232,6 +9232,171 @@ body.privacy-mode .privacy-toggle-btn{
     transition-duration:.01ms!important;
   }
 }
+/* ================================================================
+   HEADER FIX v2 - colision de cabecera + affordance de scroll en tabs
+   Va al final del <style>, despues de TODAS las reglas .header/.tabs.
+   Convive con BLACK GLASS: aqui solo hay layout + selectores nuevos.
+   ================================================================ */
+
+/* --- 1. El unico hijo de .header debe ocupar el ancho completo --- */
+.header-inner{
+  display:flex !important;
+  width:100% !important;
+  flex:1 1 auto !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+
+/* --- 2. La marca cede espacio y TRUNCA en vez de desbordar --- */
+.brand-block{flex:1 1 auto !important;min-width:0 !important;overflow:hidden !important;}
+.logo{
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:22px !important;
+}
+
+/* --- 3. El grupo derecho NUNCA envuelve --- */
+.header-inner > div.header-actions:last-child{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:8px !important;
+  flex:0 0 auto !important;
+  flex-wrap:nowrap !important;
+  position:relative !important;
+}
+.streak-badge{
+  padding:6px 11px !important;
+  font-size:10px !important;
+  min-height:30px !important;
+  flex:0 0 auto !important;
+}
+
+/* --- 4. Boton de tres puntos --- */
+.hdr-more-btn{
+  flex:0 0 auto !important;
+  width:34px !important;
+  min-width:34px !important;
+  height:32px !important;
+  padding:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:12px !important;
+  font-size:17px !important;
+  line-height:1 !important;
+  cursor:pointer;
+  background:linear-gradient(180deg,rgba(226,234,255,.13) 0%,rgba(226,234,255,.05) 100%);
+  color:#E6ECFF;
+  border:1px solid rgba(255,255,255,.10);
+  border-top-color:rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 4px 14px rgba(0,0,0,.45);
+  transition:transform .14s ease, background .2s ease;
+}
+.hdr-more-btn[aria-expanded="true"]{
+  background:linear-gradient(180deg,rgba(110,139,255,.34) 0%,rgba(110,139,255,.16) 100%);
+  border-color:rgba(140,165,255,.42);
+  color:#FFFFFF;
+}
+.hdr-more-btn:active{transform:scale(.94);}
+
+/* --- 5. Menu desplegable --- */
+/* OBLIGATORIO: display:flex le ganaria al atributo [hidden] */
+.hdr-menu[hidden]{display:none !important;}
+.hdr-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  z-index:120;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  min-width:180px;
+  padding:10px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(216,226,255,.14) 0%,rgba(216,226,255,.05) 100%), rgba(6,8,14,.94);
+  border:1px solid rgba(255,255,255,.12);
+  border-top-color:rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 18px 44px rgba(0,0,0,.62);
+}
+.hdr-menu > .currency-picker{display:flex !important;width:100% !important;flex-shrink:1 !important;}
+.hdr-menu > .currency-picker button{flex:1 1 0 !important;}
+.hdr-menu > button{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  font-size:11px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* --- 6. Tabs: wrapper + degradado de desvanecido a la derecha --- */
+/* El sticky vive AHORA en el wrapper: si .tabs siguiera siendo sticky
+   dentro del wrapper su recorrido quedaria reducido al padding.
+   El margen de .tabs pasa al padding del wrapper para poder anclar el
+   fade a medidas deterministas. */
+.tabs-wrap{
+  position:relative;   /* fallback: si no hay sticky, sigue siendo el
+                          contenedor posicionado del .tabs-fade */
+  position:sticky;
+  top:64px;
+  z-index:90;
+  padding:12px 14px 16px;
+}
+.tabs{
+  position:static !important;
+  top:auto !important;
+  margin:0 !important;
+  scroll-padding-left:16px;
+  scroll-padding-right:60px;
+}
+/* El degradado se tine con la MISMA superficie del pill (var --surf-glass)
+   compuesta sobre el fondo del .app-frame (#0A0D16), no con negro puro:
+   asi el borde opaco es exactamente el color del pill y no una mancha.
+   Va 1px por dentro del borde del pill para no taparlo. */
+.tabs-fade{
+  position:absolute;
+  top:13px; right:15px; bottom:17px;
+  width:56px;
+  z-index:2;
+  pointer-events:none;
+  border-radius:0 15px 15px 0;
+  background:
+    linear-gradient(to left, var(--surf-glass) 0%, var(--surf-glass) 44%, rgba(0,0,0,0) 100%),
+    linear-gradient(to left, #0A0D16 0%, #0A0D16 44%, rgba(10,13,22,0) 100%);
+  opacity:1;
+  transition:opacity .18s ease;
+}
+/* chevron dibujado con bordes: cero secuencias de escape en el CSS */
+.tabs-fade::after{
+  content:"";
+  position:absolute;
+  right:13px; top:50%;
+  margin-top:-4px;
+  width:7px; height:7px;
+  border-right:2px solid rgba(226,234,255,.72);
+  border-top:2px solid rgba(226,234,255,.72);
+  transform:rotate(45deg);
+}
+.tabs-wrap.at-end .tabs-fade{opacity:0;}
+
+/* --- 7. Pantallas muy estrechas (iPhone SE) --- */
+@media (max-width:360px){
+  .logo{font-size:18px !important;}
+  .streak-badge{padding:5px 8px !important;font-size:9px !important;min-height:28px !important;}
+  .hdr-more-btn{width:32px !important;min-width:32px !important;}
+  .tabs-wrap{padding:10px 12px 14px;}
+  .tabs-fade{top:11px;right:13px;bottom:15px;width:48px;}
+}
+
 @media (display-mode: standalone){
   .header{padding-top:calc(env(safe-area-inset-top,16px) + 18px);}
   .bottom-nav{padding-bottom:calc(10px + var(--safe-bottom));}
@@ -9240,11 +9405,849 @@ body.privacy-mode .privacy-toggle-btn{
     position:fixed;
     inset:0 0 auto 0;
     height:env(safe-area-inset-top,0px);
-    background:#05070f;
+    background:#000000;
     z-index:1000;
     pointer-events:none;
   }
 }
+
+/* ================================================================
+   JERARQUIA VISUAL v2 - capa de limpieza + alta progresiva Compras.
+   Va DESPUES del bloque BLACK GLASS y debe ser LO ULTIMO del <style>.
+   Solo CSS: no cambia el DOM ni ningun id/clase que lea el JS.
+   Todos los var() llevan fallback: funciona aunque BLACK GLASS no este.
+   ================================================================ */
+
+/* ---------------- H1. NIVEL 2: tarjetas que faltaban ----------------
+   NOTA: .ins-top-card (Insights) queda FUERA a proposito: sus variantes
+   .earn/.spend/.save llevan color semantico verde/rojo/azul en el
+   background y en el border-color, y uniformarlas las dejaria grises. */
+#page-hoy.fx-home .daily-brief-card,
+#page-hoy.fx-home .ws-card,
+#page-hoy.fx-home .fx-chart-card,
+#page-recetas.rx-page .rx-mini-stat,
+#page-compras .shop-suggested-card{
+  background:var(--k-s2,linear-gradient(180deg,rgba(216,226,255,.105) 0%,rgba(216,226,255,.058) 38%,rgba(216,226,255,.042) 100%)) !important;
+  border:1px solid var(--k-line,rgba(255,255,255,.09)) !important;
+  border-top-color:var(--k-line-top,rgba(255,255,255,.20)) !important;
+  border-bottom-color:var(--k-line-bot,rgba(255,255,255,.04)) !important;
+  box-shadow:var(--k-sh-card,inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.55)) !important;
+}
+#page-hoy.fx-home .daily-brief-card,
+#page-hoy.fx-home .ws-card,
+#page-hoy.fx-home .fx-chart-card{border-radius:22px !important;}
+#page-recetas.rx-page .rx-mini-stat{border-radius:16px !important;}
+
+/* ---------------- H2. ADIOS TARJETAS ANIDADAS ---------------- */
+/* H2a. Hoy - "Metas": tarjeta cuyo unico contenido son .mx-card */
+#page-hoy.fx-home .mx-metas-section{
+  background:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  border-radius:0 !important;
+}
+/* H2b. Hoy - totales del dia: bloque plano dentro de .day-tile */
+#page-hoy .day-totals{
+  background:transparent !important;
+  border:0 !important;
+  border-top:1px solid var(--k-line-soft,rgba(255,255,255,.06)) !important;
+  border-bottom:1px solid var(--k-line-soft,rgba(255,255,255,.06)) !important;
+  border-radius:0 !important;
+  padding:12px 0 !important;
+}
+/* box-shadow SIN !important a proposito: con !important se apagaria el
+   glow de cardSoftGlow que dispara triggerValuePop() sobre .day-totals.
+   (1,2,0) gana a las reglas 1226/2437/3413/3598/4310/4518. */
+#page-hoy.fx-home .day-totals{
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+#page-hoy .day-total-row{border:0 !important;background:transparent !important;}
+/* H2c. Hoy - stats de la semana: columnas, no mini tarjetas */
+#page-hoy.fx-home .ws-stat{
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:10px 0 2px !important;
+}
+#page-hoy.fx-home .ws-stat::before{left:0 !important;right:auto !important;width:22px !important;}
+/* H2d. Hoy - stats del brief: columnas separadas por hairline.
+   gap:0 en el grid para que el separador quede centrado de verdad. */
+#page-hoy.fx-home .daily-brief-grid{gap:0 !important;}
+#page-hoy.fx-home .daily-brief-stat{
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:10px 8px !important;
+}
+#page-hoy.fx-home .daily-brief-stat + .daily-brief-stat{
+  border-left:1px solid var(--k-line-soft,rgba(255,255,255,.06)) !important;
+}
+/* H2e. Presupuesto - el mensaje de estado es texto, no pildora */
+#page-presupuesto .bud-cat-msg{
+  background:transparent !important;
+  border-radius:0 !important;
+  padding:6px 0 0 !important;
+}
+
+/* ---------------- H3. COMPRAS: un total menos ----------------
+   El total pendiente salia 3 veces: #shopTotalCard, #shopPageSub y
+   #shopCounter. Se oculta SOLO #shopPageSub (el mas redundante).
+   #shopCounter se queda: es el unico que muestra los comprados y el
+   unico resumen que sobrevive cuando renderShopList() vuelve a poner
+   la clase 'hidden' a #shopTotalCard (np===0). El JS sigue rellenando
+   #shopPageSub con textContent sin ningun error. */
+#page-compras #shopPageSub{display:none !important;}
+#page-compras .shop-total-card{margin-bottom:18px !important;}
+
+/* ---------------- H4. CONTRASTE de las etiquetas ---------------- */
+#page-compras .stc-label,
+#page-compras .stc-count,
+#page-compras .shop-pri-label,
+#page-compras .shop-section-hdr.pending,
+#page-compras .spent-group-label,
+#page-compras .shop-suggested-meta,
+#page-hoy.fx-home .ws-stat-label,
+#page-hoy.fx-home .ws-compare-title,
+#page-hoy.fx-home .ws-range,
+#page-hoy.fx-home .mx-title,
+#page-hoy.fx-home .mx-remaining,
+#page-hoy.fx-home .mx-deadline,
+#page-hoy.fx-home .mx-of,
+#page-hoy.fx-home .daily-brief-stat span,
+#page-hoy.fx-home .daily-brief-kicker,
+#page-insights .ins-top-lbl,
+#page-insights .ins-section-sub,
+#page-insights .ins-cat-pct,
+#page-recetas.rx-page .rx-mini-stat span,
+#page-presupuesto .bud-cat-period,
+#page-presupuesto .bud-cat-remain-lbl,
+#page-presupuesto .bud-cat-spent-txt,
+#page-presupuesto .bud-cat-budget-txt,
+#shopModeOverlay .sm-stat-lbl,
+#shopModeOverlay .sm-subtitle{color:var(--k-t3,#8792AB) !important;}
+
+#page-compras .stc-amount,
+#page-hoy.fx-home .daily-brief-stat b,
+#page-hoy.fx-home .mx-name,
+#page-insights .ins-cat-name,
+#page-insights .ins-cat-amt,
+#page-recetas.rx-page .rx-mini-stat b,
+#shopModeOverlay .sm-stat-val{color:var(--k-t1,#F2F5FF) !important;}
+
+/* ---------------- H5. COMPRAS: alta progresiva del formulario -------
+   Colapsado = 1 campo de texto + boton "+" (y la fila de Prioridad,
+   que se queda VISIBLE porque _shopPriority es una global pegajosa que
+   addShopItem() nunca resetea: si se ocultara, todo lo siguiente se
+   guardaria como urgente sin ninguna senal).
+   Categoria, precio y cantidad aparecen en cuanto hay texto.
+   Los inputs NO se eliminan ni se mueven: solo cambian de display, asi
+   que addShopItem() los sigue leyendo igual y la categoria sigue
+   cayendo en 'general' -> inferShopCategory(name), como hoy.
+   El estado revelado respeta el layout actual: flex lado a lado, y
+   grid de 1 columna solo en <=430px, igual que la regla 9201.
+   Todo dentro de @supports: sin :has() no se oculta nada. */
+@supports selector(:has(*)){
+  #page-compras .shop-input-row-meta,
+  #page-compras #shopQtyInput{display:none !important;}
+
+  #page-compras:has(#shopInput:not(:placeholder-shown)) .shop-input-row-meta,
+  #page-compras:has(#shopQtyInput:not(:placeholder-shown)) .shop-input-row-meta,
+  #page-compras:has(#shopPriceInput:not(:placeholder-shown)) .shop-input-row-meta{
+    display:flex !important;
+    gap:8px !important;
+  }
+  @media (max-width:430px){
+    #page-compras:has(#shopInput:not(:placeholder-shown)) .shop-input-row-meta,
+    #page-compras:has(#shopQtyInput:not(:placeholder-shown)) .shop-input-row-meta,
+    #page-compras:has(#shopPriceInput:not(:placeholder-shown)) .shop-input-row-meta{
+      display:grid !important;
+      grid-template-columns:1fr !important;
+    }
+  }
+  #page-compras:has(#shopInput:not(:placeholder-shown)) #shopQtyInput,
+  #page-compras:has(#shopQtyInput:not(:placeholder-shown)) #shopQtyInput,
+  #page-compras:has(#shopPriceInput:not(:placeholder-shown)) #shopQtyInput{
+    display:block !important;
+  }
+}
+
+/* ==================================================================
+   BLACK GLASS v1 - CAPA DE OVERRIDE (debe ser LO ULTIMO del <style>)
+   ------------------------------------------------------------------
+   Por que va al final: la hoja tiene ~14 capas apiladas y 1.149
+   !important. El orden desempata SOLO a igual especificidad, asi que
+   donde una regla vieja lleva !important y mas especificidad, aqui se
+   repite su MISMA forma de selector (o mayor). Nada de lo anterior se
+   borra. El :root de abajo ademas REMAPEA los tokens viejos, asi que
+   las ~570 llamadas var() del archivo siguen a este tema sin tocarlas.
+   ================================================================== */
+:root{
+  /* --- base --- */
+  --k-black:#000000;
+  --k-ink:#0B0C10;
+
+  /* --- superficies glass: se componen SOBRE negro, por eso el alfa
+         es alto. s1=fila/chip, s2=tarjeta, s3=chrome/hoja --- */
+  --k-s1:linear-gradient(180deg,rgba(216,226,255,.075) 0%,rgba(216,226,255,.035) 100%);
+  --k-s2:linear-gradient(180deg,rgba(216,226,255,.105) 0%,rgba(216,226,255,.058) 38%,rgba(216,226,255,.042) 100%);
+  --k-s3:linear-gradient(180deg,rgba(216,226,255,.145) 0%,rgba(216,226,255,.065) 55%,rgba(216,226,255,.05) 100%);
+  --k-glass-btn:linear-gradient(180deg,rgba(226,234,255,.13) 0%,rgba(226,234,255,.055) 55%,rgba(226,234,255,.045) 100%);
+
+  /* --- hairlines: sobre negro la elevacion NO puede venir de una
+         sombra negra (invisible). Viene del borde superior claro y
+         del borde inferior oscuro. --- */
+  --k-line:rgba(255,255,255,.09);
+  --k-line-top:rgba(255,255,255,.20);
+  --k-line-bot:rgba(255,255,255,.04);
+  --k-line-soft:rgba(255,255,255,.06);
+
+  /* --- tinta (AA sobre negro: 19.4 / 9.6 / 6.1) --- */
+  --k-t1:#F2F5FF;
+  --k-t2:#AEB9D4;
+  --k-t3:#8792AB;
+
+  /* --- acentos --- */
+  --k-indigo:#6E8BFF;
+  --k-indigo-deep:#3D5BFF;
+  --k-violet:#9B6BFF;
+  --k-violet-deep:#7A3FE0;
+  --k-pink:#FF8FB0;
+  --k-green:#3EE39B;
+  --k-rose:#FF6E8A;
+  --k-amber:#FFC759;
+
+  /* --- sombras / glow --- */
+  --k-sh-card:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.55);
+  --k-sh-hero:inset 0 1px 0 rgba(255,255,255,.14), 0 24px 60px -18px rgba(80,90,255,.35), 0 8px 28px rgba(0,0,0,.7);
+  --k-sh-btn:inset 0 1px 0 rgba(255,255,255,.28), 0 8px 22px rgba(93,110,255,.34), 0 2px 8px rgba(0,0,0,.6);
+
+  /* ==== REMAPEO DE LOS TOKENS VIEJOS ====
+     Estos nombres ya existen en los 4 :root anteriores (lineas 21,
+     3430, 4234 y 5749). Todos tienen la misma especificidad, asi que
+     al redeclararlos aqui gana el ultimo y este bloque arrastra gratis
+     la regla unificadora de la linea 5792 (17 clases de tarjeta) sin
+     editar ni una sola regla vieja. */
+  --bg:#000000;
+  --surface:#08090D;
+  --card:#0D0E12;
+  --card2:#111319;
+  --border:rgba(255,255,255,.09);
+  --text:#AEB9D4;
+  --text-light:#F2F5FF;
+  --muted:#8792AB;
+  --accent:#6E8BFF;
+  --accent2:#9B6BFF;
+  --green:#3EE39B;
+  --cyan:#5AD7F0;
+  --pink:#FF8FB0;
+  --yellow:#FFC759;
+  --purple:#9B6BFF;
+  --orange:#FF9A5C;
+  --bd-1:rgba(255,255,255,.09);
+  --bd-2:rgba(255,255,255,.14);
+  --bd-accent:rgba(110,139,255,.30);
+  --surf-1:linear-gradient(180deg,rgba(216,226,255,.105) 0%,rgba(216,226,255,.058) 38%,rgba(216,226,255,.042) 100%);
+  --surf-2:linear-gradient(180deg,rgba(216,226,255,.075) 0%,rgba(216,226,255,.035) 100%);
+  --surf-hero:linear-gradient(160deg,#0B0E1E 0%,#06070F 55%,#000000 100%);
+  --surf-glass:rgba(0,0,0,.55);
+  --sh-card:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.55);
+  --sh-elev:inset 0 1px 0 rgba(255,255,255,.14), 0 20px 56px rgba(0,0,0,.75);
+  --sh-glow:0 0 0 1px rgba(110,139,255,.10), 0 0 70px rgba(110,139,255,.10);
+  --sh-btn:inset 0 1px 0 rgba(255,255,255,.28), 0 8px 22px rgba(93,110,255,.34);
+  --shadow-card:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.55);
+  --shadow-sm:inset 0 1px 0 rgba(255,255,255,.07), 0 6px 18px rgba(0,0,0,.5);
+  --shadow-btn:inset 0 1px 0 rgba(255,255,255,.28), 0 8px 22px rgba(93,110,255,.34);
+  --neu:0 10px 30px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.06);
+  --neu-sm:0 6px 18px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.05);
+  --neu-in:inset 0 2px 6px rgba(0,0,0,.55);
+  --input-bg:rgba(255,255,255,.055);
+  --input-border:rgba(255,255,255,.10);
+  --glass-bg:rgba(216,226,255,.06);
+  --glass-border:rgba(255,255,255,.10);
+  --glass-highlight:rgba(255,255,255,.14);
+  --accent-grad:linear-gradient(135deg,#3D5BFF 0%,#5B4BF5 52%,#7A3FE0 100%);
+  --accent-grad-soft:linear-gradient(135deg,rgba(110,139,255,.22) 0%,rgba(155,107,255,.16) 100%);
+}
+
+/* ---------------- 1. FONDO: NEGRO REAL ----------------
+   Negro puro mas dos radiales de acento muy bajos (.10/.07) para que
+   el fondo no sea un vacio plano. background-attachment:fixed evita
+   que el degradado viaje con el scroll.
+   #galaxyBg es un canvas pintado por JS con colores hardcodeados que
+   no responden a tokens: se domestica bajandole la opacidad. */
+html{background:#000 !important;}
+body{
+  background:
+    radial-gradient(95% 55% at 50% -12%, rgba(110,139,255,.10) 0%, rgba(110,139,255,0) 60%),
+    radial-gradient(75% 50% at 100% 102%, rgba(155,107,255,.07) 0%, rgba(155,107,255,0) 62%),
+    #000 !important;
+  background-attachment:fixed !important;
+  color:var(--k-t2) !important;
+}
+#galaxyBg{opacity:.38 !important;}
+::selection{background:rgba(110,139,255,.34);color:#fff;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+/* ---------------- 2. CHROME: HEADER Y PESTANAS ----------------
+   Los dos unicos elementos permanentes con blur real. Aqui si hay
+   algo detras que difuminar (contenido + canvas), asi que el vidrio
+   se ve de verdad. Presupuesto en iPhone: 3 capas de blur a la vez
+   (header + tabs + la hoja abierta). Ver seccion 11. */
+.header{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.10) 0%,rgba(216,226,255,.04) 100%),
+    rgba(0,0,0,.62) !important;
+  backdrop-filter:blur(28px) saturate(160%) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(160%) !important;
+  border-bottom:1px solid var(--k-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 12px 30px rgba(0,0,0,.6) !important;
+}
+/* .tabs es la NAVEGACION REAL de la app (switchTab). .bottom-nav fue
+   eliminada del DOM; se cubre igual en la seccion 9 por si vuelve. */
+.tabs{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.09) 0%,rgba(216,226,255,.03) 100%),
+    rgba(0,0,0,.5) !important;
+  backdrop-filter:blur(24px) saturate(150%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(150%) !important;
+  border:1px solid var(--k-line) !important;
+  border-top-color:var(--k-line-top) !important;
+  border-bottom-color:var(--k-line-bot) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 28px rgba(0,0,0,.55) !important;
+}
+/* pestana inactiva: antes rgba(180,200,240,.5) = 3.5:1, no cumplia */
+.tab{color:var(--k-t2) !important;background:transparent !important;}
+.tab.active{
+  background:linear-gradient(180deg,rgba(110,139,255,.34) 0%,rgba(110,139,255,.16) 100%) !important;
+  color:#FFFFFF !important;
+  border:1px solid rgba(140,165,255,.40) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24), 0 6px 18px rgba(93,110,255,.28) !important;
+}
+.toast{
+  background:linear-gradient(180deg,rgba(216,226,255,.16),rgba(216,226,255,.06)), rgba(0,0,0,.78) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  color:var(--k-t1) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 16px 40px rgba(0,0,0,.75) !important;
+}
+
+/* ---------------- 3. NIVEL 1 - HERO (uno por pestana) ----------------
+   Gradiente casi negro + dos blooms de acento + glow exterior. Es la
+   unica pieza con glow: si lo llevaran mas elementos se perderia la
+   jerarquia. Actividad, Timeline, Insights y Consejos NO llevan hero
+   a proposito: su primera fila ya es contenido. */
+#page-hoy.fx-home .fx-hero,
+#page-escanear.sx-page .sx-hero,
+#page-recetas.rx-page .rx-header,
+#page-logros .ach-header-card,
+#page-calendario .cal-grid-wrap,
+.bud-summary-card,
+.shop-total-card,
+.ai-chat-header{
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(110,139,255,.34) 0%, rgba(110,139,255,0) 58%),
+    radial-gradient(100% 90% at 100% 100%, rgba(155,107,255,.24) 0%, rgba(155,107,255,0) 60%),
+    linear-gradient(160deg,#0B0E1E 0%,#06070F 55%,#000000 100%) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:var(--k-line-top) !important;
+  border-bottom-color:var(--k-line-bot) !important;
+  box-shadow:var(--k-sh-hero) !important;
+  color:var(--k-t1) !important;
+}
+#page-hoy.fx-home .fx-hero::before{opacity:.55 !important;}
+#page-hoy.fx-home .fx-hero-kicker,
+#page-hoy.fx-home .fx-hero-sub{color:rgba(226,234,255,.78) !important;}
+#page-hoy.fx-home .fx-hero-sub-pct,
+#page-hoy.fx-home .fx-hero-level .hero-badge.level{
+  background:rgba(255,255,255,.12) !important;
+  border:1px solid rgba(255,255,255,.20) !important;
+  color:#FFFFFF !important;
+}
+#page-hoy.fx-home .fx-hero-track{background:rgba(255,255,255,.12) !important;}
+
+/* ---------------- 4. NIVEL 2 - TARJETA (faux glass, sin blur) ----------------
+   Degradado translucido + hairline arriba claro / abajo oscuro +
+   highlight interno. Coste GPU cero y sobre negro se lee como vidrio.
+   .grid-tile se repite con selector identico al de la linea 6509
+   (que lleva !important): esta capa gana por orden. */
+.grid-tile,
+#page-hoy.fx-home .day-card,
+#page-hoy.fx-home .fx-dash-card,
+#page-hoy.fx-home .fx-insights,
+#page-hoy.fx-home .fx-cats-card,
+#page-hoy.fx-home .mx-card,
+#page-recetas .mdb-search-box,
+#page-recetas.rx-page .rx-card,
+#page-logros .ach-card2,
+#page-escanear.sx-page .sx-items-card,
+#page-escanear.sx-page .sx-stat,
+#page-escanear.sx-page .sx-upload,
+#page-escanear.sx-page .sx-preview,
+#page-calendario .cal-top,
+#page-calendario .cal-sum,
+.sx-key-card,
+.yt-search-box,
+.ins-card,
+.bud-cat-card,
+.consejo-bubble,
+.spent-group-card,
+.empty-state{
+  background:var(--k-s2) !important;
+  border:1px solid var(--k-line) !important;
+  border-top-color:var(--k-line-top) !important;
+  border-bottom-color:var(--k-line-bot) !important;
+  border-radius:22px !important;
+  box-shadow:var(--k-sh-card) !important;
+}
+/* el estado vacio NO es una tarjeta: borde punteado y sin sombra */
+.empty-state{border-style:dashed !important;border-color:rgba(255,255,255,.14) !important;background:rgba(255,255,255,.025) !important;box-shadow:none !important;}
+
+/* zona HUNDIDA dentro de una tarjeta: mas oscura que su contenedor y
+   con la luz abajo, justo al reves que una tarjeta elevada.
+   OJO ESPECIFICIDAD: la caja de entrada la pintan DOS reglas viejas
+   con !important, '#page-hoy .new-entry-box' (linea 6306, 1-1-0) y
+   '.day-tile .new-entry-box' (linea 6851, 0-2-0). Se repiten las dos
+   formas: la del id gana a ambas y la de clases cubre el caso de un
+   .day-tile fuera de #page-hoy. */
+#page-hoy .new-entry-box,
+.day-tile .new-entry-box,
+#page-escanear.sx-page .sx-preview-imgwrap{
+  background:rgba(0,0,0,.38) !important;
+  border:1px solid rgba(255,255,255,.05) !important;
+  border-bottom-color:rgba(255,255,255,.10) !important;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.55) !important;
+}
+
+/* ---------------- 5. NIVEL 3 - FILA DE LISTA (sin tarjeta) ----------------
+   Hoy Actividad, Timeline y Compras apilan tarjetas dentro de otra
+   tarjeta: ese es el ruido visual principal de la app. Una fila de
+   lista es transparente mas un hairline inferior: sin radius, sin
+   sombra y sin blur.
+   NO se toca transform: el scale(.985) de :active que ya existe en
+   las lineas 1737 / 2037 / 6061 es feedback tactil deseable y ademas
+   gana por especificidad (0-2-0 con !important), asi que declarar
+   transform:none aqui seria una promesa incumplida. */
+.history-item,
+.activity-item,
+.timeline-item,
+.entry-item,
+.shop-item{
+  background:transparent !important;
+  border:0 !important;
+  border-bottom:1px solid var(--k-line-soft) !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+.history-item:active,
+.activity-item:active,
+.timeline-item:active,
+.entry-item:active,
+.shop-item:active{background:rgba(255,255,255,.05) !important;}
+.history-item:last-child,
+.activity-item:last-child,
+.timeline-item:last-child,
+.entry-item:last-child,
+.shop-item:last-child{border-bottom:0 !important;}
+/* el item ya comprado conserva su tinte verde, a alfa bajo.
+   box-shadow:none es OBLIGATORIO aqui: la regla de la linea 1740
+   ('.shop-item.checked', 0-2-0 con !important) le mete una sombra
+   propia que la base de arriba (0-1-0) no puede apagar. */
+.shop-item.checked{
+  background:rgba(62,227,155,.07) !important;
+  border-bottom-color:rgba(62,227,155,.20) !important;
+  box-shadow:none !important;
+}
+#page-calendario .cal-day{
+  background:var(--k-s1) !important;
+  border:1px solid rgba(255,255,255,.05) !important;
+  box-shadow:none !important;
+}
+
+/* ---------------- 6. BOTONES ---------------- */
+/* 6a. PRIMARIO. El degradado viejo (#6188ff -> #8b65f0) daba 3.1:1
+   con texto blanco. Este (#3D5BFF -> #5B4BF5 -> #7A3FE0) da 5.1-5.8:1
+   y el barrido blanco superior le devuelve el brillo de vidrio.
+   #page-hoy .save-btn se repite a proposito: la regla de la linea
+   6351 lleva !important con esa misma especificidad. */
+.save-btn,
+#page-hoy .save-btn,
+.shop-add-btn,
+.sx-scan-btn,
+#page-escanear.sx-page .sx-action.primary,
+#page-escanear.sx-page .sx-confirm.primary,
+#page-recetas .mdb-search-btn,
+.yt-btn,
+.bud-modal-save,
+.ach-popup-btn,
+#page-hoy.fx-home .mx-add-btn,
+.bud-add-btn,
+.bud-fab,
+.consejos-refresh,
+.ai-send-btn,
+.sm-add-all-btn,
+.mx-modal-save,
+.data-vault-action{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 46%),
+    linear-gradient(135deg,#3D5BFF 0%,#5B4BF5 52%,#7A3FE0 100%) !important;
+  color:#FFFFFF !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  border-top-color:rgba(255,255,255,.34) !important;
+  box-shadow:var(--k-sh-btn) !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.30) !important;
+}
+.save-btn:active,
+#page-hoy .save-btn:active,
+.shop-add-btn:active,
+.sx-scan-btn:active,
+.ai-send-btn:active{filter:brightness(1.12) !important;}
+
+/* 6b. GLASS (secundario / filtro / toggle): degradado translucido,
+   borde superior claro y borde inferior oscuro = boton levantado. */
+.work-btn,
+#page-hoy.fx-home .fx-qa,
+.shop-cat,
+.activity-filter,
+#page-recetas.rx-page .rx-pill,
+.bud-period-btn,
+#page-calendario .cal-nav-btn,
+#page-escanear.sx-page .sx-action.secondary,
+#page-escanear.sx-page .sx-confirm.secondary,
+#page-escanear.sx-page .sx-rescan,
+.shop-pri-btn,
+.shop-mode-entry,
+.shop-clear-btn,
+.bud-modal-cancel,
+.bud-modal-period-btn,
+.data-vault-action.secondary,
+.data-vault-btn,
+.privacy-toggle-btn,
+.command-btn,
+.currency-picker button,
+.streak-badge,
+.sm-exit-btn{
+  background:var(--k-glass-btn) !important;
+  color:#E6ECFF !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:rgba(255,255,255,.22) !important;
+  border-bottom-color:rgba(255,255,255,.05) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 4px 14px rgba(0,0,0,.5) !important;
+}
+/* 6c. estado ACTIVO de los glass (mismo indigo que .tab.active) */
+.shop-cat.active,
+.activity-filter.active,
+#page-recetas.rx-page .rx-pill.active,
+.bud-period-btn.active,
+.bud-modal-period-btn.active,
+.currency-picker button.active,
+.privacy-toggle-btn.active{
+  background:linear-gradient(180deg,rgba(110,139,255,.34) 0%,rgba(110,139,255,.16) 100%) !important;
+  border-color:rgba(140,165,255,.42) !important;
+  color:#FFFFFF !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 6px 18px rgba(93,110,255,.26) !important;
+}
+.work-btn.yes.active{
+  background:linear-gradient(180deg,rgba(62,227,155,.30) 0%,rgba(62,227,155,.13) 100%) !important;
+  border-color:rgba(62,227,155,.42) !important;
+  color:#EAFFF6 !important;
+}
+.work-btn.no.active{
+  background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.07) 100%) !important;
+  border-color:rgba(255,255,255,.22) !important;
+  color:var(--k-t1) !important;
+}
+/* 6d. destructivo */
+.bud-modal-delete,
+.data-vault-action.warn{
+  background:linear-gradient(180deg,rgba(255,110,138,.20),rgba(255,110,138,.08)) !important;
+  border:1px solid rgba(255,110,138,.34) !important;
+  color:#FF9DB2 !important;
+}
+
+/* ---------------- 7. INPUTS (superficie HUNDIDA: luz ABAJO) ----------------
+   Se invierte la luz respecto a las tarjetas: borde superior oscuro,
+   inferior claro e inset negro. Ese contraste levantado/hundido es lo
+   que hace que se lea como vidrio y no como plastico plano.
+   NO se toca font-size: la linea 7636 (16px !important) es la que
+   evita el zoom automatico de iOS al enfocar un campo. */
+.money-wrap,
+.note-input,
+.yt-input,
+.shop-input,
+.shop-select,
+.activity-search,
+.activity-filter-select,
+.entry-category-row,
+.entry-category-select,
+#page-recetas .mdb-search-input,
+.sx-key-input,
+.ai-input,
+.bud-modal-input,
+.bud-modal-select,
+.command-search,
+.mx-modal input,
+.mx-modal select,
+.mx-modal textarea{
+  background:rgba(255,255,255,.055) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:rgba(255,255,255,.05) !important;
+  border-bottom-color:rgba(255,255,255,.15) !important;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.45) !important;
+  color:var(--k-t1) !important;
+  border-radius:16px !important;
+}
+.money-wrap:focus-within,
+.note-input:focus,
+.yt-input:focus,
+.shop-input:focus,
+.activity-search:focus,
+.activity-filter-select:focus,
+.entry-category-select:focus,
+#page-recetas .mdb-search-input:focus,
+.sx-key-input:focus,
+.ai-input:focus,
+.bud-modal-input:focus,
+.command-search:focus{
+  background:rgba(110,139,255,.10) !important;
+  border-color:rgba(110,139,255,.55) !important;
+  box-shadow:0 0 0 3px rgba(110,139,255,.16), inset 0 2px 6px rgba(0,0,0,.40) !important;
+  outline:none !important;
+}
+/* placeholders: antes rgba(180,196,238,.38) = 2.4:1 */
+input::placeholder,textarea::placeholder{color:rgba(226,234,255,.44) !important;}
+.money-input,.money-wrap .currency{color:var(--k-t1) !important;}
+
+/* ---------------- 8. OVERLAYS Y HOJAS ----------------
+   Se difumina el SCRIM, no la hoja: la hoja va translucida encima del
+   scrim ya difuminado. El efecto se ve doble y el coste es uno. */
+.recipe-overlay,
+.ach-overlay,
+.cal-overlay,
+.bud-modal-overlay,
+.data-vault-overlay,
+.command-overlay,
+.ai-overlay,
+.mx-modal-overlay,
+#mdbDetailOverlay{
+  background:rgba(0,0,0,.74) !important;
+  backdrop-filter:blur(18px) saturate(130%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(130%) !important;
+}
+.recipe-sheet,
+.ach-popup,
+.cal-sheet,
+.bud-modal,
+.data-vault-sheet,
+.command-sheet,
+.mx-modal{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.145) 0%,rgba(216,226,255,.06) 42%,rgba(216,226,255,.05) 100%),
+    rgba(0,0,0,.72) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:rgba(255,255,255,.22) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 -20px 60px rgba(0,0,0,.8) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  color:var(--k-t1) !important;
+}
+#shopModeOverlay{background:#000000 !important;}
+.sm-topbar{background:linear-gradient(180deg,rgba(216,226,255,.10),rgba(216,226,255,.03)), rgba(0,0,0,.6) !important;border-bottom:1px solid rgba(255,255,255,.09) !important;}
+.data-vault-card,
+.command-grid > *{
+  background:var(--k-s1) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+}
+
+/* ---------------- 9. BARRA INFERIOR Y PIEZAS FIJAS ABAJO ----------------
+   AVISO: .bottom-nav fue ELIMINADA del DOM (el markup lo dice:
+   "top tabs are the single source of navigation"). Su CSS sigue vivo
+   en 10 bloques pero no pinta nada. Se le da el mismo glass que a
+   .tabs por si alguna vez se reactiva, para que el tema no se rompa.
+   Lo que SI vive abajo hoy: .ai-input-wrap, .ai-fab y .bud-fab. */
+.bottom-nav{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.09) 0%,rgba(216,226,255,.03) 100%),
+    rgba(0,0,0,.62) !important;
+  backdrop-filter:blur(24px) saturate(150%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(150%) !important;
+  border-top:1px solid var(--k-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 -10px 28px rgba(0,0,0,.6) !important;
+}
+.nav-btn{color:var(--k-t2) !important;background:transparent !important;}
+.nav-btn.active{color:#FFFFFF !important;}
+.ai-input-wrap{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.10) 0%,rgba(216,226,255,.03) 100%),
+    rgba(0,0,0,.72) !important;
+  backdrop-filter:blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(150%) !important;
+  border-top:1px solid var(--k-line) !important;
+}
+.ai-fab{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 46%),
+    linear-gradient(135deg,#3D5BFF 0%,#5B4BF5 52%,#7A3FE0 100%) !important;
+  color:#FFFFFF !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:var(--k-sh-btn) !important;
+}
+
+/* ---------------- 10. TIPOGRAFIA / CONTRASTE (todo AA) ----------------
+   Sustituye la familia de labels que hoy incumple: --muted #5a6888
+   (2.8:1), rgba(200,212,240,.5) (3.9:1), rgba(180,196,238,.35)
+   (2.2:1)... por --k-t3 #8792AB (6.1:1).
+   IMPORTANTE: varios de estos textos los pinta una regla ANTERIOR con
+   !important y MAS especificidad, y ahi el orden no desempata. Por eso
+   cada uno aparece tambien con la forma de selector exacta que hoy
+   gana (se calculo una por una):
+     .day-date   <- '#page-hoy .day-card .day-date' (6288, 1-2-0)
+                    y '.day-tile .day-date'         (6837, 0-2-0)
+     .day-title  <- '.day-tile .day-title'          (6831, 0-2-0)
+     .cal-sum-l  <- '#page-calendario .cal-sum-l'   (8035, 1-1-0)
+     .cal-wd     <- '#page-calendario .cal-wd'      (8062, 1-1-0)
+     .cal-month  <- '#page-calendario .cal-month'   (7977, 1-1-0)
+     .rx-sub     <- '#page-recetas.rx-page .rx-sub' (8186, 1-2-0)
+   Al repetir la misma forma, empatan en especificidad y este bloque
+   gana por orden. */
+.section-title,
+#page-hoy.fx-home .fx-dash-val,
+#page-hoy.fx-home .fx-insights-text,
+.day-title,
+.day-tile .day-title,
+#page-hoy .day-card .day-title,
+.sx-hero-title,
+.rx-title,
+.bud-summary-val,
+.cal-month,
+#page-calendario .cal-month{color:var(--k-t1) !important;}
+
+#page-hoy.fx-home .fx-dash-head,
+#page-hoy.fx-home .fx-dash-sub,
+#page-hoy.fx-home .fx-dash-mini-lbl,
+#page-hoy.fx-home .fx-dash-badge,
+#page-hoy.fx-home .fx-section-title,
+#page-hoy.fx-home .fx-insights-head,
+#page-hoy.fx-home .mx-empty,
+#page-escanear.sx-page .sx-stat-label,
+#page-escanear.sx-page .sx-stat-sub,
+#page-escanear.sx-page .sx-upload-sub,
+#page-escanear.sx-page .sx-hero-sub,
+#page-recetas .mdb-search-label,
+.brand-kicker,
+.day-date,
+.day-tile .day-date,
+#page-hoy .day-card .day-date,
+.entry-category-hint,
+.yt-hint,
+.sx-key-note,
+.hist-page-sub,
+.timeline-page-sub,
+.shop-page-sub,
+.ins-page-sub,
+.bud-page-sub,
+.bud-summary-lbl,
+.consejos-sub,
+.rx-sub,
+#page-recetas.rx-page .rx-sub,
+.scan-page-sub,
+.cal-sum-l,
+#page-calendario .cal-sum-l,
+.cal-wd,
+#page-calendario .cal-wd,
+.data-vault-label,
+.data-vault-sub,
+.command-kicker,
+.shop-counter{color:var(--k-t3) !important;}
+
+/* estados semanticos de las cifras. '.bud-summary-val.over' lo pone el
+   JS cuando el presupuesto se pasa (className='bud-summary-val over'):
+   sin esta linea el aviso perderia su ambar y saldria blanco como una
+   cifra normal, porque la regla vieja (3878) no lleva !important. */
+.day-total-val.green,.cal-sum-v.saved,.bud-summary-val.remain{color:var(--k-green) !important;}
+.day-total-val.pink,.cal-sum-v.spent,.bud-summary-val.spent{color:var(--k-rose) !important;}
+.day-total-val.cyan{color:#5AD7F0 !important;}
+.bud-summary-val.over{color:var(--k-amber) !important;}
+/* unico guino rosa del chrome; el SVG del cerdito queda intacto */
+.logo span{color:var(--k-pink) !important;}
+
+/* ---------------- 11. RENDIMIENTO: blur SOLO en chrome + 1 hoja ----------------
+   La regla de la linea 8285 pone blur(16px) sobre .shop-item,
+   .activity-item, .history-item, .day-card... Con 60 movimientos en
+   Actividad eso son 60 capas de blur en el iPhone, y ademas
+   INVISIBLES (el fondo de esas tarjetas era opaco al 99%). Aqui se
+   apaga en todo lo que se repite en una lista. */
+.grid-tile,
+#page-hoy.fx-home .day-card,
+#page-hoy.fx-home .fx-dash-card,
+#page-hoy.fx-home .fx-insights,
+#page-hoy.fx-home .fx-cats-card,
+#page-hoy.fx-home .mx-card,
+#page-recetas.rx-page .rx-card,
+#page-recetas.rx-page .rx-card-fav,
+#page-recetas.rx-page .rx-card-diff,
+#page-recetas.rx-page .rx-featured-fav,
+#page-recetas.rx-page .rx-filters,
+#page-logros .ach-card2,
+#page-escanear.sx-page .sx-items-card,
+#page-escanear.sx-page .sx-stat,
+#page-escanear.sx-page .sx-hero-kicker,
+#page-escanear.sx-page .sx-hero-illu,
+#page-calendario .cal-grid-wrap,
+#page-calendario .cal-top,
+#page-calendario .cal-sum,
+#page-calendario .cal-day,
+.history-item,
+.activity-item,
+.timeline-item,
+.entry-item,
+.shop-item,
+.ins-card,
+.bud-cat-card,
+.consejo-bubble,
+.spent-group-card,
+.balance-hero,
+.stat-card,
+.ach-card,
+.recipe-card,
+.shop-summary,
+.scan-results-card,
+.sx-key-card,
+.streak-badge,
+.mdb-card,
+.ai-msg,
+.tip-bubble,
+.app-nudge,
+.app-status-mini{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* ---------------- 12. FALLBACKS ----------------
+   Sin soporte de backdrop-filter el chrome pasa a negro casi opaco,
+   para que nunca se lea el contenido a traves de el. */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .header,.tabs,.bottom-nav,.ai-input-wrap{background:rgba(0,0,0,.94) !important;}
+  .recipe-overlay,.ach-overlay,.cal-overlay,.bud-modal-overlay,
+  .data-vault-overlay,.command-overlay,.ai-overlay,.mx-modal-overlay,
+  #mdbDetailOverlay{background:rgba(0,0,0,.9) !important;}
+}
+/* accesibilidad: si el sistema pide menos transparencia se sirven
+   superficies solidas y se apaga todo el blur */
+@media (prefers-reduced-transparency: reduce){
+  .header,.tabs,.bottom-nav,.ai-input-wrap,.recipe-sheet,.ach-popup,.cal-sheet,.bud-modal,
+  .data-vault-sheet,.command-sheet,.mx-modal{
+    background:#0D0E12 !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+}
+/* ================= FIN BLACK GLASS v1 ================= */
 </style>
 </head>
 <body>
@@ -9286,19 +10289,19 @@ body.privacy-mode .privacy-toggle-btn{
 <div class="header">
   <div class="header-inner">
     <div class="brand-block">
-      <div class="brand-kicker">Tu ahorro diario</div>
+      <!-- eyebrow retirado: competia con el logo -->
       <div class="logo">Mi<span>Alcancía</span> 🐷</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-actions">
       <div class="streak-badge" id="streakBadge">🔥 0 días</div>
-      <div class="currency-picker" id="currencyPicker">
+      <button class="hdr-more-btn" id="hdrMoreBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="M&aacute;s opciones" onclick="var m=document.getElementById('hdrMenu');var willOpen=m.hasAttribute('hidden');if(willOpen){m.removeAttribute('hidden');}else{m.setAttribute('hidden','');}this.setAttribute('aria-expanded',willOpen?'true':'false');">&#8943;</button><div class="hdr-menu" id="hdrMenu" hidden onclick="this.setAttribute('hidden','');var b=document.getElementById('hdrMoreBtn');if(b){b.setAttribute('aria-expanded','false');}"><div class="currency-picker" id="currencyPicker">
         <button onclick="setCurrency('USD')" id="btnCurrencyUSD" class="active">$</button>
         <button onclick="setCurrency('EUR')" id="btnCurrencyEUR">€</button>
         <button onclick="setCurrency('HNL')" id="btnCurrencyHNL">L</button>
       </div>
       <button class="data-vault-btn" onclick="openDataVault()" type="button" aria-label="Abrir centro de datos">Data</button>
       <button class="privacy-toggle-btn" id="privacyToggleBtn" onclick="var on=!document.body.classList.contains('privacy-mode');document.body.classList.toggle('privacy-mode',on);this.textContent=on?'Show':'Hide';this.classList.toggle('active',on);this.setAttribute('aria-pressed',on?'true':'false');this.setAttribute('aria-label',on?'Mostrar montos':'Ocultar montos');this.title=on?'Mostrar montos':'Ocultar montos';try{localStorage.setItem('alcancia_privacy_mode',on?'1':'0')}catch(e){}" type="button" aria-label="Ocultar montos" aria-pressed="false">Hide</button>
-      <button class="command-btn" onclick="openCommandCenter()" type="button" aria-label="Abrir acciones rápidas">Go</button>
+      <button class="command-btn" onclick="openCommandCenter()" type="button" aria-label="Abrir acciones rápidas">Go</button></div>
     </div>
 </div>
 </div>
@@ -9320,14 +10323,14 @@ body.privacy-mode .privacy-toggle-btn{
   </div>
 </div>
 
-<div class="tabs">
+<div class="tabs-wrap"><div class="tabs">
   <button class="tab active" data-tab="hoy" onclick="switchTab('hoy')">Hoy</button>
   <button class="tab" data-tab="actividad" onclick="switchTab('actividad')">Actividad</button>
   <button class="tab" data-tab="logros" onclick="switchTab('logros')">Logros</button>
   <button class="tab" data-tab="calendario" onclick="switchTab('calendario')">Calendario</button>
   <button class="tab" data-tab="recetas" onclick="switchTab('recetas')">🍳 Recetas</button>
   <button class="tab" data-tab="compras" onclick="switchTab('compras')">🛒 Compras</button>
-  <button class="tab" data-tab="escanear" onclick="switchTab('escanear')">📷 Scan</button>
+  <button class="tab" data-tab="escanear" onclick="switchTab('escanear')">📷 Scan</button></div><div class="tabs-fade" aria-hidden="true"></div><script>(function(){var t=document.querySelector('.tabs-wrap .tabs');if(!t||!t.parentNode)return;var w=t.parentNode;function u(){w.classList.toggle('at-end',t.scrollLeft+t.clientWidth>=t.scrollWidth-4);}t.addEventListener('scroll',u);window.addEventListener('resize',u);window.addEventListener('load',u);window.__tabsFadeSync=u;u();function c(e){var m=document.getElementById('hdrMenu');if(!m||m.hasAttribute('hidden'))return;var b=document.getElementById('hdrMoreBtn');if(m.contains(e.target)||(b&&b.contains(e.target)))return;m.setAttribute('hidden','');if(b){b.setAttribute('aria-expanded','false');}}document.addEventListener('click',c);document.addEventListener('touchstart',c);})();</script>
 </div>
 
 <main class="page-stack">
@@ -11447,7 +12450,7 @@ var MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','D
 var DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 function fmtDate(k){ var p=k.split('-'); return parseInt(p[2])+' '+MONTHS[parseInt(p[1])-1]+' '+p[0]; }
 function fmtDay(k){ var p=k.split('-').map(Number); return DAYS[new Date(p[0],p[1]-1,p[2]).getDay()]; }
-function fmtMoney(n){ var s=currSym(); var v=toActiveCurrency(n); return v>=1000?s+(v/1000).toFixed(1)+'k':s+v.toFixed(0); }
+function fmtMoney(n){ var s=currSym(); var v=toActiveCurrency(n); var g=(v<=-0.5)?'-':''; var a=Math.abs(v); return a>=1000?g+s+(a/1000).toFixed(1)+'k':g+s+a.toFixed(0); }
 function getYesterdayKey(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 
 function dayEarned(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.earned||0);},0); }
@@ -12207,12 +13210,12 @@ function showAiToast(msg, onClick){
   if(old&&old.parentNode) old.parentNode.removeChild(old);
   var toast=document.createElement('div');
   toast.id='aiActionToast';
-  toast.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:108px;z-index:10002;max-width:300px;width:calc(100% - 40px);background:linear-gradient(135deg,rgba(20,25,50,.97),rgba(12,15,30,.97));border:1px solid rgba(85,120,240,.28);border-radius:16px;padding:11px 16px;font-size:13.5px;color:#d8e4ff;line-height:1.45;box-shadow:0 8px 28px rgba(0,0,0,.45),0 0 0 1px rgba(85,120,240,.10);cursor:pointer;text-align:center;animation:aiMsgIn .35s cubic-bezier(.22,1,.36,1) both;';
-  toast.innerHTML='<span style="font-size:11px;color:rgba(130,160,255,.7);display:block;margin-bottom:3px;font-weight:700;letter-spacing:.04em;">ASISTENTE</span>'+escapeHtml(msg);
+  toast.style.cssText='animation:aiDockIn .34s cubic-bezier(.22,1,.36,1) both;';
+  toast.innerHTML='<span class="ai-toast-body"><span class="ai-toast-kicker">ASISTENTE</span>'+escapeHtml(msg)+'</span><button type="button" class="ai-toast-x" aria-label="Cerrar aviso" onclick="event.stopPropagation();removeAiActionToast();">&#215;</button>'; removeProactiveToast(); _aiToastAutoHide(toast, 9000); _aiFabDuck(1);
   toast.onclick=function(){
     if(old&&old.parentNode) old.parentNode.removeChild(old);
     var t=document.getElementById('aiActionToast');
-    if(t&&t.parentNode) t.parentNode.removeChild(t);
+    if(t){ _aiToastHide(t); } else { _aiFabDuck(0); }
     if(onClick) onClick();
   };
   document.body.appendChild(toast);
@@ -12309,7 +13312,7 @@ function updatePiggy(){
   var s=$('fillSurface');
   if(s){s.setAttribute('cy',184-fh);s.setAttribute('opacity',fh>4?'0.5':'0');}
   var pctInt=Math.round(pct*100);
-  setText('piggyLabel',pctInt>0?pctInt+'% llena · $'+ts.toFixed(2)+' ahorrados':'Toca para animar 🪙');
+  setText('piggyLabel',pctInt>0?pctInt+'% · '+fmtMoney(ts):'Toca 🪙');
 }
 
 // ── COIN CANVAS ────────────────────────────────────────────────────
@@ -12601,12 +13604,12 @@ function checkAchievements(){
       ul.push(a);
     }
   });
-  saveState();
+  if(ul.length) saveState();
   if(ul.length) setTimeout(function(){showAchievementPopup(ul[0]);},600);
 }
 
 function renderAchievements(){
-  var g=$('achievementsGrid'); if(!g) return;
+  var g=$('achievementsGrid'); if(!g) return; try{ checkAchievements(); }catch(e){}
   if(!state||typeof state!=='object') state={days:[],unlockedAchs:[],achDates:{}};
   if(!Array.isArray(state.days)) state.days=[];
   if(!Array.isArray(state.unlockedAchs)) state.unlockedAchs=[];
@@ -12632,7 +13635,7 @@ function renderAchievements(){
       p=1;
     }else{
       try{p=typeof a.progress==='function'?a.progress(state.days,s):0;}catch(e){p=0;}
-      if(!isFinite(p)||isNaN(p)) p=0;
+      if(!isFinite(p)||isNaN(p)) p=0; if(p>=1) p=0.99;
       p=Math.max(0,Math.min(1,p));
     }
     var pct=Math.round(p*100);
@@ -12674,10 +13677,10 @@ function switchTab(id){
   var entering=document.getElementById('page-'+id);
   if(!entering) return;
   _tabBusy=true;
-  _activeTab=id;
+  _activeTab=id; removeAllAiToasts();
   try{ localStorage.setItem(LAST_TAB_SK,id); }catch(e){}
   // Update top-tab highlights
-  document.querySelectorAll('.tabs .tab').forEach(function(t){
+  document.querySelectorAll('.tabs .tab').forEach(function(t){ if(t.getAttribute('data-tab')===id&&t.scrollIntoView){try{t.scrollIntoView({block:'nearest',inline:'center'});}catch(e){}} 
     t.classList.toggle('active',t.getAttribute('data-tab')===id);
   });
   var leaveDirCls=dir>0?'dir-l':'dir-r';
@@ -12708,7 +13711,7 @@ function switchTab(id){
     if(id==='calendario') renderCalendar();
     if(id==='presupuesto') renderBudgetPage();
     if(id==='consejos') renderConsejos();
-    if(id==='escanear') updateScanKeyGate();
+    if(id==='escanear') updateScanKeyGate(); updateAiFabVisibility();
     if(id==='ai') aiInit();
     if(navigator.vibrate) navigator.vibrate(12);
     var stack=document.querySelector('.page-stack');
@@ -15579,7 +16582,7 @@ function renderBudgetPage(){
   setText('budSumTotal2', fmtMoney(totalBudget));
   setText('budSumSpent2', fmtMoney(actualSpent));
   var remEl=$('budSumRemain2');
-  if(remEl){ remEl.textContent=fmtMoney(Math.abs(remain)); remEl.className='bud-summary-val '+(remain<0?'over':'remain'); }
+  if(remEl){ remEl.textContent=fmtMoney(remain); remEl.className='bud-summary-val '+(remain<0?'over':'remain'); }
   var globalPct=totalBudget>0?Math.min((actualSpent/totalBudget)*100,100):0;
   var gbar=$('budGlobalBar2');
   var gmsg=$('budGlobalMsg2');
@@ -16474,7 +17477,7 @@ function aiRenderHistory(){
 function openAiOverlay(){
   _aiOverlayOpen=true;
   var ov=$('aiOverlay');
-  if(ov) ov.classList.add('show');
+  if(ov) ov.classList.add('show'); removeAllAiToasts();
   aiInit();
   aiRenderHistory();
   updateAiFabDot();
@@ -16499,7 +17502,7 @@ function updateAiFabVisibility(){
   var fab=$('aiFab');
   if(!fab) return;
   var shouldShow=_activeTab==='hoy'||_activeTab==='ai';
-  fab.classList.toggle('hidden',!shouldShow);
+  fab.classList.toggle('hidden',!shouldShow); if(!shouldShow) removeAllAiToasts();
 }
 
 function aiInit(){
@@ -17033,7 +18036,7 @@ function _aiProactiveCheck(){
 
   if(!msg) return;
 
-  _aiProactiveShown = true;
+  if(typeof updateAiFabVisibility==='function') updateAiFabVisibility(); var _fabNow = $('aiFab'); if(!_fabNow || _fabNow.classList.contains('hidden')){ window._aiProactiveRetries = (window._aiProactiveRetries||0)+1; if(window._aiProactiveRetries <= 6) setTimeout(_aiProactiveCheck, 8000); return; } _aiProactiveShown = true;
 
   // Inject into chat history so it shows when overlay opens
   if(!_aiReady){
@@ -17044,18 +18047,18 @@ function _aiProactiveCheck(){
 
   // Show floating toast from FAB area
   var fab = $('aiFab');
-  if(fab){
+  if(fab && !fab.classList.contains('hidden')){
     fab.classList.add('has-dot');
     var toast = document.createElement('div');
     toast.id = 'aiProactiveToast';
-    toast.style.cssText = 'position:fixed;right:88px;bottom:104px;z-index:10001;max-width:210px;background:linear-gradient(135deg,rgba(20,25,50,.97),rgba(12,15,30,.97));border:1px solid rgba(85,120,240,.28);border-radius:16px;padding:10px 14px;font-size:13px;color:#d8e4ff;line-height:1.45;box-shadow:0 8px 28px rgba(0,0,0,.45),0 0 0 1px rgba(85,120,240,.12);cursor:pointer;animation:aiMsgIn .4s cubic-bezier(.22,1,.36,1) both;';
-    toast.innerHTML = '<span style="font-size:11px;color:rgba(130,160,255,.7);display:block;margin-bottom:4px;font-weight:700;letter-spacing:.04em;">ASISTENTE</span>'+escapeHtml(msg);
-    toast.onclick = function(){ removeProactiveToast(); openAiOverlay(); };
+    toast.style.cssText = 'animation:aiDockIn .34s cubic-bezier(.22,1,.36,1) both;';
+    toast.innerHTML = '<span class="ai-toast-body"><span class="ai-toast-kicker">ASISTENTE</span>'+escapeHtml(msg)+'</span><button type="button" class="ai-toast-x" aria-label="Cerrar aviso" onclick="event.stopPropagation();removeProactiveToast();">&#215;</button>';
+    toast.onclick = function(){ removeProactiveToast(); openAiOverlay(); }; removeAiActionToast(); _aiToastAutoHide(toast, 11000); _aiFabDuck(1);
     document.body.appendChild(toast);
   }
 }
 
-function removeProactiveToast(){
+function _aiFabDuck(on){ var b=document.body; if(!b) return; if(on){ b.classList.add('ai-toast-open'); return; } var p=document.getElementById('aiProactiveToast'), q=document.getElementById('aiActionToast'); if((p&&!p._aiHiding)||(q&&!q._aiHiding)) return; if(p||q){ setTimeout(function(){ _aiFabDuck(0); },340); return; } b.classList.remove('ai-toast-open'); } function _aiToastHide(el){ if(!el) return; if(el._aiHiding) return; el._aiHiding=1; el.style.animation='none'; el.style.transition='opacity .26s ease, transform .26s ease'; el.style.opacity='0'; el.style.transform='translateY(12px)'; setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); _aiFabDuck(0); },300); } function _aiToastAutoHide(el, ms){ if(!el) return; setTimeout(function(){ if(el.parentNode && document.getElementById(el.id)===el){ _aiToastHide(el); } else { _aiFabDuck(0); } }, ms||10000); } function removeAiActionToast(){ _aiToastHide(document.getElementById('aiActionToast')); } function removeAllAiToasts(){ removeProactiveToast(); removeAiActionToast(); _aiFabDuck(0); } function removeProactiveToast(){ _aiToastHide(document.getElementById('aiProactiveToast')); return;
   var t = document.getElementById('aiProactiveToast');
   if(t){
     t.style.opacity='0';
