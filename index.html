@@ -8708,9 +8708,13 @@ textarea:focus-visible,
   letter-spacing:-.04em;
   color:#f7faff;
 }
+.daily-brief-head > div:first-child{min-width:0;}
 .daily-brief-action{
   min-height:38px;
   min-width:74px;
+  padding:0 14px;
+  white-space:nowrap;
+  flex-shrink:0;
   border:1px solid rgba(143,216,200,.20);
   border-radius:15px;
   background:linear-gradient(135deg,rgba(143,216,200,.18),rgba(97,136,255,.12));
@@ -10248,6 +10252,25 @@ input::placeholder,textarea::placeholder{color:rgba(226,234,255,.44) !important;
   }
 }
 /* ================= FIN BLACK GLASS v1 ================= */
+
+/* ==================================================================
+   PULIDO v1 - va DESPUES de BLACK GLASS, asi que gana por orden
+   ================================================================== */
+
+/* Recetas mostraba su titulo dos veces: el .section-title de la pagina y
+   el <h2 class="rx-title"> del hero. Se conserva el hero, que ademas
+   lleva subtitulo. */
+#page-recetas > .section-title{ display:none !important; }
+
+/* El boton flotante del asistente es position:fixed en bottom:96px con
+   60px de alto, o sea ocupa de 96px a 156px desde el borde inferior.
+   Con .page a 48px de padding y el body a 74px, quedaban unos 34px de
+   contenido que NUNCA se podian destapar por scroll. Se amplia el
+   colchon para que el final de cualquier pestana pueda librar el boton. */
+.page{ padding-bottom:150px !important; }
+
+/* Y el parrafo del resumen deja de meterse debajo del boton. */
+#page-hoy .daily-brief-copy{ padding-right:4px; }
 </style>
 </head>
 <body>
@@ -16598,7 +16621,7 @@ function renderBudgetPage(){
   // Cards
   var list=$('budCatList2'); if(!list) return;
   if(filtered.length===0){
-    list.innerHTML='<div class="bud-empty"><div class="bud-empty-icon">📊</div><div class="bud-empty-title">No budgets yet — tap + to create one</div><div class="bud-empty-sub">Agrega un límite para empezar a ver tus categorías con progreso y gasto real inmediatamente.</div><button class="bud-empty-cta" onclick="openBudModal(null)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H13v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Crear presupuesto</button></div>';
+    list.innerHTML='<div class="bud-empty"><div class="bud-empty-icon">📊</div><div class="bud-empty-title">Aún no tienes presupuestos — toca + para crear uno</div><div class="bud-empty-sub">Agrega un límite para empezar a ver tus categorías con progreso y gasto real inmediatamente.</div><button class="bud-empty-cta" onclick="openBudModal(null)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H13v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Crear presupuesto</button></div>';
     return;
   }
   list.innerHTML=filtered.map(function(b){
