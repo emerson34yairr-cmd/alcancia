@@ -10336,104 +10336,6 @@ body[data-tab="ai"] #aiProactiveToast{
 body[data-tab="ai"].ai-toast-open #toast{
   bottom:calc(248px + var(--safe-bottom)) !important;
 }
-
-/* ==================================================================
-   HORAS v1 - va DESPUES de PULIDO v1, o sea es lo ultimo del <style>
-   ================================================================== */
-
-/* 1. Marca del dia con horas. .cal-day ya es position:relative (8073)
-   y NO tiene ::before propio, asi que la barra va ARRIBA: el ::after
-   ambar de .today esta en bottom:5px y el emoji tambien abajo.
-   Especificidad 1-2-0 + !important, por encima del 1-1-0 !important de
-   la linea 9870, que es quien anula el style inline de calDayColor. */
-#page-calendario .cal-day.has-hours{
-  background:
-    linear-gradient(180deg,rgba(110,139,255,.20) 0%,rgba(110,139,255,.05) 62%),
-    var(--k-s1) !important;
-  border-color:rgba(110,139,255,.34) !important;
-}
-#page-calendario .cal-day.has-hours::before{
-  content:"";
-  position:absolute;
-  top:4px; left:50%;
-  width:16px; height:3px;
-  transform:translateX(-50%);
-  border-radius:999px;
-  background:var(--k-indigo);
-  box-shadow:0 0 8px rgba(110,139,255,.75);
-}
-/* hoy + horas: el ambar de .today manda en el borde, la barra indigo
-   sigue arriba. Los dos estados se leen a la vez. */
-#page-calendario .cal-day.today.has-hours{
-  border-color:rgba(255,209,150,.48) !important;
-}
-
-/* 2. Franja del total del mes. Va suelta bajo .cal-summary y NO como un
-   4o .cal-sum: la linea 8006 fija repeat(3,...)!important y los emojis
-   van por :nth-child(1|2|3)::before. */
-#page-calendario .cal-hours-strip{
-  display:flex; align-items:center; gap:8px;
-  margin:0 0 14px; padding:10px 14px;
-  border-radius:16px;
-  background:var(--k-s1);
-  border:1px solid var(--k-line);
-  box-shadow:var(--k-sh-card);
-  color:var(--k-t2);
-  font-size:12px; font-weight:700; letter-spacing:-.01em;
-}
-#page-calendario .cal-hours-strip[hidden]{ display:none !important; }
-#page-calendario .cal-hours-strip-ico{ font-size:13px; opacity:.9; }
-#page-calendario .cal-hours-strip-txt{ color:var(--k-t1); font-variant-numeric:tabular-nums; }
-
-/* 3. Editor dentro de #calOverlay. Solo separacion + stepper: el input y
-   los botones reusan .bud-modal-*, ya vestidos por BLACK GLASS. */
-.cal-hours-block{
-  margin-top:16px; padding-top:16px;
-  border-top:1px solid var(--k-line-soft);
-}
-.cal-hours-head{
-  display:flex; align-items:baseline; justify-content:space-between;
-  gap:10px; margin-bottom:10px;
-}
-.cal-hours-head .bud-modal-lbl{ margin-bottom:0; }
-.cal-hours-preview{
-  font-family:'Space Mono',monospace;
-  font-size:17px; font-weight:700;
-  color:var(--k-t1); font-variant-numeric:tabular-nums;
-}
-.cal-hours-stepper{
-  display:grid; grid-template-columns:52px 1fr 52px;
-  gap:10px; align-items:stretch;
-}
-.cal-hours-step{
-  min-height:52px; border-radius:16px;
-  border:1px solid var(--k-line);
-  background:var(--k-glass-btn);
-  color:var(--k-t1);
-  font-family:'Syne',sans-serif; font-size:22px; font-weight:800; line-height:1;
-  cursor:pointer; -webkit-tap-highlight-color:transparent;
-  transition:transform .14s ease,filter .18s ease;
-}
-.cal-hours-step:active{ transform:scale(.94); filter:brightness(1.12); }
-/* OJO: aqui NO se declara font-size para el input. Hereda los 16px de
-   las lineas 7636/7642 y eso es lo que evita el zoom automatico de iOS
-   al enfocarlo. No anadir font-size nunca. */
-.cal-hours-input{
-  min-height:52px; text-align:center;
-  font-variant-numeric:tabular-nums;
-  -moz-appearance:textfield;
-}
-.cal-hours-input::-webkit-outer-spin-button,
-.cal-hours-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-.cal-hours-presets{
-  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px; margin-top:10px;
-}
-.cal-hours-presets .bud-modal-period-btn{ min-height:44px; }
-.cal-hours-block .bud-modal-actions{ margin-top:14px; }
-.cal-hours-block .bud-modal-save,
-.cal-hours-block .bud-modal-cancel{ min-height:48px; }
-.cal-hours-block .bud-modal-delete{ min-height:44px; }
 </style>
 </head>
 <body>
@@ -11594,7 +11496,6 @@ body[data-tab="ai"].ai-toast-open #toast{
     <div class="cal-sum"><div class="cal-sum-l">Gastado</div><div class="cal-sum-v spent" id="calSumSpent">$0</div></div>
     <div class="cal-sum"><div class="cal-sum-l">Activos</div><div class="cal-sum-v active" id="calSumActive">0</div></div>
   </div>
-  <div class="cal-hours-strip" id="calHoursStrip" hidden><span class="cal-hours-strip-ico">⏱</span><span class="cal-hours-strip-txt" id="calHoursStripText">0 h</span></div>
   <div class="cal-grid-wrap">
     <div class="cal-weekdays">
       <div class="cal-wd">Lun</div><div class="cal-wd">Mar</div><div class="cal-wd">Mié</div><div class="cal-wd">Jue</div><div class="cal-wd">Vie</div><div class="cal-wd">Sáb</div><div class="cal-wd">Dom</div>
@@ -11841,28 +11742,6 @@ body[data-tab="ai"].ai-toast-open #toast{
     <div class="cal-det-row"><span>Ahorrado</span><b id="calDetSaved">$0</b></div>
     <div class="cal-det-row"><span>Gastado</span><b id="calDetSpent">$0</b></div>
     <div class="cal-det-notes" id="calDetNotes">Sin notas</div>
-    <div class="cal-hours-block">
-      <div class="cal-hours-head">
-        <div class="bud-modal-lbl">⏱ Horas trabajadas</div>
-        <div class="cal-hours-preview" id="calHoursPreview">Sin horas</div>
-      </div>
-      <div class="cal-hours-stepper">
-        <button class="cal-hours-step" type="button" onclick="calHoursStep(-0.5)" aria-label="Media hora menos">−</button>
-        <input class="bud-modal-input cal-hours-input" id="calHoursInput" type="number" inputmode="decimal" step="0.5" min="0" max="24" placeholder="0" oninput="calHoursType(this)">
-        <button class="cal-hours-step" type="button" onclick="calHoursStep(0.5)" aria-label="Media hora más">+</button>
-      </div>
-      <div class="cal-hours-presets" id="calHoursPresets">
-        <button class="bud-modal-period-btn" type="button" data-h="4" onclick="calHoursPreset(4)">4 h</button>
-        <button class="bud-modal-period-btn" type="button" data-h="6" onclick="calHoursPreset(6)">6 h</button>
-        <button class="bud-modal-period-btn" type="button" data-h="8" onclick="calHoursPreset(8)">8 h</button>
-        <button class="bud-modal-period-btn" type="button" data-h="9" onclick="calHoursPreset(9)">9 h</button>
-      </div>
-      <div class="bud-modal-actions cal-hours-actions">
-        <button class="bud-modal-save" type="button" onclick="calHoursSave()">Guardar horas</button>
-        <button class="bud-modal-cancel" type="button" onclick="closeCalendarDetail()">Cancelar</button>
-        <button class="bud-modal-delete" id="calHoursClearBtn" type="button" onclick="calHoursClear()" style="display:none">Quitar horas</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -12665,10 +12544,6 @@ function getYesterdayKey(){ var d=new Date(); d.setDate(d.getDate()-1); return d
 function dayEarned(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.earned||0);},0); }
 function daySaved(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.saved||0)+(e.savedAdj||0);},0); }
 function daySpent(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.spent||0);},0); }
-function dayHours(d){ var h=d&&d.hours; return (typeof h==='number'&&isFinite(h)&&h>0)?h:0; }
-function calHoursNorm(v){ v=parseFloat(v); if(!isFinite(v)||v<=0) return 0; v=Math.round(v*4)/4; return Math.min(24,v); }
-function fmtHoursSum(h){ h=parseFloat(h); if(!isFinite(h)||h<=0) return '0 h'; h=Math.round(h*4)/4; return String(h)+' h'; }
-function fmtHours(h){ h=calHoursNorm(h); return h?(String(h)+' h'):'0 h'; }
 
 function calcStreak(){
   if(!state.days.length) return 0;
@@ -12917,7 +12792,7 @@ function deleteEntry(date,idx){
   if(!day||!day.entries||!day.entries[idx]) return;
   var snapshot=JSON.parse(JSON.stringify(day));
   day.entries.splice(idx,1);
-  if(!day.entries.length && !dayHours(day)) state.days=state.days.filter(function(d){return d.date!==date;});
+  if(!day.entries.length) state.days=state.days.filter(function(d){return d.date!==date;});
   saveState(); updateAll();
   showToast('Entrada eliminada','Deshacer',function(){
     state.days=state.days.filter(function(d){return d.date!==date;});
@@ -13984,16 +13859,6 @@ function renderCalendar(){
   var offset=(first.getDay()+6)%7, total=last.getDate();
   setText('calMonthLabel',MONTHS[m]+' '+y);
   var sumSaved=0,sumSpent=0,active=0;
-  var hoursMap={}, hSum=0, hDays=0;
-  (function(){
-    var mk=calMonthKey(y,m);
-    for(var hi=0;hi<state.days.length;hi++){
-      var dd=state.days[hi];
-      if((dd.date||'').slice(0,7)!==mk) continue;
-      var hv=dayHours(dd);
-      if(hv>0){ hoursMap[dd.date]=hv; hSum+=hv; hDays++; }
-    }
-  })();
   var html='';
   for(var i=0;i<offset;i++) html+='<div class="cal-day empty"></div>';
   for(var d=1;d<=total;d++){
@@ -14010,9 +13875,7 @@ function renderCalendar(){
       else if(cSpent>cSaved) calEmoji='🔴';
       else calEmoji='🟡';
     }
-    var hDay=hoursMap[key]||0;
-    var hCls=hDay>0?' has-hours':'';
-    html+='<button class="cal-day'+today+hCls+'" data-date="'+key+'" data-h="'+hDay+'" style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')" aria-label="'+fmtDate(key)+(hDay>0?', '+fmtHours(hDay):'')+'">'
+    html+='<button class="cal-day'+today+'" style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')">'
       +d+(calEmoji?'<span class="cal-day-emoji">'+calEmoji+'</span>':'')
       +'</button>';
   }
@@ -14020,13 +13883,6 @@ function renderCalendar(){
   setText('calSumSaved',moneyText(sumSaved));
   setText('calSumSpent',moneyText(sumSpent));
   setText('calSumActive',String(active));
-  var hStrip=$('calHoursStrip');
-  if(hStrip){
-    if(hSum>0){
-      hStrip.hidden=false;
-      setText('calHoursStripText', fmtHoursSum(hSum)+' este mes · '+hDays+' día'+(hDays!==1?'s':'')+' · '+fmtHours(hSum/hDays)+'/día');
-    } else { hStrip.hidden=true; }
-  }
 }
 function calPrevMonth(){ calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()-1,1); renderCalendar(); }
 function calNextMonth(){ calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()+1,1); renderCalendar(); }
@@ -14041,73 +13897,9 @@ function openCalendarDetail(key){
   if(rec.notes&&rec.notes.length) lines.push('📝 '+rec.notes.join(' · '));
   if(rec.items&&rec.items.length) lines.push('🛒 '+rec.items.slice(0,6).join(', '));
   setText('calDetNotes',lines.length?lines.join('\n'):'Sin notas ni compras registradas.');
-  calHoursOpen(key);
   $('calOverlay').classList.add('show');
 }
 function closeCalendarDetail(){ var o=$('calOverlay'); if(o) o.classList.remove('show'); }
-
-// ── HORAS TRABAJADAS (editor del calendario) ─────────────────
-var _calHoursKey=null, _calHoursVal=0;
-function calFindDay(key){ for(var i=0;i<state.days.length;i++){ if(state.days[i].date===key) return state.days[i]; } return null; }
-function calHoursOpen(key){
-  _calHoursKey=key;
-  _calHoursVal=dayHours(calFindDay(key));
-  calHoursPaint();
-}
-function calHoursPaint(){
-  var inp=$('calHoursInput'); if(inp) inp.value=_calHoursVal?String(_calHoursVal):'';
-  setText('calHoursPreview', _calHoursVal?fmtHours(_calHoursVal):'Sin horas');
-  var del=$('calHoursClearBtn');
-  if(del) del.style.display=(dayHours(calFindDay(_calHoursKey))>0)?'block':'none';
-  var pre=document.querySelectorAll('#calHoursPresets .bud-modal-period-btn');
-  for(var i=0;i<pre.length;i++){
-    pre[i].classList.toggle('active', parseFloat(pre[i].getAttribute('data-h'))===_calHoursVal);
-  }
-}
-function calHoursStep(delta){
-  _calHoursVal=calHoursNorm(_calHoursVal+delta);
-  calHoursPaint();
-  try{ if(navigator.vibrate) navigator.vibrate(8); }catch(e){}
-}
-function calHoursPreset(h){ _calHoursVal=calHoursNorm(h); calHoursPaint(); }
-function calHoursType(el){
-  _calHoursVal=calHoursNorm(el.value);
-  setText('calHoursPreview', _calHoursVal?fmtHours(_calHoursVal):'Sin horas');
-}
-function calHoursSave(){
-  var key=_calHoursKey; if(!key) return;
-  var h=calHoursNorm(_calHoursVal);
-  var day=calFindDay(key);
-  if(h>0){
-    if(!day){ day={date:key,worked:true,entries:[],hours:h}; state.days.push(day); }
-    else { if(!day.entries) day.entries=[]; day.hours=h; day.worked=true; }
-    if(key===TODAY){ currentWorked=true; if(typeof setWorkedUI==='function') setWorkedUI(true); }
-  } else if(day){
-    delete day.hours;
-    if(!day.entries||!day.entries.length) state.days=state.days.filter(function(d){return d.date!==key;});
-  }
-  saveState();
-  closeCalendarDetail();
-  updateAll();
-  showToast(h>0?('⏱ '+fmtHours(h)+' · '+fmtDate(key)):('⏱ Sin horas · '+fmtDate(key)));
-}
-function calHoursClear(){
-  var key=_calHoursKey; if(!key) return;
-  var day=calFindDay(key); if(!day){ closeCalendarDetail(); return; }
-  var snap=JSON.parse(JSON.stringify(day));
-  var idx=state.days.indexOf(day);
-  _calHoursVal=0;
-  delete day.hours;
-  if(!day.entries||!day.entries.length) state.days=state.days.filter(function(d){return d.date!==key;});
-  saveState();
-  closeCalendarDetail();
-  updateAll();
-  showToast('⏱ Horas quitadas','Deshacer',function(){
-    state.days=state.days.filter(function(d){return d.date!==key;});
-    if(idx>=0&&idx<=state.days.length) state.days.splice(idx,0,snap); else state.days.push(snap);
-    saveState(); updateAll(); showToast('⏱ Horas restauradas');
-  });
-}
 
 // ── INSIGHTS ───────────────────────────────────────────────────────
 function insGetCatEmoji(cat){
