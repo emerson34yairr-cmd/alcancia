@@ -10336,6 +10336,198 @@ body[data-tab="ai"] #aiProactiveToast{
 body[data-tab="ai"].ai-toast-open #toast{
   bottom:calc(248px + var(--safe-bottom)) !important;
 }
+
+/* ==================================================================
+   FOTO DEL DIA v1 - ultimo bloque de la hoja: gana por orden a
+   BLACK GLASS v1, PULIDO v1 y FIX AI v1 a igual especificidad, y sube
+   a 1-1-0 / 1-0-0 donde hace falta. La hoja del calendario cuelga del
+   <body>, NO de #page-calendario, asi que las reglas
+   "#page-calendario ..." no la alcanzan.
+   ================================================================== */
+
+/* --- marca de "este dia tiene foto": punto violeta arriba-derecha.
+   ::before de .cal-day estaba libre; el ::after lo usa .today con su
+   punto ambar abajo-centro (8137) y el emoji de color va bajo el
+   numero, asi que no hay colision ni geometrica ni cromatica. --- */
+#page-calendario .cal-day[data-photo="1"]::before{
+  content:"";
+  position:absolute;
+  top:4px;
+  right:4px;
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  background:var(--k-violet);
+  box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 8px rgba(155,107,255,.85);
+  pointer-events:none;
+  z-index:2;
+}
+@media(max-width:360px){
+  #page-calendario .cal-day[data-photo="1"]::before{ top:3px; right:3px; width:5px; height:5px; }
+}
+
+/* --- bloque de foto dentro de la hoja del dia --- */
+#calDetPhoto{ margin-top:14px; }
+#calDetPhoto .cal-photo-add{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  width:100%;
+  min-height:48px;
+  padding:13px 14px;
+  border-radius:16px;
+  background:var(--k-glass-btn);
+  border:1px solid var(--k-line);
+  color:var(--k-t1);
+  font-family:'Syne',sans-serif;
+  font-size:13.5px;
+  font-weight:700;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,filter .15s ease;
+}
+#calDetPhoto .cal-photo-add svg{ width:17px; height:17px; flex:0 0 auto; }
+#calDetPhoto .cal-photo-add:active{ transform:scale(.98); filter:brightness(1.08); }
+#calDetPhoto .cal-photo-input{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  font-size:0;
+  cursor:pointer;
+}
+#calDetPhoto .cal-photo-thumb{
+  display:none;
+  position:relative;
+  width:100%;
+  height:170px;
+  padding:0;
+  margin:0;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--k-line);
+  background:#000;
+  cursor:zoom-in;
+  -webkit-tap-highlight-color:transparent;
+}
+#calDetPhoto .cal-photo-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+#calDetPhoto .cal-photo-thumb:active{ transform:scale(.99); }
+#calDetPhoto .cal-photo-zoom{
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  width:30px;
+  height:30px;
+  border-radius:999px;
+  background:rgba(0,0,0,.55);
+  color:var(--k-t1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  pointer-events:none;
+}
+#calDetPhoto .cal-photo-actions{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+#calDetPhoto .cal-photo-replace{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  border-radius:14px;
+  background:var(--k-s1);
+  border:1px solid var(--k-line);
+  color:var(--k-t2);
+  font-family:'Syne',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#calDetPhoto .cal-photo-del{
+  min-height:44px;
+  border-radius:14px;
+  border:1px solid rgba(255,110,138,.30);
+  background:rgba(255,110,138,.10);
+  color:var(--k-rose);
+  font-family:'Syne',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#calDetPhoto .cal-photo-del:active{ transform:scale(.98); }
+#calDetPhoto .cal-photo-meta{
+  margin-top:8px;
+  font-family:'Space Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:.4px;
+  color:var(--k-t3);
+  text-align:center;
+}
+#calDetPhoto.has-photo .cal-photo-add{ display:none; }
+#calDetPhoto.has-photo .cal-photo-thumb{ display:block; }
+#calDetPhoto.has-photo .cal-photo-actions{ display:grid; }
+#calDetPhoto.off .cal-photo-add,
+#calDetPhoto.off .cal-photo-thumb,
+#calDetPhoto.off .cal-photo-actions{ display:none !important; }
+
+/* --- lightbox: vive FUERA de .cal-sheet porque la hoja tiene
+   transform, y un position:fixed dentro de un ancestro transformado
+   se ancla a la hoja, no a la ventana. z-index 470 > 410 del overlay. --- */
+.photo-lb{
+  position:fixed;
+  inset:0;
+  z-index:470;
+  background:rgba(0,0,0,.94);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+}
+.photo-lb.show{ opacity:1; pointer-events:auto; }
+.photo-lb-img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border-radius:12px;
+}
+.photo-lb-close{
+  position:absolute;
+  top:calc(12px + env(safe-area-inset-top,0px));
+  right:12px;
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  border:1px solid var(--k-line);
+  background:rgba(255,255,255,.10);
+  color:var(--k-t1);
+  font-size:17px;
+  line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* --- modo privacidad: un recibo fotografiado es tan sensible como
+   una cifra, asi que se difumina igual que los importes. --- */
+body.privacy-mode #calDetPhoto .cal-photo-thumb img,
+body.privacy-mode .photo-lb-img{ filter:blur(16px); }
+
+/* --- de paso, el bug latente de calDetNotes: mete un salto de linea
+   real pero ninguna regla ponia white-space, asi que las dos lineas
+   (nota y compras) se pintaban pegadas en una sola. --- */
+#calDetNotes{ white-space:pre-line; }
 </style>
 </head>
 <body>
@@ -11735,6 +11927,10 @@ body[data-tab="ai"].ai-toast-open #toast{
   </div>
 </div>
 
+<div class="photo-lb" id="calPhotoLb" onclick="calPhotoZoomClose()">
+  <img class="photo-lb-img" id="calPhotoLbImg" loading="eager" alt="Foto del día"/>
+  <button class="photo-lb-close" type="button" onclick="event.stopPropagation();calPhotoZoomClose()" aria-label="Cerrar foto">✕</button>
+</div>
 <div class="cal-overlay" id="calOverlay" onclick="closeCalendarDetail()">
   <div class="cal-sheet" onclick="event.stopPropagation()">
     <div class="cal-det-date" id="calDetDate">Fecha</div>
@@ -11742,6 +11938,26 @@ body[data-tab="ai"].ai-toast-open #toast{
     <div class="cal-det-row"><span>Ahorrado</span><b id="calDetSaved">$0</b></div>
     <div class="cal-det-row"><span>Gastado</span><b id="calDetSpent">$0</b></div>
     <div class="cal-det-notes" id="calDetNotes">Sin notas</div>
+    <div class="cal-photo" id="calDetPhoto">
+      <div class="bud-modal-lbl">Foto del día</div>
+      <label class="cal-photo-add" id="calPhotoAdd" role="button">
+        <input type="file" class="cal-photo-input" id="calPhotoInput" accept="image/*" onchange="calPhotoPick(this)"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Añadir foto del día</span>
+      </label>
+      <button class="cal-photo-thumb" id="calPhotoThumbBtn" type="button" onclick="calPhotoZoom()" aria-label="Ampliar la foto del día">
+        <img id="calPhotoImg" loading="eager" alt="Foto del día"/>
+        <span class="cal-photo-zoom" aria-hidden="true">⤢</span>
+      </button>
+      <div class="cal-photo-actions">
+        <label class="cal-photo-replace" role="button">
+          <input type="file" class="cal-photo-input" id="calPhotoInput2" accept="image/*" onchange="calPhotoPick(this)"/>
+          <span>Cambiar</span>
+        </label>
+        <button class="cal-photo-del" type="button" onclick="calPhotoDelete()">Borrar foto</button>
+      </div>
+      <div class="cal-photo-meta" id="calPhotoMeta">Sin foto</div>
+    </div>
   </div>
 </div>
 
@@ -12808,7 +13024,7 @@ function deleteDay(date){
   if(!removed) return;
   state.days=state.days.filter(function(d){return d.date!==date;});
   saveState(); updateAll();
-  showToast('Dia eliminado','Deshacer',function(){
+  showToast((typeof _photoDays!=='undefined'&&_photoDays[date])?'Día eliminado (la foto se conserva)':'Día eliminado','Deshacer',function(){
     state.days=state.days.filter(function(d){return d.date!==date;});
     if(dayIndex>=0&&dayIndex<=state.days.length) state.days.splice(dayIndex,0,removed);
     else state.days.push(removed);
@@ -13875,7 +14091,8 @@ function renderCalendar(){
       else if(cSpent>cSaved) calEmoji='🔴';
       else calEmoji='🟡';
     }
-    html+='<button class="cal-day'+today+'" style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')">'
+    var photoAttr=(typeof _photoDays!=='undefined'&&_photoDays[key])?' data-photo="1"':'';
+    html+='<button class="cal-day'+today+'"'+photoAttr+' style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')">'
       +d+(calEmoji?'<span class="cal-day-emoji">'+calEmoji+'</span>':'')
       +'</button>';
   }
@@ -13897,9 +14114,274 @@ function openCalendarDetail(key){
   if(rec.notes&&rec.notes.length) lines.push('📝 '+rec.notes.join(' · '));
   if(rec.items&&rec.items.length) lines.push('🛒 '+rec.items.slice(0,6).join(', '));
   setText('calDetNotes',lines.length?lines.join('\n'):'Sin notas ni compras registradas.');
+  _calDetKey=key;
+  calPhotoRender(key);
   $('calOverlay').classList.add('show');
 }
-function closeCalendarDetail(){ var o=$('calOverlay'); if(o) o.classList.remove('show'); }
+function closeCalendarDetail(){
+  var o=$('calOverlay'); if(o) o.classList.remove('show');
+  calPhotoZoomClose();
+  var im=$('calPhotoImg'); if(im) im.removeAttribute('src');
+  calPhotoRevoke();
+  _calDetKey='';
+}
+
+/* ==================================================================
+   FOTO DEL DIA v1 - las imagenes viven en IndexedDB, NUNCA en
+   localStorage: 'state' no crece ni un byte, asi que saveState() no
+   puede reventar la cuota por culpa de una foto.
+   ================================================================== */
+var PHOTO_DB='alcanciaFotos', PHOTO_STORE='dayPhotos', PHOTO_VER=1;
+var PHOTO_MAX_EDGE=1280, PHOTO_TARGET=320*1024, PHOTO_HARD_LIMIT=10*1024*1024;
+var _photoDb=null, _photoOff=false, _photoDays={}, _photoBusy=false, _photoWd=0;
+var _calDetKey='', _calPhotoUrl='';
+var PHOTO_MSG={
+  off:'Este navegador no puede guardar fotos. Todo lo demás sigue igual.',
+  type:'Eso no es una imagen. Elige una foto (JPG, PNG o HEIC).',
+  huge:'Esa imagen pesa demasiado (más de 25 MB). Prueba con otra.',
+  decode:'No se pudo leer esa imagen. Prueba con otra.',
+  quota:'No queda espacio en el teléfono. Borra alguna foto del calendario.',
+  write:'No se pudo guardar la foto. Inténtalo otra vez.',
+  read:'No se pudo leer la foto guardada.',
+  del:'No se pudo borrar la foto.',
+  busy:'Espera, la foto anterior todavía se está guardando.'
+};
+function photoFail(code){ showToast(PHOTO_MSG[code]||PHOTO_MSG.write); }
+function photoErrCode(e){
+  var n=(e&&e.name)||'';
+  return (n==='QuotaExceededError'||n==='NotEnoughSpaceError')?'quota':'write';
+}
+
+/* --- capa de almacenamiento --- */
+function photoOpen(cb){
+  if(_photoOff){ cb('off'); return; }
+  if(_photoDb){ cb(null,_photoDb); return; }
+  var req=null;
+  try{
+    if(typeof indexedDB==='undefined'||!indexedDB) throw new Error('no idb');
+    req=indexedDB.open(PHOTO_DB,PHOTO_VER);
+  }catch(e){ _photoOff=true; cb('off'); return; }
+  if(!req){ _photoOff=true; cb('off'); return; }
+  req.onupgradeneeded=function(ev){
+    var db=ev.target.result;
+    if(!db.objectStoreNames.contains(PHOTO_STORE)) db.createObjectStore(PHOTO_STORE,{keyPath:'key'});
+  };
+  req.onsuccess=function(ev){
+    _photoDb=ev.target.result;
+    _photoDb.onclose=function(){ _photoDb=null; };
+    _photoDb.onversionchange=function(){ try{_photoDb.close();}catch(e){} _photoDb=null; };
+    cb(null,_photoDb);
+  };
+  req.onerror=function(){ _photoOff=true; cb('off'); };
+  req.onblocked=function(){ _photoOff=true; cb('off'); };
+}
+function photoStore(mode,cb){
+  photoOpen(function(err,db){
+    if(err){ cb(err); return; }
+    try{ cb(null,db.transaction(PHOTO_STORE,mode).objectStore(PHOTO_STORE)); }
+    catch(e){ _photoDb=null; cb(mode==='readonly'?'read':'write'); }
+  });
+}
+function photoGet(key,cb){
+  photoStore('readonly',function(err,st){
+    if(err){ cb(err); return; }
+    var r; try{ r=st.get(key); }catch(e){ cb('read'); return; }
+    r.onsuccess=function(){ cb(null,r.result||null); };
+    r.onerror=function(){ cb('read'); };
+  });
+}
+function photoWrite(run,cb){
+  photoStore('readwrite',function(err,st){
+    if(err){ cb(err); return; }
+    var tx=st.transaction, done=false;
+    var fin=function(c){ if(done) return; done=true; cb(c||null); };
+    var r; try{ r=run(st); }catch(e){ fin(photoErrCode(e)); return; }
+    r.onerror=function(ev){ if(ev&&ev.preventDefault) ev.preventDefault(); fin(photoErrCode(r.error)); };
+    tx.onabort=function(){ fin(photoErrCode(tx.error)); };
+    tx.oncomplete=function(){ fin(null); };
+  });
+}
+function photoPut(rec,cb){ photoWrite(function(st){ return st.put(rec); },cb); }
+function photoDel(key,cb){ photoWrite(function(st){ return st['delete'](key); },cb); }
+function photoIndexLoad(cb){
+  photoStore('readonly',function(err,st){
+    if(err){ if(cb) cb(err); return; }
+    var idx={};
+    if(st.getAllKeys){
+      var r=st.getAllKeys();
+      r.onsuccess=function(){ var a=r.result||[]; for(var i=0;i<a.length;i++) idx[a[i]]=1; _photoDays=idx; if(cb) cb(null); };
+      r.onerror=function(){ if(cb) cb('read'); };
+    }else{
+      var c=st.openKeyCursor?st.openKeyCursor():st.openCursor();
+      c.onsuccess=function(ev){ var cur=ev.target.result; if(cur){ idx[cur.key]=1; cur['continue'](); } else { _photoDays=idx; if(cb) cb(null); } };
+      c.onerror=function(){ if(cb) cb('read'); };
+    }
+  });
+}
+
+/* --- compresion: la orientacion EXIF ya la aplica el propio <img>,
+   no se rota a mano (eso es justo lo que gira las fotos al reves) --- */
+function canvasToBlob(cv,q,cb){
+  if(cv.toBlob){ cv.toBlob(function(b){ cb(b); },'image/jpeg',q); return; }
+  try{
+    var du=cv.toDataURL('image/jpeg',q), bin=atob(du.split(',')[1]);
+    var arr=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    cb(new Blob([arr],{type:'image/jpeg'}));
+  }catch(e){ cb(null); }
+}
+function photoCompress(file,cb){
+  var sent=false;
+  var out=function(a,b,c,d){ if(sent) return; sent=true; cb(a,b,c,d); };
+  if(!file){ out('decode'); return; }
+  if(file.type&&file.type.indexOf('image/')!==0){ out('type'); return; }
+  if(file.size>PHOTO_HARD_LIMIT){ out('huge'); return; }
+  var url='';
+  try{ url=URL.createObjectURL(file); }catch(e){ out('decode'); return; }
+  var img=new Image(), freed=false;
+  /* soltar el decodificado SIN volver a disparar onerror: poner
+     img.src='' relanza una carga vacia que emite 'error' y colaba un
+     "No se pudo leer esa imagen" despues de cada foto correcta. */
+  var release=function(){
+    if(freed) return; freed=true;
+    img.onload=null; img.onerror=null;
+    try{ URL.revokeObjectURL(url); }catch(e){}
+    try{ img.removeAttribute('src'); }catch(e){}
+  };
+  img.onerror=function(){ release(); out('decode'); };
+  img.onload=function(){ if(img.naturalWidth*img.naturalHeight>30e6){ release(); out('huge'); return; }
+    var w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+    if(!w||!h){ release(); out('decode'); return; }
+    var sc=Math.min(1,PHOTO_MAX_EDGE/Math.max(w,h));
+    var cw=Math.max(1,Math.round(w*sc)), ch=Math.max(1,Math.round(h*sc));
+    var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch; var _freeCv=function(){ try{ cv.width=0; cv.height=0; }catch(e){} };
+    var cx=cv.getContext('2d');
+    if(!cx){ release(); out('decode'); return; }
+    cx.fillStyle='#000'; cx.fillRect(0,0,cw,ch);
+    try{ cx.drawImage(img,0,0,cw,ch); }catch(e){ release(); out('decode'); return; }
+    release();
+    canvasToBlob(cv,0.72,function(b1){
+      if(!b1){ out('decode'); return; }
+      if(b1.size<=PHOTO_TARGET){ out(null,b1,cw,ch); return; }
+      canvasToBlob(cv,0.55,function(b2){ _freeCv();
+        out(null,(b2&&b2.size<b1.size)?b2:b1,cw,ch);
+      });
+    });
+  };
+  img.src=url;
+}
+
+/* --- UI de la hoja --- */
+function calPhotoRevoke(){
+  if(_calPhotoUrl){ try{ URL.revokeObjectURL(_calPhotoUrl); }catch(e){} _calPhotoUrl=''; }
+}
+function calPhotoMetaText(rec){
+  var kb=Math.round((rec.bytes||0)/1024);
+  return (rec.w||'?')+'x'+(rec.h||'?')+' · '+kb+' KB';
+}
+function calPhotoRender(key){
+  var box=$('calDetPhoto'); if(!box) return;
+  var img=$('calPhotoImg'), meta=$('calPhotoMeta');
+  calPhotoRevoke();
+  if(img) img.removeAttribute('src');
+  box.classList.remove('has-photo');
+  box.classList.remove('off');
+  if(_photoOff){ box.classList.add('off'); if(meta) meta.textContent=PHOTO_MSG.off; return; }
+  if(meta) meta.textContent='Sin foto';
+  photoGet(key,function(err,rec){
+    if(key!==_calDetKey) return;
+    if(err){
+      if(err==='off'){ box.classList.add('off'); if(meta) meta.textContent=PHOTO_MSG.off; }
+      else if(meta) meta.textContent=PHOTO_MSG.read;
+      return;
+    }
+    if(!rec||!rec.blob) return;
+    calPhotoRevoke();
+    try{ _calPhotoUrl=URL.createObjectURL(rec.blob); }catch(e){ if(meta) meta.textContent=PHOTO_MSG.read; return; }
+    if(img){ img.onerror=function(){ if(box) box.classList.remove('has-photo'); if(meta) meta.textContent=PHOTO_MSG.read; }; }
+    box.classList.add('has-photo'); if(img) img.src=_calPhotoUrl;;
+    if(meta) meta.textContent=calPhotoMetaText(rec);
+  });
+}
+function calPhotoAfterChange(key){
+  if(_calDetKey===key) calPhotoRender(key);
+  renderCalendar();
+}
+function calPhotoPick(input){
+  var file=input&&input.files&&input.files[0];
+  if(input) input.value='';
+  if(!file) return;
+  var key=_calDetKey;
+  if(!key) return;
+  if(_photoOff){ photoFail('off'); return; }
+  if(_photoBusy){ photoFail('busy'); return; }
+  _photoBusy=true; if(_photoWd) clearTimeout(_photoWd); _photoWd=setTimeout(function(){ if(_photoBusy){ _photoBusy=false; _photoWd=0; try{ calPhotoRender(_calDetKey); }catch(e){} photoFail('write'); } },20000);
+  var meta=$('calPhotoMeta'); if(meta) meta.textContent='Procesando foto…';
+  photoGet(key,function(gerr,prev){
+    photoCompress(file,function(cerr,blob,w,h){
+      if(cerr){ _photoBusy=false; if(_photoWd){ clearTimeout(_photoWd); _photoWd=0; } if(_calDetKey===key) calPhotoRender(key); photoFail(cerr); return; }
+      var rec={key:key,blob:blob,w:w,h:h,bytes:blob.size,type:blob.type||'image/jpeg',addedAt:new Date().toISOString()};
+      photoPut(rec,function(perr){
+        _photoBusy=false; if(_photoWd){ clearTimeout(_photoWd); _photoWd=0; }
+        if(perr){ if(_calDetKey===key) calPhotoRender(key); photoFail(perr); return; }
+        _photoDays[key]=1;
+        calPhotoAfterChange(key);
+        if(prev&&prev.blob){
+          showToast('📷 Foto reemplazada','Deshacer',function(){
+            photoPut(prev,function(rerr){
+              if(rerr){ photoFail(rerr); return; }
+              calPhotoAfterChange(key);
+              showToast('Foto anterior restaurada');
+            });
+          });
+        }else{
+          showToast('📷 Foto guardada');
+        }
+      });
+    });
+  });
+}
+function calPhotoDelete(){
+  var key=_calDetKey; if(!key) return;
+  if(_photoBusy){ photoFail('busy'); return; }
+  photoGet(key,function(err,rec){
+    if(err){ photoFail(err); return; }
+    if(!rec){ showToast('Este día no tiene foto'); return; }
+    photoDel(key,function(derr){
+      if(derr){ photoFail('del'); return; }
+      delete _photoDays[key];
+      calPhotoAfterChange(key);
+      showToast('Foto eliminada','Deshacer',function(){
+        photoPut(rec,function(rerr){
+          if(rerr){ photoFail(rerr); return; }
+          _photoDays[key]=1;
+          calPhotoAfterChange(key);
+          showToast('Foto restaurada');
+        });
+      });
+    });
+  });
+}
+function calPhotoZoom(){
+  if(!_calPhotoUrl) return;
+  var lb=$('calPhotoLb'), im=$('calPhotoLbImg');
+  if(!lb||!im) return;
+  im.src=_calPhotoUrl;
+  lb.classList.add('show');
+}
+function calPhotoZoomClose(){
+  var lb=$('calPhotoLb'); if(!lb) return;
+  lb.classList.remove('show');
+  var im=$('calPhotoLbImg'); if(im) im.removeAttribute('src');
+}
+function photoBoot(){
+  try{ window.addEventListener('pagehide',calPhotoRevoke); }catch(e){}
+  photoIndexLoad(function(err){
+    if(err) return;
+    for(var k in _photoDays){ if(_photoDays.hasOwnProperty(k)){ renderCalendar(); break; } }
+  });
+}
+setTimeout(photoBoot,600);
 
 // ── INSIGHTS ───────────────────────────────────────────────────────
 function insGetCatEmoji(cat){
@@ -18746,7 +19228,7 @@ document.addEventListener('DOMContentLoaded', function(){
       try { autoDate = localStorage.getItem(AUTO_SNAPSHOT_DATE_SK) || ''; } catch (error) {}
       autoEl.textContent = autoDate ? autoDate : 'Pendiente';
     }
-    if (noteEl) noteEl.textContent = 'Se excluye groq_api_key. Auto respaldo diario activo. Respaldos locales: ' + snapshots.length + '/5.';
+    if (noteEl) noteEl.textContent = 'Se excluye groq_api_key. Las fotos del calendario NO entran en el respaldo: viven en este dispositivo. Auto respaldo diario activo. Respaldos locales: ' + snapshots.length + '/5.';
   }
 
   window.openDataVault = function(){
