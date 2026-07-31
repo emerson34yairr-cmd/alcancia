@@ -2543,8 +2543,19 @@ body::before{
 
 /* ── Bar chart ── */
 .ins-chart-wrap{
-  padding:22px 20px 18px;
-  background:linear-gradient(180deg,rgba(10,14,30,.0) 0%,rgba(8,10,24,.6) 100%);
+  padding:20px 16px 16px;
+  margin:12px;
+  border-radius:16px;
+  /* El grafico se afino para un fondo casi negro y la tarjeta ya no lo es:
+     BLACK GLASS v1 pinta .ins-card con var(--k-s2) (blanco al ~10%) y con
+     !important, asi que el fondo oscuro que renderInsights escribia inline
+     nunca llegaba a aplicarse. En vez de pelear ese !important con otro
+     override, el grafico se dibuja sobre su propia ZONA HUNDIDA, el mismo
+     patron que BLACK GLASS ya usa para las zonas hundidas de una tarjeta. */
+  background:linear-gradient(180deg,rgba(4,6,16,.90) 0%,rgba(2,3,10,.96) 100%);
+  border:1px solid rgba(255,255,255,.05);
+  border-top-color:rgba(0,0,0,.55);
+  box-shadow:inset 0 3px 12px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05);
 }
 .ins-chart-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;}
 .ins-chart-title{font-size:15px;font-weight:800;color:#eef2ff;letter-spacing:-.2px;}
@@ -2564,7 +2575,7 @@ body::before{
   pointer-events:none;padding-bottom:0;
 }
 .ins-chart-gridline{
-  width:100%;border-top:1px solid rgba(255,255,255,.05);
+  width:100%;border-top:1px solid rgba(255,255,255,.08);
 }
 .ins-chart{
   display:flex;align-items:flex-end;justify-content:space-between;
@@ -2576,54 +2587,76 @@ body::before{
 }
 .ins-bar-track{
   flex:1;width:100%;display:flex;align-items:flex-end;
-  background:rgba(255,255,255,.03);
-  border-radius:10px;overflow:hidden;
+  /* el carril se lee de abajo hacia arriba: mas claro en la base */
+  background:linear-gradient(180deg,rgba(255,255,255,.018) 0%,rgba(255,255,255,.06) 100%);
+  border-radius:10px;
+  /* SIN overflow:hidden: recortaba .ins-bar-amt, que va fuera del carril
+     justo encima de su barra, y por eso las cifras no se veian nunca. */
   position:relative;
 }
 .ins-bar-glow{
   position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:140%;height:60%;
-  background:radial-gradient(ellipse at bottom,rgba(100,130,255,.28) 0%,transparent 70%);
+  /* la altura la fija el JS en proporcion al valor. Antes era 60% fijo e
+     identico en las 7 columnas: siendo las barras invisibles, el grafico
+     entero eran 7 manchas azules iguales. Y el 140% de ancho se saldria
+     del carril ahora que no hay overflow:hidden. */
+  width:100%;height:0;
+  background:radial-gradient(ellipse at bottom,rgba(110,139,255,.30) 0%,transparent 72%);
   pointer-events:none;opacity:0;
   transition:opacity .6s .4s;
 }
 .ins-bar-col.has-val .ins-bar-glow{opacity:1;}
 .ins-bar-fill{
   width:100%;
-  border-radius:10px 10px 0 0;
-  background:linear-gradient(180deg,#8ab0ff 0%,#6060f0 50%,#9040e0 100%);
-  box-shadow:0 -3px 16px rgba(85,120,240,.4),0 0 8px rgba(85,120,240,.25);
-  transform-origin:bottom;transform:scaleY(0);
-  transition:transform .75s cubic-bezier(.34,1.18,.64,1);
+  border-radius:10px;
+  background:linear-gradient(180deg,#A8C0FF 0%,var(--k-indigo) 40%,#7C6BF2 72%,var(--k-violet-deep) 100%);
+  box-shadow:0 -2px 14px rgba(110,139,255,.45),inset 0 0 0 1px rgba(170,190,255,.16);
+  /* CAUSA RAIZ del grafico "apagado": la barra nunca tuvo height. Dentro de
+     un .ins-bar-track flex con align-items:flex-end el estirado vertical
+     queda anulado, asi que la altura usada era la del contenido (0) subida
+     a min-height:4px... y encima el scaleY() encogia esos 4px. Las 7 barras
+     median entre 0,3px y 4px sobre un carril de ~170px: el gradiente estaba
+     intacto pero pintado en una tira de menos de un pixel, que el navegador
+     antialiasa contra el fondo hasta dejarla gris. Era un fallo GEOMETRICO,
+     no de color. Ahora la altura la escribe el JS en % y la transicion va
+     sobre height, que ademas no deforma las esquinas ni la sombra como si
+     hacia scaleY. */
+  height:0;
+  transform:none;
+  transition:height .75s cubic-bezier(.34,1.18,.64,1);
   position:relative;z-index:2;
-  min-height:4px;
 }
 .ins-bar-fill.is-max{
-  background:linear-gradient(180deg,#c0d8ff 0%,#7080ff 40%,#8040f0 100%);
+  /* el pico se marca en ROSA, el color con el que la app ya pinta el gasto
+     (.ins-top-card.spend), sobre la base indigo/violeta del resto */
+  background:linear-gradient(180deg,var(--k-pink) 0%,#C97CDC 45%,var(--k-violet-deep) 100%);
   box-shadow:
-    0 -6px 24px rgba(120,150,255,.65),
-    0 0 14px rgba(120,150,255,.4),
-    0 0 30px rgba(100,120,255,.2);
+    0 -3px 20px rgba(255,143,176,.45),
+    0 0 14px rgba(155,107,255,.35),
+    inset 0 0 0 1px rgba(255,196,214,.28);
 }
 .ins-bar-lbl{
   font-family:'Space Mono',monospace;font-size:9px;font-weight:700;
-  color:rgba(130,150,200,.45);letter-spacing:.3px;text-transform:uppercase;
+  color:rgba(150,168,215,.62);letter-spacing:.3px;text-transform:uppercase;
   flex-shrink:0;
 }
 .ins-bar-lbl.is-max{
-  color:rgba(160,185,255,.9);
-  text-shadow:0 0 8px rgba(120,150,255,.5);
+  color:var(--k-pink);
+  text-shadow:0 0 10px rgba(255,143,176,.35);
 }
 .ins-bar-amt{
-  font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;
+  font-family:'Space Mono',monospace;font-size:9px;font-weight:700;
   color:rgba(160,185,255,.0);white-space:nowrap;
-  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  /* el JS le pone bottom:calc(<altura de su barra>% + 7px), asi cada cifra
+     flota sobre SU barra. Con top:-18px las 7 salian en la misma linea
+     encima del carril y ademas las recortaba el overflow:hidden. */
+  position:absolute;top:auto;bottom:0;left:50%;transform:translateX(-50%);
   transition:color .4s .5s;pointer-events:none;
   z-index:3;
 }
-.ins-bar-col.has-val .ins-bar-amt{color:rgba(160,185,255,.7);}
-.ins-bar-col.has-val.is-peak .ins-bar-amt{color:rgba(200,220,255,.95);}
-.ins-bar-fill.is-max~.ins-bar-amt{color:rgba(200,220,255,.95);}
+.ins-bar-col.has-val .ins-bar-amt{color:rgba(178,196,245,.75);}
+.ins-bar-col.has-val.is-peak .ins-bar-amt{color:var(--k-pink);text-shadow:0 0 10px rgba(255,143,176,.30);}
+.ins-bar-fill.is-max~.ins-bar-amt{color:var(--k-pink);text-shadow:0 0 10px rgba(255,143,176,.30);}
 
 /* ── Insight highlight card ── */
 .ins-insight-card{
@@ -4095,7 +4128,7 @@ body::before{
    AI CHAT TAB
    ══════════════════════════════════════════════════════════════════ */
 #page-ai{
-  padding:0;display:flex;flex-direction:column;
+  padding:0;flex-direction:column;
   height:calc(100svh - 78px - 82px - var(--safe-bottom));
   padding-bottom:0 !important;
 }
@@ -10271,6 +10304,136 @@ input::placeholder,textarea::placeholder{color:rgba(226,234,255,.44) !important;
 
 /* Y el parrafo del resumen deja de meterse debajo del boton. */
 #page-hoy .daily-brief-copy{ padding-right:4px; }
+
+/* ==================================================================
+   FIX AI v1 - va DESPUES de PULIDO v1: gana por orden y por especificidad
+   ================================================================== */
+
+/* El globo del asistente (#aiActionToast / #aiProactiveToast) cuelga del
+   <body> con position:fixed, bottom:calc(12px + var(--safe-bottom)) y
+   z-index:9990, todo !important. En la pestana AI esa misma franja la
+   ocupa .ai-input-wrap (el composer), que NO es fixed: mide ~70px + safe
+   en reposo y hasta ~124px + safe cuando crece el textarea (aiAutoResize
+   limita a 96px y .ai-input tiene max-height:96px). El globo lo tapaba
+   entero y, como lleva cursor:pointer y un onclick que abre el overlay,
+   encima se robaba el tap del textarea y del boton de enviar.
+   Subirle el z-index al composer NO sirve: .page es position:relative con
+   z-index:1, o sea un contexto de apilamiento propio, y nada de dentro
+   puede pasar de la capa 1. Por eso lo que se mueve es el globo.
+   136px + safe deja 12px de aire incluso con el composer en su altura
+   maxima. Solo en la pestana AI (atributo data-tab que pone switchTab);
+   en las demas el globo se queda exactamente donde estaba.
+   El .ai-fab ya se aparta solo con body.ai-toast-open, asi que el globo
+   aterriza en un hueco libre. La X de cerrar y el auto-hide no se tocan. */
+body[data-tab="ai"] #aiActionToast,
+body[data-tab="ai"] #aiProactiveToast{
+  bottom:calc(136px + var(--safe-bottom)) !important;
+}
+
+/* La regla vieja manda #toast a 136px + safe mientras hay globo abierto,
+   que es justo donde acaba de aterrizar el globo. En la pestana AI se le
+   da otro escalon para que no se solapen entre ellos. */
+body[data-tab="ai"].ai-toast-open #toast{
+  bottom:calc(248px + var(--safe-bottom)) !important;
+}
+
+/* ==================================================================
+   HORAS v1 - va DESPUES de PULIDO v1, o sea es lo ultimo del <style>
+   ================================================================== */
+
+/* 1. Marca del dia con horas. .cal-day ya es position:relative (8073)
+   y NO tiene ::before propio, asi que la barra va ARRIBA: el ::after
+   ambar de .today esta en bottom:5px y el emoji tambien abajo.
+   Especificidad 1-2-0 + !important, por encima del 1-1-0 !important de
+   la linea 9870, que es quien anula el style inline de calDayColor. */
+#page-calendario .cal-day.has-hours{
+  background:
+    linear-gradient(180deg,rgba(110,139,255,.20) 0%,rgba(110,139,255,.05) 62%),
+    var(--k-s1) !important;
+  border-color:rgba(110,139,255,.34) !important;
+}
+#page-calendario .cal-day.has-hours::before{
+  content:"";
+  position:absolute;
+  top:4px; left:50%;
+  width:16px; height:3px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:var(--k-indigo);
+  box-shadow:0 0 8px rgba(110,139,255,.75);
+}
+/* hoy + horas: el ambar de .today manda en el borde, la barra indigo
+   sigue arriba. Los dos estados se leen a la vez. */
+#page-calendario .cal-day.today.has-hours{
+  border-color:rgba(255,209,150,.48) !important;
+}
+
+/* 2. Franja del total del mes. Va suelta bajo .cal-summary y NO como un
+   4o .cal-sum: la linea 8006 fija repeat(3,...)!important y los emojis
+   van por :nth-child(1|2|3)::before. */
+#page-calendario .cal-hours-strip{
+  display:flex; align-items:center; gap:8px;
+  margin:0 0 14px; padding:10px 14px;
+  border-radius:16px;
+  background:var(--k-s1);
+  border:1px solid var(--k-line);
+  box-shadow:var(--k-sh-card);
+  color:var(--k-t2);
+  font-size:12px; font-weight:700; letter-spacing:-.01em;
+}
+#page-calendario .cal-hours-strip[hidden]{ display:none !important; }
+#page-calendario .cal-hours-strip-ico{ font-size:13px; opacity:.9; }
+#page-calendario .cal-hours-strip-txt{ color:var(--k-t1); font-variant-numeric:tabular-nums; }
+
+/* 3. Editor dentro de #calOverlay. Solo separacion + stepper: el input y
+   los botones reusan .bud-modal-*, ya vestidos por BLACK GLASS. */
+.cal-hours-block{
+  margin-top:16px; padding-top:16px;
+  border-top:1px solid var(--k-line-soft);
+}
+.cal-hours-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:10px; margin-bottom:10px;
+}
+.cal-hours-head .bud-modal-lbl{ margin-bottom:0; }
+.cal-hours-preview{
+  font-family:'Space Mono',monospace;
+  font-size:17px; font-weight:700;
+  color:var(--k-t1); font-variant-numeric:tabular-nums;
+}
+.cal-hours-stepper{
+  display:grid; grid-template-columns:52px 1fr 52px;
+  gap:10px; align-items:stretch;
+}
+.cal-hours-step{
+  min-height:52px; border-radius:16px;
+  border:1px solid var(--k-line);
+  background:var(--k-glass-btn);
+  color:var(--k-t1);
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800; line-height:1;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:transform .14s ease,filter .18s ease;
+}
+.cal-hours-step:active{ transform:scale(.94); filter:brightness(1.12); }
+/* OJO: aqui NO se declara font-size para el input. Hereda los 16px de
+   las lineas 7636/7642 y eso es lo que evita el zoom automatico de iOS
+   al enfocarlo. No anadir font-size nunca. */
+.cal-hours-input{
+  min-height:52px; text-align:center;
+  font-variant-numeric:tabular-nums;
+  -moz-appearance:textfield;
+}
+.cal-hours-input::-webkit-outer-spin-button,
+.cal-hours-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.cal-hours-presets{
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px; margin-top:10px;
+}
+.cal-hours-presets .bud-modal-period-btn{ min-height:44px; }
+.cal-hours-block .bud-modal-actions{ margin-top:14px; }
+.cal-hours-block .bud-modal-save,
+.cal-hours-block .bud-modal-cancel{ min-height:48px; }
+.cal-hours-block .bud-modal-delete{ min-height:44px; }
 </style>
 </head>
 <body>
@@ -11431,6 +11594,7 @@ input::placeholder,textarea::placeholder{color:rgba(226,234,255,.44) !important;
     <div class="cal-sum"><div class="cal-sum-l">Gastado</div><div class="cal-sum-v spent" id="calSumSpent">$0</div></div>
     <div class="cal-sum"><div class="cal-sum-l">Activos</div><div class="cal-sum-v active" id="calSumActive">0</div></div>
   </div>
+  <div class="cal-hours-strip" id="calHoursStrip" hidden><span class="cal-hours-strip-ico">⏱</span><span class="cal-hours-strip-txt" id="calHoursStripText">0 h</span></div>
   <div class="cal-grid-wrap">
     <div class="cal-weekdays">
       <div class="cal-wd">Lun</div><div class="cal-wd">Mar</div><div class="cal-wd">Mié</div><div class="cal-wd">Jue</div><div class="cal-wd">Vie</div><div class="cal-wd">Sáb</div><div class="cal-wd">Dom</div>
@@ -11677,6 +11841,28 @@ input::placeholder,textarea::placeholder{color:rgba(226,234,255,.44) !important;
     <div class="cal-det-row"><span>Ahorrado</span><b id="calDetSaved">$0</b></div>
     <div class="cal-det-row"><span>Gastado</span><b id="calDetSpent">$0</b></div>
     <div class="cal-det-notes" id="calDetNotes">Sin notas</div>
+    <div class="cal-hours-block">
+      <div class="cal-hours-head">
+        <div class="bud-modal-lbl">⏱ Horas trabajadas</div>
+        <div class="cal-hours-preview" id="calHoursPreview">Sin horas</div>
+      </div>
+      <div class="cal-hours-stepper">
+        <button class="cal-hours-step" type="button" onclick="calHoursStep(-0.5)" aria-label="Media hora menos">−</button>
+        <input class="bud-modal-input cal-hours-input" id="calHoursInput" type="number" inputmode="decimal" step="0.5" min="0" max="24" placeholder="0" oninput="calHoursType(this)">
+        <button class="cal-hours-step" type="button" onclick="calHoursStep(0.5)" aria-label="Media hora más">+</button>
+      </div>
+      <div class="cal-hours-presets" id="calHoursPresets">
+        <button class="bud-modal-period-btn" type="button" data-h="4" onclick="calHoursPreset(4)">4 h</button>
+        <button class="bud-modal-period-btn" type="button" data-h="6" onclick="calHoursPreset(6)">6 h</button>
+        <button class="bud-modal-period-btn" type="button" data-h="8" onclick="calHoursPreset(8)">8 h</button>
+        <button class="bud-modal-period-btn" type="button" data-h="9" onclick="calHoursPreset(9)">9 h</button>
+      </div>
+      <div class="bud-modal-actions cal-hours-actions">
+        <button class="bud-modal-save" type="button" onclick="calHoursSave()">Guardar horas</button>
+        <button class="bud-modal-cancel" type="button" onclick="closeCalendarDetail()">Cancelar</button>
+        <button class="bud-modal-delete" id="calHoursClearBtn" type="button" onclick="calHoursClear()" style="display:none">Quitar horas</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -12479,6 +12665,10 @@ function getYesterdayKey(){ var d=new Date(); d.setDate(d.getDate()-1); return d
 function dayEarned(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.earned||0);},0); }
 function daySaved(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.saved||0)+(e.savedAdj||0);},0); }
 function daySpent(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.spent||0);},0); }
+function dayHours(d){ var h=d&&d.hours; return (typeof h==='number'&&isFinite(h)&&h>0)?h:0; }
+function calHoursNorm(v){ v=parseFloat(v); if(!isFinite(v)||v<=0) return 0; v=Math.round(v*4)/4; return Math.min(24,v); }
+function fmtHoursSum(h){ h=parseFloat(h); if(!isFinite(h)||h<=0) return '0 h'; h=Math.round(h*4)/4; return String(h)+' h'; }
+function fmtHours(h){ h=calHoursNorm(h); return h?(String(h)+' h'):'0 h'; }
 
 function calcStreak(){
   if(!state.days.length) return 0;
@@ -12727,7 +12917,7 @@ function deleteEntry(date,idx){
   if(!day||!day.entries||!day.entries[idx]) return;
   var snapshot=JSON.parse(JSON.stringify(day));
   day.entries.splice(idx,1);
-  if(!day.entries.length) state.days=state.days.filter(function(d){return d.date!==date;});
+  if(!day.entries.length && !dayHours(day)) state.days=state.days.filter(function(d){return d.date!==date;});
   saveState(); updateAll();
   showToast('Entrada eliminada','Deshacer',function(){
     state.days=state.days.filter(function(d){return d.date!==date;});
@@ -13701,6 +13891,7 @@ function switchTab(id){
   if(!entering) return;
   _tabBusy=true;
   _activeTab=id; removeAllAiToasts();
+  try{ document.body.setAttribute('data-tab', id); }catch(e){}
   try{ localStorage.setItem(LAST_TAB_SK,id); }catch(e){}
   // Update top-tab highlights
   document.querySelectorAll('.tabs .tab').forEach(function(t){ if(t.getAttribute('data-tab')===id&&t.scrollIntoView){try{t.scrollIntoView({block:'nearest',inline:'center'});}catch(e){}} 
@@ -13793,6 +13984,16 @@ function renderCalendar(){
   var offset=(first.getDay()+6)%7, total=last.getDate();
   setText('calMonthLabel',MONTHS[m]+' '+y);
   var sumSaved=0,sumSpent=0,active=0;
+  var hoursMap={}, hSum=0, hDays=0;
+  (function(){
+    var mk=calMonthKey(y,m);
+    for(var hi=0;hi<state.days.length;hi++){
+      var dd=state.days[hi];
+      if((dd.date||'').slice(0,7)!==mk) continue;
+      var hv=dayHours(dd);
+      if(hv>0){ hoursMap[dd.date]=hv; hSum+=hv; hDays++; }
+    }
+  })();
   var html='';
   for(var i=0;i<offset;i++) html+='<div class="cal-day empty"></div>';
   for(var d=1;d<=total;d++){
@@ -13809,7 +14010,9 @@ function renderCalendar(){
       else if(cSpent>cSaved) calEmoji='🔴';
       else calEmoji='🟡';
     }
-    html+='<button class="cal-day'+today+'" style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')">'
+    var hDay=hoursMap[key]||0;
+    var hCls=hDay>0?' has-hours':'';
+    html+='<button class="cal-day'+today+hCls+'" data-date="'+key+'" data-h="'+hDay+'" style="background:'+calDayColor(rec,maxSaved,maxSpent)+'" onclick="openCalendarDetail(\''+key+'\')" aria-label="'+fmtDate(key)+(hDay>0?', '+fmtHours(hDay):'')+'">'
       +d+(calEmoji?'<span class="cal-day-emoji">'+calEmoji+'</span>':'')
       +'</button>';
   }
@@ -13817,6 +14020,13 @@ function renderCalendar(){
   setText('calSumSaved',moneyText(sumSaved));
   setText('calSumSpent',moneyText(sumSpent));
   setText('calSumActive',String(active));
+  var hStrip=$('calHoursStrip');
+  if(hStrip){
+    if(hSum>0){
+      hStrip.hidden=false;
+      setText('calHoursStripText', fmtHoursSum(hSum)+' este mes · '+hDays+' día'+(hDays!==1?'s':'')+' · '+fmtHours(hSum/hDays)+'/día');
+    } else { hStrip.hidden=true; }
+  }
 }
 function calPrevMonth(){ calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()-1,1); renderCalendar(); }
 function calNextMonth(){ calViewDate=new Date(calViewDate.getFullYear(),calViewDate.getMonth()+1,1); renderCalendar(); }
@@ -13831,9 +14041,73 @@ function openCalendarDetail(key){
   if(rec.notes&&rec.notes.length) lines.push('📝 '+rec.notes.join(' · '));
   if(rec.items&&rec.items.length) lines.push('🛒 '+rec.items.slice(0,6).join(', '));
   setText('calDetNotes',lines.length?lines.join('\n'):'Sin notas ni compras registradas.');
+  calHoursOpen(key);
   $('calOverlay').classList.add('show');
 }
 function closeCalendarDetail(){ var o=$('calOverlay'); if(o) o.classList.remove('show'); }
+
+// ── HORAS TRABAJADAS (editor del calendario) ─────────────────
+var _calHoursKey=null, _calHoursVal=0;
+function calFindDay(key){ for(var i=0;i<state.days.length;i++){ if(state.days[i].date===key) return state.days[i]; } return null; }
+function calHoursOpen(key){
+  _calHoursKey=key;
+  _calHoursVal=dayHours(calFindDay(key));
+  calHoursPaint();
+}
+function calHoursPaint(){
+  var inp=$('calHoursInput'); if(inp) inp.value=_calHoursVal?String(_calHoursVal):'';
+  setText('calHoursPreview', _calHoursVal?fmtHours(_calHoursVal):'Sin horas');
+  var del=$('calHoursClearBtn');
+  if(del) del.style.display=(dayHours(calFindDay(_calHoursKey))>0)?'block':'none';
+  var pre=document.querySelectorAll('#calHoursPresets .bud-modal-period-btn');
+  for(var i=0;i<pre.length;i++){
+    pre[i].classList.toggle('active', parseFloat(pre[i].getAttribute('data-h'))===_calHoursVal);
+  }
+}
+function calHoursStep(delta){
+  _calHoursVal=calHoursNorm(_calHoursVal+delta);
+  calHoursPaint();
+  try{ if(navigator.vibrate) navigator.vibrate(8); }catch(e){}
+}
+function calHoursPreset(h){ _calHoursVal=calHoursNorm(h); calHoursPaint(); }
+function calHoursType(el){
+  _calHoursVal=calHoursNorm(el.value);
+  setText('calHoursPreview', _calHoursVal?fmtHours(_calHoursVal):'Sin horas');
+}
+function calHoursSave(){
+  var key=_calHoursKey; if(!key) return;
+  var h=calHoursNorm(_calHoursVal);
+  var day=calFindDay(key);
+  if(h>0){
+    if(!day){ day={date:key,worked:true,entries:[],hours:h}; state.days.push(day); }
+    else { if(!day.entries) day.entries=[]; day.hours=h; day.worked=true; }
+    if(key===TODAY){ currentWorked=true; if(typeof setWorkedUI==='function') setWorkedUI(true); }
+  } else if(day){
+    delete day.hours;
+    if(!day.entries||!day.entries.length) state.days=state.days.filter(function(d){return d.date!==key;});
+  }
+  saveState();
+  closeCalendarDetail();
+  updateAll();
+  showToast(h>0?('⏱ '+fmtHours(h)+' · '+fmtDate(key)):('⏱ Sin horas · '+fmtDate(key)));
+}
+function calHoursClear(){
+  var key=_calHoursKey; if(!key) return;
+  var day=calFindDay(key); if(!day){ closeCalendarDetail(); return; }
+  var snap=JSON.parse(JSON.stringify(day));
+  var idx=state.days.indexOf(day);
+  _calHoursVal=0;
+  delete day.hours;
+  if(!day.entries||!day.entries.length) state.days=state.days.filter(function(d){return d.date!==key;});
+  saveState();
+  closeCalendarDetail();
+  updateAll();
+  showToast('⏱ Horas quitadas','Deshacer',function(){
+    state.days=state.days.filter(function(d){return d.date!==key;});
+    if(idx>=0&&idx<=state.days.length) state.days.splice(idx,0,snap); else state.days.push(snap);
+    saveState(); updateAll(); showToast('⏱ Horas restauradas');
+  });
+}
 
 // ── INSIGHTS ───────────────────────────────────────────────────────
 function insGetCatEmoji(cat){
@@ -13940,7 +14214,11 @@ function renderInsights(){
 
   // ── 2. Bar chart ──
   var hasAnySpend=dowSpend.some(function(v){return v>0;});
-  html+='<div class="ins-card" style="background:linear-gradient(160deg,rgba(13,18,38,.99),rgba(8,11,24,.99));border-color:rgba(85,120,240,.12);box-shadow:0 12px 40px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.06) inset;">'
+  // El style inline que habia aqui era codigo muerto: '.ins-card' de la capa
+  // BLACK GLASS v1 lo pisa con background/border/box-shadow !important, y un
+  // !important de hoja gana a un inline sin !important. El fondo oscuro que
+  // pedia se consigue ahora en .ins-chart-wrap, que es la zona del grafico.
+  html+='<div class="ins-card">'
     +'<div class="ins-chart-wrap">'
       +'<div class="ins-chart-hdr">'
         +'<div>'
@@ -13962,11 +14240,17 @@ function renderInsights(){
     var isMax=i===peakDow&&val>0;
     var hasVal=val>0;
     var colCls='ins-bar-col'+(hasVal?' has-val':'')+(isMax?' is-peak':'');
+    // Altura real de la barra en % del carril. El pico se queda en 92% para
+    // dejarle sitio arriba a su cifra, y hay un suelo del 4% para que un dia
+    // con gasto minimo siga siendo visible (antes TODAS median <=4px).
+    var barH=hasVal?Math.max(4,pct*92).toFixed(2):'0';
+    // el resplandor deja de ser identico en las 7 columnas: acompana al valor
+    var glowH=hasVal?Math.max(10,pct*44).toFixed(2):'0';
     html+='<div class="'+colCls+'">'
       +'<div class="ins-bar-track">'
-        +'<div class="ins-bar-glow"></div>'
-        +'<div class="ins-bar-fill'+(isMax?' is-max':'')+'" data-scale="'+pct+'"></div>'
-        +(hasVal?'<div class="ins-bar-amt">$'+val.toFixed(0)+'</div>':'')
+        +'<div class="ins-bar-glow" style="height:'+glowH+'%"></div>'
+        +'<div class="ins-bar-fill'+(isMax?' is-max':'')+'" data-h="'+barH+'%"></div>'
+        +(hasVal?'<div class="ins-bar-amt" style="bottom:calc('+barH+'% + 7px)">$'+val.toFixed(0)+'</div>':'')
       +'</div>'
       +'<div class="ins-bar-lbl'+(isMax?' is-max':'')+'">'+DOW[i].substring(0,3)+'</div>'
     +'</div>';
@@ -14019,9 +14303,10 @@ function renderInsights(){
   // ── Animate bars after render ──
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      // chart bars
-      el.querySelectorAll('.ins-bar-fill[data-scale]').forEach(function(b){
-        b.style.transform='scaleY('+b.getAttribute('data-scale')+')';
+      // chart bars: se anima la ALTURA, no scaleY. scaleY escalaba una tira
+      // de 4px (y le deformaba esquinas y sombra); data-h ya viene en %.
+      el.querySelectorAll('.ins-bar-fill[data-h]').forEach(function(b){
+        b.style.height=b.getAttribute('data-h');
       });
       // category bars
       el.querySelectorAll('.ins-cat-bar-fill[data-w]').forEach(function(b){
