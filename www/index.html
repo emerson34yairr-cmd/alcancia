@@ -12318,11 +12318,11 @@ function editMainGoal(){
   if(newTargetRaw===null) return;
   var newTarget=parseMoneyText(newTargetRaw);
   if(!(newTarget>0)){ alert('Monto invalido'); return; }
-  if(m){ m.name=newName; m.goal=newTarget; }
+  if(m){ m.name=newName; m.goal=(_curRate>0?newTarget/_curRate:newTarget); }
   else metas.unshift({
     id: Date.now().toString(36)+(Math.random()*0xfffff|0).toString(36),
     name: newName,
-    goal: newTarget,
+    goal: (_curRate>0?newTarget/_curRate:newTarget),
     deadline: null,
     createdAt: new Date().toISOString()
   });
@@ -12588,7 +12588,7 @@ function getLastPriceHistory(name){
   return best;
 }
 function daysAgoFromDate(dateKey){
-  var d=new Date(dateKey);
+  var _pk=String(dateKey||'').split('-'); var d=(_pk.length===3)?new Date(+_pk[0],+_pk[1]-1,+_pk[2]):new Date(dateKey);
   if(!isFinite(d.getTime())) return 0;
   var now=new Date(); now.setHours(0,0,0,0);
   d.setHours(0,0,0,0);
@@ -12787,7 +12787,10 @@ function _applyCurrencyUI(){
     var btn=document.getElementById('btnCurrency'+keys[i]);
     if(btn) btn.classList.toggle('active',keys[i]===_activeCurrency);
   }
-  var spans=document.querySelectorAll('.currency');
+  // Los montos tecleados se guardan tal cual (addEntry no convierte): la unidad
+  // de almacenamiento es USD. Reescribir este prefijo a L/EUR mentia sobre lo
+  // que se estaba guardando, asi que se deja fijo en $.
+  var spans=[];
   for(var j=0;j<spans.length;j++) spans[j].textContent=currSym();
 }
 
@@ -12832,7 +12835,7 @@ function calcStreak(){
   if(!state.days.length) return 0;
   // Only count days that actually have at least one entry
   var keys=state.days.filter(function(d){return d.entries&&d.entries.length>0;}).map(function(d){return d.date;}).sort().reverse();
-  var streak=0, cur=new Date(todayKey());
+  var streak=0, _tk=todayKey().split('-'), cur=new Date(+_tk[0],+_tk[1]-1,+_tk[2]);
   for(var i=0;i<365;i++){
     var k=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
     if(keys.indexOf(k)>=0){ streak++; cur.setDate(cur.getDate()-1); }
@@ -13706,7 +13709,7 @@ function updateStreak(){
 // ── PIGGY FILL ─────────────────────────────────────────────────────
 function updatePiggy(){
   var ts=state.days.reduce(function(a,d){return a+daySaved(d);},0);
-  var pct=Math.min(ts/MAX_FILL,1);
+  var pct=Math.max(0,Math.min(ts/MAX_FILL,1));
   var fh=pct*118;
   var r=$('fillRect');
   if(r){r.setAttribute('height',fh);r.setAttribute('y',184-fh);}
@@ -14124,10 +14127,10 @@ function switchTab(id){
 // ── CALENDARIO ────────────────────────────────────────────────────
 var calViewDate=(function(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),1);})();
 function calMonthKey(y,m){ return y+'-'+pad(m+1); }
-function buildCalendarDayMap(y,m){
+function buildCalendarDayMap(y,m){ var stateDates={}; /* dias cuyo gasto YA viene de state.days */
   var map={};
   state.days.forEach(function(d){
-    if((d.date||'').slice(0,7)!==calMonthKey(y,m)) return;
+    if((d.date||'').slice(0,7)!==calMonthKey(y,m)) return; stateDates[d.date]=(d.entries||[]).some(function(e){return !!e&&(e.source==='shop'||e.source==='scan');});
     var notes=(d.entries||[]).map(function(e){return (e.note||'').trim();}).filter(function(n){return !!n;});
     map[d.date]={
       earned:dayEarned(d),
@@ -14142,7 +14145,7 @@ function buildCalendarDayMap(y,m){
     if(!map[it.date]) map[it.date]={earned:0,saved:0,spent:0,notes:[],items:[]};
     var rec=map[it.date];
     var p=toShopPrice(it.price);
-    if(p>0) rec.spent+=p;
+    if(p>0&&!stateDates[it.date]) rec.spent+=p;
     if(Array.isArray(it.items)&&it.items.length) rec.items=rec.items.concat(it.items);
     else if(it.name) rec.items.push(it.name);
   });
@@ -15547,13 +15550,13 @@ function renderShopSpentHistory(){
       return '<div class="spent-group spent-group-card">'
         +'<div class="spent-group-head">'
           +'<div class="spent-group-date">'+getSpentGroupLabel(dateKey)+'</div>'
-          +'<div class="spent-group-total">Total -$'+dayTotal.toFixed(2)+'</div>'
+          +'<div class="spent-group-total">Total -'+currSym()+toActiveCurrency(dayTotal).toFixed(2)+'</div>'
         +'</div>'
         +'<div class="spent-items-list">'
         +dayItems.map(function(it){
-          var amount='-$'+toShopPrice(it.price).toFixed(2);
+          var amount='-'+currSym()+toActiveCurrency(toShopPrice(it.price)).toFixed(2);
           if(Array.isArray(it.items)&&it.items.length){
-            return it.items.map(function(name){
+            return [it.items.join(', ')].map(function(name){ /* el precio es del ticket completo: no repetirlo por articulo */
               return '<div class="spent-item-line"><span class="spent-item-name">'+name+'</span><span class="shop-price-pill">'+amount+'</span></div>';
             }).join('');
           }
@@ -17136,7 +17139,7 @@ function renderCatBreakdown(){
           +'<div class="cat-name">'+emoji+' '+label+'</div>'
           +'<div class="cat-right">'
             +'<span class="cat-pct">'+pctOfTotal+'%</span>'
-            +'<span class="cat-amt">$'+amt.toFixed(0)+'</span>'
+            +'<span class="cat-amt">'+currSym()+toActiveCurrency(amt).toFixed(0)+'</span>'
           +'</div>'
         +'</div>'
         +'<div class="cat-bar-track"><div class="cat-bar-fill" style="width:0%" data-w="'+pct+'%"></div></div>'
@@ -17187,12 +17190,12 @@ function getBudWeekSpent(){
   var now=new Date();
   var day=now.getDay(); // 0=Sun
   var diff=day===0?6:day-1; // days since Monday
-  var mon=new Date(now); mon.setHours(0,0,0,0); mon.setDate(now.getDate()-diff);
-  var sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+  var mon=new Date(now); mon.setHours(0,0,0,0); mon.setDate(now.getDate()-diff); var _monKey=mon.getFullYear()+'-'+pad(mon.getMonth()+1)+'-'+pad(mon.getDate());
+  var sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999); var _sunKey=sun.getFullYear()+'-'+pad(sun.getMonth()+1)+'-'+pad(sun.getDate());
   shopSpentHistory.forEach(function(it){
     if(!it||!it.date) return;
-    var d=new Date(it.date);
-    if(d<mon||d>sun) return;
+    var d=String(it.date).slice(0,10);
+    if(d<_monKey||d>_sunKey) return;
     var cat=normalizeShopCategory(it.category);
     map[cat]=(map[cat]||0)+Number(it.price||0);
   });
