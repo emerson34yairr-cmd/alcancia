@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Mi Alcancia: finanzas personales, lista de compras, recetas y escaner de recibos en una app movil.">
@@ -2792,7 +2792,7 @@ body::before{
 /* Top bar */
 .sm-topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(env(safe-area-inset-top,16px)+14px) 18px 14px;
+  padding:calc(env(safe-area-inset-top,16px) + 14px) 18px 14px;
   background:rgba(7,9,15,.95);
   border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;
@@ -10533,6 +10533,176 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
    real pero ninguna regla ponia white-space, asi que las dos lineas
    (nota y compras) se pintaban pegadas en una sola. --- */
 #calDetNotes{ white-space:pre-line; }
+
+
+/* ==================================================================
+   LOTE 3 - iPHONE: superficie tactil, teclado real y presupuesto de
+   blur. Va DESPUES de BLACK GLASS y de PULIDO v1, asi que a igual
+   especificidad gana por orden. Donde la regla que hoy gana lleva
+   !important Y mas especificidad, aqui se repite su MISMA forma de
+   selector; cada caso lleva anotada la linea que se le disputa.
+   Todo medido en Chrome sobre este archivo, con el notch emulado.
+   ================================================================== */
+
+/* --- 3.2  El boton "Escanear recibo" nace deshabilitado (markup
+   11826) pero se veia encendido. La regla que lo apaga (7492,
+   '#page-escanear.sx-page .sx-scan-btn:disabled') NO lleva !important
+   y el bloque 6a de BLACK GLASS (9923, '.sx-scan-btn', 0-1-0) lo
+   repinta CON !important, que gana aunque tenga menos especificidad:
+   del apagado solo sobrevivia 'filter:saturate(.7)'. Medido antes del
+   parche: degradado #3D5BFF -> #7A3FE0 a pleno brillo y sombra de
+   boton primario. --- */
+#page-escanear.sx-page .sx-scan-btn:disabled,
+.sx-scan-btn:disabled{
+  background:var(--k-s1) !important;
+  color:var(--k-t3) !important;
+  border:1px solid var(--k-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
+  filter:none !important;
+  cursor:not-allowed !important;
+}
+
+/* --- 3.3  El selector de Prioridad no marcaba el elegido: 4739-4741
+   pintan .active-* SIN !important y 9965 pinta '.shop-pri-btn' CON
+   !important, asi que los tres salian identicos y la clase que pone
+   el JS (btn.className='shop-pri-btn active-'+k, 12649) no se veia.
+   0-2-0 + !important gana a 0-1-0 + !important. Contraste medido
+   sobre el tramo mas claro del degradado: 10.4 / 9.4 / 10.4 : 1. --- */
+.shop-pri-btn.active-urgente{
+  background:linear-gradient(180deg,rgba(255,110,138,.30) 0%,rgba(255,110,138,.13) 100%) !important;
+  border:1px solid rgba(255,110,138,.55) !important;
+  color:#FFD9E1 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.shop-pri-btn.active-normal{
+  background:linear-gradient(180deg,rgba(255,199,89,.28) 0%,rgba(255,199,89,.12) 100%) !important;
+  border:1px solid rgba(255,199,89,.55) !important;
+  color:#FFE7B8 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.shop-pri-btn.active-espera{
+  background:linear-gradient(180deg,rgba(62,227,155,.26) 0%,rgba(62,227,155,.11) 100%) !important;
+  border:1px solid rgba(62,227,155,.52) !important;
+  color:#C6F5DF !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* --- 3.6  Un campo por debajo de 16px hace que iOS haga zoom solo al
+   enfocarlo, y ese zoom no se deshace. El bloque "iOS ZOOM FIX"
+   (7674-7680) lo tenia previsto, pero dos reglas posteriores y mas
+   especificas lo machacan:
+     7737  '#page-actividad .activity-filter-select'  13px !important
+     6380  '#page-hoy .money-input'                   13px !important
+   Se repite la forma exacta de las dos. Medido despues del parche:
+   los 23 campos enfocables de la app estan a 16px, cero por debajo.
+   Esta es la condicion que faltaba para poder tocar el meta viewport,
+   por eso los dos cambios van en el MISMO lote. --- */
+#page-actividad .activity-filter-select{ font-size:16px !important; }
+#page-hoy .money-input{ font-size:16px !important; padding:9px 0 !important; }
+
+/* --- 3.4 (mitad CSS)  El teclado tapaba el campo del asistente. El
+   script del final del <body> publica la altura real del teclado en
+   --kb leyendola de visualViewport; aqui se consume. .ai-overlay ya
+   es flex-end, asi que el panel sube exactamente lo que mide el
+   teclado y no pelea con el transform de entrada. Medido con
+   --kb:336px: el composer queda con su borde inferior en 516 de 852,
+   o sea justo encima del teclado. Si no hay script, o el navegador no
+   trae visualViewport, --kb no existe y el fallback 0px deja el
+   comportamiento de hoy. --- */
+.ai-overlay{ padding-bottom:var(--kb,0px) !important; }
+.ai-overlay-panel{ max-height:calc(86svh - var(--kb,0px)) !important;
+  min-height:min(86svh,240px) !important; }
+
+/* --- 3.5  El alto del scroller estaba escrito a mano:
+   'calc(100svh - 78px - 82px - var(--safe-bottom))'. Medido: la
+   cabecera mide 55px mas el inset de arriba (102px con un notch de
+   47) y la tira de pestanas 72px, no 78+82; y ya no hay nada abajo
+   que justifique restar --safe-bottom, porque .bottom-nav se elimino
+   del DOM. Resultado: NO hay segundo scroll (el documento no se
+   mueve), pero si una franja muerta al final de TODAS las paginas:
+   19px con notch, 32px sin el, 36px en un SE de 320. Se sustituye la
+   aritmetica por una columna flex, que se recalcula sola con el
+   notch, con el modo PWA y con la banda de instalar. Medido despues:
+   franja de 1px (el borde del marco) en las tres configuraciones y en
+   las 7 pestanas, y el documento sigue sin scroll. --- */
+.app-frame{ display:flex !important; flex-direction:column !important; }
+.app-frame > .header,
+.app-frame > .tabs-wrap,
+.app-frame > .app-status-mini,
+.app-frame > .app-nudge{ flex:0 0 auto !important; }
+.page-stack{ flex:1 1 auto !important; height:auto !important; min-height:0 !important; }
+#page-ai{ height:100% !important; }
+
+/* ---------------- GLASS 1: el presupuesto de blur ----------------
+   El tema ya lo decidio (seccion 11, 10221): blur solo en el chrome y
+   en UNA hoja. Medido en Chrome sobre el archivo de hoy: 36 elementos
+   con backdrop-filter activo, y 18 de ellos son la MISMA insignia
+   repetida en la rejilla de Recetas. Aquella lista no cubrio estos
+   cinco. Despues del parche: 14, y de esos 9 son scrims de overlay
+   que solo se pintan de uno en uno y 2 viven en #page-ai (a donde no
+   llega ningun switchTab). A la vez, en pantalla: cabecera +
+   pestanas + una hoja. Justo el presupuesto escrito. --- */
+
+/* La insignia de pais va encima de la FOTO de la receta, asi que ahi
+   el blur si se veia... 18 veces a la vez, sobre 18 JPEG, en la unica
+   rejilla que se recorre con el dedo. Se cambia blur por scrim: sale
+   gratis y de paso arregla el contraste, que era el problema de
+   verdad (blanco sobre rgba(5,9,20,.66) encima de una foto clara da
+   6.6:1; a .82 sube a 12.2:1). */
+#page-recetas.rx-page .rx-country-badge{
+  background:rgba(5,9,20,.82) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+/* Estos cuatro no son sticky (medido: static / relative), o sea que
+   al hacer scroll detras de ellos no pasa nada: su vidrio difumina el
+   fondo plano de la pagina. Coste sin efecto. */
+#page-hoy .new-entry-box,
+.day-tile .new-entry-box,
+#page-actividad .activity-filters,
+#page-compras .shop-cats{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+/* Con el asistente abierto habia CUATRO blurs a la vez: cabecera +
+   pestanas + scrim del overlay + este. Y el composer vive DENTRO del
+   panel, o sea que difumina el degradado liso del propio panel. */
+.ai-overlay .ai-input-wrap{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* ---------------- GLASS 2: la hoja del asistente ----------------
+   Es la unica hoja que se quedo fuera del tratamiento de BLACK GLASS
+   (10084-10100): mientras .cal-sheet, .recipe-sheet, .bud-modal,
+   .ach-popup, .data-vault-sheet, .command-sheet y .mx-modal van
+   translucidas sobre un scrim ya difuminado, esta seguia con su
+   degradado casi opaco de rgba(10,13,22,.98) y el vidrio no se veia
+   por ningun lado. Se le da EXACTAMENTE la misma superficie que a las
+   otras siete: hairline claro arriba, oscuro abajo, y la elevacion
+   sale de ahi y no de una sombra negra. Contraste medido sobre la
+   superficie nueva: titulo 14.8:1, --k-t2 8.2:1, boton de cerrar
+   6.0:1 (y en el peor caso teorico, con fondo blanco tras el scrim,
+   12.0 / 6.7 / 5.0: las mismas cifras que ya tienen las otras siete
+   hojas). --- */
+.ai-overlay-panel{
+  background:
+    linear-gradient(180deg,rgba(216,226,255,.145) 0%,rgba(216,226,255,.06) 42%,rgba(216,226,255,.05) 100%),
+    rgba(0,0,0,.72) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:rgba(255,255,255,.22) !important;
+  border-bottom:none !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 -20px 60px rgba(0,0,0,.8) !important;
+  color:var(--k-t1) !important;
+}
+/* La franja del titulo era casi opaca (rgba(8,11,20,.72)) y partia la
+   hoja en dos justo donde el vidrio es mas claro: se deja ver la
+   propia superficie y queda solo el hairline. */
+.ai-overlay-top{
+  background:transparent !important;
+  border-bottom:1px solid var(--k-line) !important;
+}
 </style>
 </head>
 <body>
@@ -10584,9 +10754,9 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
         <button onclick="setCurrency('EUR')" id="btnCurrencyEUR">€</button>
         <button onclick="setCurrency('HNL')" id="btnCurrencyHNL">L</button>
       </div>
-      <button class="data-vault-btn" onclick="openDataVault()" type="button" aria-label="Abrir centro de datos">Data</button>
-      <button class="privacy-toggle-btn" id="privacyToggleBtn" onclick="var on=!document.body.classList.contains('privacy-mode');document.body.classList.toggle('privacy-mode',on);this.textContent=on?'Show':'Hide';this.classList.toggle('active',on);this.setAttribute('aria-pressed',on?'true':'false');this.setAttribute('aria-label',on?'Mostrar montos':'Ocultar montos');this.title=on?'Mostrar montos':'Ocultar montos';try{localStorage.setItem('alcancia_privacy_mode',on?'1':'0')}catch(e){}" type="button" aria-label="Ocultar montos" aria-pressed="false">Hide</button>
-      <button class="command-btn" onclick="openCommandCenter()" type="button" aria-label="Abrir acciones rápidas">Go</button></div>
+      <button class="data-vault-btn" onclick="openDataVault()" type="button" aria-label="Abrir centro de datos">Datos</button>
+      <button class="privacy-toggle-btn" id="privacyToggleBtn" onclick="var on=!document.body.classList.contains('privacy-mode');document.body.classList.toggle('privacy-mode',on);this.textContent=on?'Mostrar':'Ocultar';this.classList.toggle('active',on);this.setAttribute('aria-pressed',on?'true':'false');this.setAttribute('aria-label',on?'Mostrar montos':'Ocultar montos');this.title=on?'Mostrar montos':'Ocultar montos';try{localStorage.setItem('alcancia_privacy_mode',on?'1':'0')}catch(e){}" type="button" aria-label="Ocultar montos" aria-pressed="false">Ocultar</button>
+      <button class="command-btn" onclick="openCommandCenter()" type="button" aria-label="Abrir acciones rápidas">Ir</button></div>
     </div>
 </div>
 </div>
@@ -12363,8 +12533,29 @@ var SK='alcancia_v4';
 var SHOP_SK='alcancia_shop_v1';
 var SHOP_SPENT_SK='alcancia_shop_spent_v1';
 function loadState(){
-  var out=null;
-  try{ var r=localStorage.getItem(SK); if(r) out=JSON.parse(r); }catch(e){}
+  // El catch vacio original convertia un alcancia_v4 truncado (purga a medias
+  // del WebView, escritura interrumpida) en un arranque en CERO silencioso, y
+  // el primer saveState() lo hacia permanente. Ahora se aparta el crudo y se
+  // avisa. NO se promete restauracion: en el escenario de cuota llena
+  // saveState() ya borro 'alcancia_data_snapshots_v1'.
+  // La clave de la copia es FIJA: con marca de tiempo se creaba una nueva en
+  // cada arranque danado, nadie las borraba y todas entraban en los respaldos.
+  var out=null, _raw=null, _danada=false;
+  try{ _raw=localStorage.getItem(SK); }catch(e){}
+  if(_raw){
+    try{ out=JSON.parse(_raw); }catch(e){ out=null; _danada=true; }
+    if(out===null||typeof out!=='object'||Array.isArray(out)){ out=null; _danada=true; }
+  }
+  if(_danada){
+    var _bkOk=false;
+    try{ localStorage.setItem('alcancia_v4_corrupto',_raw); _bkOk=true; }catch(e2){}
+    // Bandera global: el auto respaldo diario la mira para NO copiar el vacio
+    // encima de las dos unicas ranuras de respaldo que hay.
+    window._alcanciaDatosDanados=true;
+    setTimeout(function(){
+      alert('Mi Alcancia no pudo leer tus datos guardados: estan danados o incompletos, asi que la app abre VACIA.\n\nNo registres nada todavia si quieres intentar recuperarlos. El respaldo automatico queda en pausa para no borrar los respaldos buenos.\n\n'+(_bkOk?('Se aparto una copia intacta del original en la clave "alcancia_v4_corrupto".'):'No se pudo apartar una copia: el almacenamiento esta lleno.')+'\n\nSi tienes un backup JSON, importalo desde el menu (...) > Data.');
+    },600);
+  }
   if(!out||typeof out!=='object') out={};
   if(!Array.isArray(out.days)) out.days=[];
   if(!Array.isArray(out.unlockedAchs)) out.unlockedAchs=[];
@@ -12401,7 +12592,27 @@ function loadShopList(){
   try{ var r=localStorage.getItem(SHOP_SK); if(r) return JSON.parse(r); }catch(e){}
   return [];
 }
-function saveShopList(){ try{localStorage.setItem(SHOP_SK,JSON.stringify(shopList));}catch(e){} }
+function saveShopList(){ try{localStorage.setItem(SHOP_SK,JSON.stringify(shopList)); return _persistOk();}catch(e){ return _persistFail('la lista de compras'); } }
+// Bandera PROPIA. Antes _persistFail escribia en _saveQuotaWarned, el mismo
+// flag que usa saveState(), y alli el toast Y el alert estan los dos dentro de
+// if(!_saveQuotaWarned): si fallaba saveShopList, el siguiente saveState -el
+// que guarda el DINERO- fallaba en silencio total.
+var _persistFailWarned=false;
+function _persistOk(){ _persistFailWarned=false; return true; }
+function _persistFail(que){
+  // Ningun guardado puede fallar en silencio. Estos save* se tragaban el
+  // QuotaExceededError y la app seguia mostrando un dato que ya solo existia
+  // en memoria: al recargar desaparecia sin que nadie hubiera avisado.
+  // Toast siempre (para saber QUE se perdio) y alert una sola vez.
+  try{ if(typeof showToast==='function') showToast('No se pudo guardar '+que+': memoria llena'); }catch(e){}
+  if(!_persistFailWarned){
+    _persistFailWarned=true;
+    setTimeout(function(){
+      alert('Mi Alcancia NO pudo guardar ('+que+'): el almacenamiento del navegador esta lleno.\n\nLo que acabas de hacer solo existe en pantalla y se perdera al recargar. Abre el menu (...) > Data > Exportar JSON para bajar una copia antes de seguir.');
+    },80);
+  }
+  return false;
+}
 function currentDateKey(){
   var d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -12410,7 +12621,21 @@ function loadShopSpentHistory(){
   try{ var r=localStorage.getItem(SHOP_SPENT_SK); if(r) return JSON.parse(r); }catch(e){}
   return [];
 }
-function saveShopSpentHistory(){ try{localStorage.setItem(SHOP_SPENT_SK,JSON.stringify(shopSpentHistory));}catch(e){} }
+function trimShopSpentHistory(){
+  // Antes: slice(0,120) a secas y solo en addShopSpentRecord (el escaneo de
+  // recibos no recortaba, asi que el tope ni siquiera era real). Al pasarse, el
+  // desglose por categoria y el presupuesto de meses anteriores perdian
+  // historia en silencio. Ahora se conserva por antiguedad (13 meses) con un
+  // tope de seguridad alto.
+  if(!Array.isArray(shopSpentHistory)) return false;
+  var lim=new Date(); lim.setMonth(lim.getMonth()-13);
+  var cut=lim.getFullYear()+'-'+String(lim.getMonth()+1).padStart(2,'0')+'-'+String(lim.getDate()).padStart(2,'0');
+  var antes=shopSpentHistory.length;
+  shopSpentHistory=shopSpentHistory.filter(function(r){ return !r||!r.date||String(r.date).slice(0,10)>=cut; });
+  if(shopSpentHistory.length>2000) shopSpentHistory=shopSpentHistory.slice(0,2000);
+  return shopSpentHistory.length!==antes;
+}
+function saveShopSpentHistory(){ try{localStorage.setItem(SHOP_SPENT_SK,JSON.stringify(shopSpentHistory)); return _persistOk();}catch(e){ return _persistFail('el historial de compras'); } }
 function normalizeShopSpent(raw,fallbackId){
   raw=raw&&typeof raw==='object'?raw:{};
   var name=(raw.name||'').toString().trim();
@@ -13164,7 +13389,12 @@ function updateAll(){
     setText('todayTitle', fmtDay(TODAY));
   }
   updateStats(); updatePiggy(); updatePigExpression(); updateLevel(); updateRatio();
-  renderTodayEntries(); renderHistory(); renderTimeline(); renderActivity(); renderAchievements(); updateStreak(); renderShopList();
+  /* renderHistory() y renderTimeline() pintaban sobre paginas inalcanzables:
+     #historyList no existe en el markup (solo queda su regla CSS) y a
+     #page-timeline no llega ningun switchTab(). renderTimeline() ademas
+     reconstruia TODO el historial de movimientos en cada updateAll(), o sea
+     en cada guardado. Las dos funciones se dejan definidas. */
+  renderTodayEntries(); renderActivity(); renderAchievements(); updateStreak(); renderShopList();
   renderInsight(); renderCalendar(); renderHoyDashboard(); renderMetas(); renderWeekSummary();
   // renderMainGoalCard no existia y renderSpendingOverview solo se disparaba
   // por hooks sobre addEntry/saveShopSpentHistory: ni al cambiar de moneda ni
@@ -13184,7 +13414,9 @@ function loadMetas(){
   return [];
 }
 function saveMetas(arr){
-  try{ localStorage.setItem(MX_SK,JSON.stringify(arr)); }catch(e){}
+  // Catch vacio original: sin espacio, renderMetas() relee de localStorage y la
+  // meta recien creada desaparecia de la pantalla sin ningun mensaje.
+  try{ localStorage.setItem(MX_SK,JSON.stringify(arr)); return _persistOk(); }catch(e){ return _persistFail('tus metas'); }
 }
 
 function mxTotalSaved(){
@@ -13319,9 +13551,28 @@ function mxSaveMeta(){
 }
 
 function mxDeleteMeta(id){
-  var metas=loadMetas().filter(function(m){ return m.id!==id; });
-  saveMetas(metas);
+  // Era el UNICO borrado sin red del archivo. Mismo patron que deleteShopItem /
+  // clearCheckedItems: se guarda el objeto y su posicion para restaurarlo.
+  var metas=loadMetas();
+  if(!Array.isArray(metas)) metas=[];
+  var removed=null, idx=-1;
+  for(var i=0;i<metas.length;i++){ if(metas[i]&&metas[i].id===id){ removed=metas[i]; idx=i; break; } }
+  if(!removed) return;
+  metas.splice(idx,1);
+  var ok=saveMetas(metas);
   renderMetas();
+  // Sin guardado no hay nada que deshacer: _persistFail ya aviso y renderMetas
+  // vuelve a leer de localStorage, asi que la meta reaparece sola.
+  if(ok===false) return;
+  showToast('Meta eliminada','Deshacer',function(){
+    var cur=loadMetas();
+    if(!Array.isArray(cur)) cur=[];
+    cur=cur.filter(function(m){ return !m||m.id!==id; });
+    if(idx>=0&&idx<=cur.length) cur.splice(idx,0,removed); else cur.push(removed);
+    if(saveMetas(cur)===false){ renderMetas(); return; }
+    renderMetas();
+    showToast('Meta restaurada');
+  });
 }
 
 // ── RESUMEN SEMANAL ─────────────────────────────────────────────────
@@ -15133,13 +15384,15 @@ function addShopItem(){
     status:'pending',
     priority:_shopPriority
   },Date.now()));
-  saveShopList();
+  // El resultado del guardado se ignoraba: con la cuota llena el usuario veia
+  // 'X agregado' mientras el articulo solo existia en memoria.
+  var _ok=saveShopList();
   inp.value=''; if(qInp) qInp.value=''; if(pInp) pInp.value='';
   _shopSelectedImage='';
   _shopUpdatePriceHint('');
   inp.focus();
   renderShopList();
-  showToast('🛒 '+name+' agregado');
+  if(_ok!==false) showToast('🛒 '+name+' agregado');
 }
 
 function toggleShopItem(id){
@@ -15172,8 +15425,8 @@ function addShopSpentRecord(item,price){
     items:Array.isArray(item.items)?item.items:[],
     date:TODAY
   },stamp));
-  if(shopSpentHistory.length>120) shopSpentHistory=shopSpentHistory.slice(0,120);
-  saveShopSpentHistory();
+  trimShopSpentHistory();
+  var _okHist=saveShopSpentHistory();
 
   var day=null;
   for(var i=0;i<state.days.length;i++){
@@ -15196,8 +15449,11 @@ function addShopSpentRecord(item,price){
     entryDate:TODAY,
     source:'shop'
   });
-  saveState();
+  var _okState=saveState();
   _aiCheckBudgetAfterExpense(item.category);
+  // Devuelve si el gasto quedo REALMENTE guardado, para que quien llama no
+  // anuncie un exito que no ocurrio ni ofrezca un Deshacer imposible.
+  return _okHist!==false && _okState!==false;
 }
 
 function confirmAddToSpending(id){
@@ -15215,11 +15471,11 @@ function confirmAddToSpending(id){
 
   if(!window.confirm('¿Agregar a gastos?\n'+item.name+' · $'+price.toFixed(2))) return;
 
-  addShopSpentRecord(item,price);
+  var _okRec=addShopSpentRecord(item,price);
   item.spentLogged=true;
-  saveShopList();
+  var _okList=saveShopList();
   updateAll();
-  showToast('💸 Gasto agregado: $'+price.toFixed(2));
+  if(_okRec!==false && _okList!==false) showToast('💸 Gasto agregado: $'+price.toFixed(2));
 }
 
 function confirmAddAllToSpending(){
@@ -15275,7 +15531,10 @@ function deleteShopItem(id){
   for(var i=0;i<shopList.length;i++){if(shopList[i].id===id){removed=JSON.parse(JSON.stringify(shopList[i]));idx=i;break;}}
   if(!removed) return;
   shopList=shopList.filter(function(x){return x.id!==id;});
-  saveShopList(); renderShopList();
+  var _ok=saveShopList(); renderShopList();
+  // Si no se guardo, el borrado no llego a disco: ofrecer 'Deshacer' seria
+  // ofrecer otra escritura que tampoco cabe. _persistFail ya aviso.
+  if(_ok===false) return;
   showToast('Articulo eliminado','Deshacer',function(){
     shopList=shopList.filter(function(x){return x.id!==id;});
     if(idx>=0&&idx<=shopList.length) shopList.splice(idx,0,removed);
@@ -15291,7 +15550,8 @@ function clearCheckedItems(){
   }
   if(!removed.length) return;
   shopList=shopList.filter(function(x){return getShopStatus(x)!=='bought';});
-  saveShopList(); renderShopList();
+  var _ok=saveShopList(); renderShopList();
+  if(_ok===false) return;
   showToast('Comprados eliminados','Deshacer',function(){
     for(var r=0;r<removed.length;r++){
       var rec=removed[r];
@@ -16477,11 +16737,31 @@ function closeRecipe(){
 
 // ── TOAST ──────────────────────────────────────────────────────────
 var toastTimer;
+// Un toast con boton (Deshacer) es la UNICA marcha atras de un borrado, y vive
+// en el MISMO nodo #toast que los avisos informativos, que empiezan vaciandolo.
+// updateAll() termina en checkSpendingAlerts, que a los 400ms hace
+// showToast(msg) simple: destruia el Deshacer recien pintado antes de que diera
+// tiempo a tocarlo. Ahora un mensaje SIN boton no puede pisar a uno CON boton:
+// se aplaza hasta que el de accion caduque, y no se pierde ninguno de los dos.
+var _toastActionUntil=0, _toastPendingMsg=null, _toastPendingTimer=null;
 function showToast(msg,actionLabel,actionFn){
   var t=$('toast'); if(!t) return;
+  var hasAction=!!(actionLabel&&typeof actionFn==='function');
+  var now=Date.now();
+  if(!hasAction&&now<_toastActionUntil){
+    _toastPendingMsg=msg;
+    clearTimeout(_toastPendingTimer);
+    _toastPendingTimer=setTimeout(function(){
+      var m=_toastPendingMsg; _toastPendingMsg=null;
+      if(m!==null&&m!==undefined) showToast(m);
+    },(_toastActionUntil-now)+150);
+    return;
+  }
+  _toastPendingMsg=null; clearTimeout(_toastPendingTimer);
+  _toastActionUntil=hasAction?(now+4200):0;
   t.classList.remove('has-action');
   t.innerHTML='';
-  if(actionLabel&&typeof actionFn==='function'){
+  if(hasAction){
     t.classList.add('has-action');
     var span=document.createElement('span');
     span.className='toast-msg';
@@ -16493,6 +16773,8 @@ function showToast(msg,actionLabel,actionFn){
     btn.onclick=function(event){
       event.stopPropagation();
       clearTimeout(toastTimer);
+      // Ya se uso: el mensaje de confirmacion que venga detras no debe aplazarse.
+      _toastActionUntil=0;
       t.classList.remove('show','has-action');
       actionFn();
     };
@@ -16503,7 +16785,7 @@ function showToast(msg,actionLabel,actionFn){
   }
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){t.classList.remove('show','has-action');},actionLabel?4200:2400);
+  toastTimer=setTimeout(function(){t.classList.remove('show','has-action');_toastActionUntil=0;},actionLabel?4200:2400);
 }
 
 // ── SPLASH SCREEN ──────────────────────────────────────────────────
@@ -17175,11 +17457,17 @@ function loadBudgets(){
   return [];
 }
 function saveBudgets(){
-  try{
-    var raw=JSON.stringify(_budgets);
-    localStorage.setItem(BUD_SK,raw);
-    localStorage.setItem('budgets',raw);
-  }catch(e){}
+  // Catch vacio original, y es el peor caso: renderBudgetPage() repinta desde
+  // el array EN MEMORIA (_budgets), no desde localStorage, asi que el
+  // presupuesto aparecia en la lista y el modal decia 'Presupuesto guardado'
+  // aunque en disco no hubiera nada. Al recargar desaparecia sin aviso.
+  var raw;
+  try{ raw=JSON.stringify(_budgets); }catch(e){ return _persistFail('tus presupuestos'); }
+  try{ localStorage.setItem(BUD_SK,raw); }catch(e){ return _persistFail('tus presupuestos'); }
+  // La copia legacy 'budgets' es secundaria: loadBudgets prefiere BUD_SK, asi
+  // que si esta no cabe no se ha perdido nada y no hay que alarmar.
+  try{ localStorage.setItem('budgets',raw); }catch(e){}
+  return _persistOk();
 }
 
 _budgets = loadBudgets();
@@ -17380,19 +17668,19 @@ function saveBudget(){
     if(exists){ showToast('Ya existe un presupuesto para esa categoría y período'); return; }
     _budgets.push({id:Date.now()+'',category:cat,amount:amt,period:_budModalPeriod});
   }
-  saveBudgets();
+  var _ok=saveBudgets();
   closeBudModal();
   renderBudgetPage();
-  showToast('Presupuesto guardado');
+  if(_ok!==false) showToast('Presupuesto guardado');
 }
 
 function deleteBudget(){
   if(_budModalEditId===null) return;
   _budgets=_budgets.filter(function(b){return b.id!==_budModalEditId;});
-  saveBudgets();
+  var _ok=saveBudgets();
   closeBudModal();
   renderBudgetPage();
-  showToast('Presupuesto eliminado');
+  if(_ok!==false) showToast('Presupuesto eliminado');
 }
 
 // ── RECEIPT SCANNER ────────────────────────────────────────────────
@@ -17771,11 +18059,14 @@ scanConfirmExpense=function(){
     var cat=normalizeShopCategory(inferShopCategory(it.name));
     shopSpentHistory.unshift(normalizeShopSpent({id:Date.now()+Math.random(),name:it.name,category:cat,price:it.price,items:[],date:key},Date.now()+Math.random()));
   });
-  saveState();
-  saveShopSpentHistory();
+  // Este camino NUNCA recortaba, asi que el tope de 120 de addShopSpentRecord
+  // ni siquiera era real. Ahora los dos recortan por antiguedad.
+  trimShopSpentHistory();
+  var _okState=saveState();
+  var _okHist=saveShopSpentHistory();
   updateAll();
   _aiCheckBudgetAfterExpense('general');
-  showToast('Gasto de '+fmtMoney(total)+' registrado');
+  if(_okState!==false&&_okHist!==false) showToast('Gasto de '+fmtMoney(total)+' registrado');
   scanReset();
   switchTab('hoy');
 };
@@ -17787,9 +18078,9 @@ scanConfirmShopList=function(){
   selected.forEach(function(it){
     shopList.push(normalizeShopItem({name:it.name,qty:'1',category:inferShopCategory(it.name),estPrice:it.price,status:'pending'},Date.now()+Math.random()));
   });
-  saveShopList();
+  var _ok=saveShopList();
   renderShopList();
-  showToast('🛒 '+selected.length+' articulos agregados a tu lista');
+  if(_ok!==false) showToast('🛒 '+selected.length+' articulos agregados a tu lista');
   scanReset();
   switchTab('compras');
 };
@@ -18162,6 +18453,12 @@ function openAiOverlay(){
   if(ov) ov.classList.add('show'); removeAllAiToasts();
   aiInit();
   aiRenderHistory();
+  /* aiRenderChips() estaba definida y no se llamaba desde ningun sitio:
+     #aiChips y #aiOverlayChips quedaban vacios para siempre, y con ellos
+     _aiGetDynamicSuggestions() y aiSendChip(). Si fallara al construir el
+     snapshot los chips quedan vacios, que es exactamente el estado de hoy:
+     no se pierde nada ni se tapa un error de verdad. */
+  try{ aiRenderChips(); }catch(errChips){ console.error('aiRenderChips', errChips); }
   updateAiFabDot();
   setTimeout(function(){ var input=$('aiOverlayInput'); if(input) input.focus(); },220);
 }
@@ -19246,7 +19543,7 @@ document.addEventListener('DOMContentLoaded', function(){
     document.body.classList.toggle('privacy-mode', !!enabled);
     var btn = document.getElementById('privacyToggleBtn');
     if (btn) {
-      btn.textContent = enabled ? 'Show' : 'Hide';
+      btn.textContent = enabled ? 'Mostrar' : 'Ocultar';
       btn.classList.toggle('active', !!enabled);
       btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
       btn.setAttribute('aria-label', enabled ? 'Mostrar montos' : 'Ocultar montos');
@@ -19276,7 +19573,16 @@ document.addEventListener('DOMContentLoaded', function(){
     groq_api_key: true,
     alcancia_data_snapshots_v1: true,
     alcancia_install_nudge_dismissed: true,
-    alcancia_auto_snapshot_date: true
+    alcancia_auto_snapshot_date: true,
+    // Copia forense que aparta loadState() cuando alcancia_v4 llega ilegible.
+    // Empieza por 'alcancia', asi que isAppDataKey la daba por dato del usuario
+    // y entraba anidada y escapada en CADA snapshot y en CADA export.
+    alcancia_v4_corrupto: true,
+    // Caches regenerables, no datos del usuario: crecen sin tope y se copiaban
+    // enteras DENTRO de cada respaldo, engordando el mismo localStorage que
+    // luego revienta al guardar. Se vuelven a llenar solas si faltan.
+    alcancia_rx_imgs: true,
+    alcancia_mdb_tr: true
   };
 
   function dataToast(msg){
@@ -19285,6 +19591,10 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   function isAppDataKey(key){
+    // Doble candado, y ademas cubre las alcancia_v4_corrupto_<ts> con marca de
+    // tiempo que pudiera haber dejado alguna version anterior: son un volcado
+    // crudo para diagnostico, jamas un dato que haya que respaldar ni restaurar.
+    if (String(key).indexOf('alcancia_v4_corrupto') === 0) return false;
     return (key.indexOf('alcancia') === 0 || key === 'budgets') && !EXCLUDED_DATA_KEYS[key];
   }
 
@@ -19354,7 +19664,7 @@ document.addEventListener('DOMContentLoaded', function(){
       try { autoDate = localStorage.getItem(AUTO_SNAPSHOT_DATE_SK) || ''; } catch (error) {}
       autoEl.textContent = autoDate ? autoDate : 'Pendiente';
     }
-    if (noteEl) noteEl.textContent = 'Se excluye groq_api_key. Las fotos del calendario NO entran en el respaldo: viven en este dispositivo. Auto respaldo diario activo. Respaldos locales: ' + snapshots.length + '/5.';
+    if (noteEl) noteEl.textContent = 'Se excluye groq_api_key. Las fotos del calendario NO entran en el respaldo: viven en este dispositivo. Auto respaldo diario activo. Respaldos locales: ' + snapshots.length + '/2.';
   }
 
   window.openDataVault = function(){
@@ -19392,10 +19702,18 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   window.createLocalDataSnapshot = function(){
-    createSnapshot({ reason:'manual' });
+    // Devolver el resultado: createSnapshot da false cuando no cabe, y el
+    // import promete "se creara un respaldo local antes" fiandose de esto.
+    return createSnapshot({ reason:'manual' });
   };
 
   function maybeCreateAutoSnapshot(){
+    // Si loadState() no pudo leer alcancia_v4, la app esta funcionando VACIA.
+    // Nada frenaba este auto respaldo (DOMContentLoaded + 1400ms), asi que en
+    // dos aperturas danadas las DOS unicas ranuras (saveSnapshots recorta a 2)
+    // contenian ya el estado vacio: el aviso prometia una recuperacion que la
+    // propia app destruia. Con datos danados el auto respaldo queda en pausa.
+    if (window._alcanciaDatosDanados) return;
     var today = new Date().toISOString().slice(0, 10);
     try {
       if (localStorage.getItem(AUTO_SNAPSHOT_DATE_SK) === today) return;
@@ -19410,11 +19728,48 @@ document.addEventListener('DOMContentLoaded', function(){
     if (!snapshots.length || !snapshots[0].payload || !snapshots[0].payload.keys) {
       return dataToast('No hay respaldo local');
     }
-    if (!confirm('Restaurar el ultimo respaldo local? Esto reemplaza los datos actuales de Mi Alcancia.')) return;
     var keys = snapshots[0].payload.keys;
-    Object.keys(keys).forEach(function(key){
-      if (isAppDataKey(key)) localStorage.setItem(key, keys[key]);
-    });
+
+    // Copia COMPLETA del estado actual en memoria: es la unica marcha atras que
+    // no depende de que quede espacio libre en localStorage.
+    var current = {};
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && isAppDataKey(k)) current[k] = localStorage.getItem(k);
+      }
+    } catch (readErr) {
+      return dataToast('No se pudo leer el almacenamiento');
+    }
+
+    var incoming = Object.keys(keys).filter(function(k){ return isAppDataKey(k); });
+    var willDrop = Object.keys(current).filter(function(k){ return incoming.indexOf(k) < 0; });
+
+    // Antes solo se escribia lo que traia el respaldo: lo creado DESPUES
+    // sobrevivia y quedaba un estado hibrido que el confirm no anunciaba.
+    var msg = 'Restaurar el respaldo local del ' + formatSnapshotTime(snapshots[0].createdAt) + '?\n\nReemplaza TODOS los datos de Mi Alcancia por los de ese respaldo.';
+    if (willDrop.length) msg += '\nSe borraran ' + willDrop.length + ' dato(s) guardados despues de esa fecha.';
+    msg += '\n\nEsto no se puede deshacer.';
+    if (!confirm(msg)) return;
+
+    try {
+      willDrop.forEach(function(k){ localStorage.removeItem(k); });
+      incoming.forEach(function(k){ localStorage.setItem(k, keys[k]); });
+    } catch (writeErr) {
+      // Marcha atras. Se borra PRIMERO todo lo escrito (asi se libera sitio: si
+      // esto reviento por falta de espacio, reponer sin vaciar antes reventaria
+      // igual y dejaria el disco a medias) y luego se reponen los originales.
+      incoming.forEach(function(k){ try { localStorage.removeItem(k); } catch (e1) {} });
+      Object.keys(current).forEach(function(k){
+        try { localStorage.setItem(k, current[k]); } catch (e2) {}
+      });
+      dataToast('No se pudo restaurar: se dejo todo como estaba');
+      setTimeout(function(){
+        alert('La restauracion fallo a mitad (lo mas probable: sin espacio) y se revirtieron los cambios.\n\nExporta un backup JSON desde el menu (...) > Data antes de volver a intentarlo.');
+      }, 80);
+      return;
+    }
+
     dataToast('Respaldo restaurado');
     setTimeout(function(){ location.reload(); }, 500);
   };
@@ -19447,12 +19802,30 @@ document.addEventListener('DOMContentLoaded', function(){
         var keys = Object.keys(payload.keys).filter(isAppDataKey);
         if (!keys.length) throw new Error('Sin datos importables');
         if (!confirm('Importar ' + keys.length + ' claves de Mi Alcancia? Se creara un respaldo local antes.')) return;
-        window.createLocalDataSnapshot();
-        keys.forEach(function(key){ localStorage.setItem(key, payload.keys[key]); });
+        // El respaldo prometido puede NO haberse creado (sin espacio). Antes se
+        // daba por hecho y se sobrescribia igual.
+        if (window.createLocalDataSnapshot() === false &&
+            !confirm('AVISO: no se pudo crear el respaldo local, no hay espacio.\n\nSi continuas, los datos actuales se sobrescriben SIN red de seguridad.\n\nContinuar de todos modos?')) return;
+        // Copia en memoria de lo que se va a pisar, para revertir si el
+        // localStorage revienta a mitad del forEach.
+        var prev = {}, written = [];
+        keys.forEach(function(key){ prev[key] = localStorage.getItem(key); });
+        try {
+          keys.forEach(function(key){ localStorage.setItem(key, payload.keys[key]); written.push(key); });
+        } catch (writeErr) {
+          // Se borra PRIMERO lo ya escrito (libera sitio) y despues se reponen
+          // los valores originales, o el rollback reventaria por lo mismo.
+          written.forEach(function(key){ try { localStorage.removeItem(key); } catch (e1) {} });
+          written.forEach(function(key){
+            if (prev[key] === null) return;
+            try { localStorage.setItem(key, prev[key]); } catch (e2) {}
+          });
+          throw new Error('se quedo sin espacio a mitad; no se cambio nada');
+        }
         dataToast('Datos importados');
         setTimeout(function(){ location.reload(); }, 500);
       } catch (error) {
-        dataToast('No se pudo importar el archivo');
+        dataToast('No se pudo importar: ' + ((error && error.message) ? error.message : 'archivo invalido'));
       } finally {
         input.value = '';
       }
@@ -19640,6 +20013,39 @@ document.addEventListener('DOMContentLoaded', function(){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
+})();
+</script>
+
+<script>
+/* LOTE 3.4 - altura real del teclado -> --kb.
+   En iOS el teclado no reduce el layout viewport, asi que ningun
+   svh/vh se entera y el composer del asistente queda tapado.
+   visualViewport si lo ve.  Se multiplica por scale porque al hacer
+   pinch-zoom (ahora permitido, ver el meta viewport) vv.height baja
+   sin que haya teclado ninguno: sin ese factor el overlay se comeria
+   media pantalla de padding.
+   Si el navegador no trae visualViewport se sale sin tocar nada y el
+   CSS usa el fallback 0px: mismo comportamiento que antes, no hay
+   ningun fallo que ocultar. */
+(function(){
+  var vv = window.visualViewport;
+  var root = document.documentElement;
+  if(!vv || !root || !root.style || !root.style.setProperty) return;
+  var last = -1;
+  function syncKeyboardInset(){
+    var hidden = window.innerHeight - (vv.height * (vv.scale || 1));
+    /* por debajo de 90px es la barra de URL colapsando, no un teclado */
+    var kb = hidden > 90 ? Math.round(hidden) : 0;
+    if(kb === last) return;
+    last = kb;
+    root.style.setProperty('--kb', kb + 'px');
+  }
+  vv.addEventListener('resize', syncKeyboardInset);
+  vv.addEventListener('scroll', syncKeyboardInset);
+  window.addEventListener('orientationchange', function(){
+    setTimeout(syncKeyboardInset, 250);
+  });
+  syncKeyboardInset();
 })();
 </script>
 
