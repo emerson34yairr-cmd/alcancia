@@ -10592,7 +10592,7 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
 </div>
 
 <div class="app-nudge" id="appInstallNudge" hidden>
-  <div class="app-nudge-icon" aria-hidden="true">âœ¨</div>
+  <div class="app-nudge-icon" aria-hidden="true">✨</div>
   <div>
     <div class="app-nudge-title" id="appInstallTitle">Instala Mi Alcancía</div>
     <div class="app-nudge-sub" id="appInstallSub">Abrela como app, sin buscarla en el navegador.</div>
@@ -11144,7 +11144,7 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
         <span class="fx-dash-badge" id="wkChartBadge">—</span>
       </div>
       <div class="fx-dash-val" id="statTotalSpent">$0</div>
-      <div class="fx-dash-sub">Últimos 7 días</div>
+      <div class="fx-dash-sub">Total gastado</div>
       <div class="wk-card">
         <div class="wk-chart" id="wkChart">
           <div class="wk-chart-gridlines">
@@ -12272,18 +12272,57 @@ function updateMainGoalUI(name,saved,target){
     df.style.strokeDashoffset=(c*(1-pct/100)).toFixed(2);
   }
 }
+// La tarjeta 'Meta' de la home estaba muerta: updateMainGoalUI() solo se
+// llamaba desde editMainGoal(), que leia el DOM, pedia dos prompt() y volvia
+// a escribir el DOM sin tocar state ni saveState(). Resultado: la tarjeta
+// decia 'Meta / $0 de $0 / — / 0%' para siempre y lo que escribieras se
+// perdia al recargar. Ahora la tarjeta es una VISTA de la primera meta real
+// (loadMetas/saveMetas), que es el sistema que si persiste y ya vive en la
+// misma pagina: una sola fuente de verdad, no dos conceptos de meta.
+function renderMainGoalCard(){
+  if(typeof loadMetas!=='function') return;
+  var metas=loadMetas();
+  if(!metas.length){
+    setText('metaGoalName','Sin meta');
+    setText('metaGoalSaved',moneyText(0));
+    setText('metaGoalTarget',moneyText(0));
+    setText('metaGoalLeft','Toca para crear tu primera meta');
+    setText('metaDonutPct','0%');
+    setText('metaProgressPct','0%');
+    var pf0=$('metaProgressFill'); if(pf0) pf0.style.width='0%';
+    var df0=$('metaDonutFill');
+    if(df0){ df0.style.strokeDasharray='251.3'; df0.style.strokeDashoffset='251.3'; }
+    return;
+  }
+  var m=metas[0];
+  var goal=m.goal||0;
+  updateMainGoalUI(m.name||'Meta',Math.min(mxTotalSaved(),goal),goal);
+}
 function editMainGoal(){
-  var currentName=(($('metaGoalName')||{}).textContent||'').trim()||'Meta principal';
-  var saved=parseMoneyText((($('metaGoalSaved')||{}).textContent||'0'));
-  var currentTarget=parseMoneyText((($('metaGoalTarget')||{}).textContent||'0'));
-  var newName=prompt('Nuevo nombre de la meta:',currentName);
+  // La tarjeta pinta con moneyText() (moneda activa) pero el prompt pedia y
+  // guardaba en la unidad base: con HNL activo la tarjeta decia L4,900 y el
+  // prompt proponia 200. Se pide y se devuelve en la MISMA unidad.
+  var _curRate=1; try{ if(typeof toActiveCurrency==='function') _curRate=toActiveCurrency(1)||1; }catch(e){}
+  if(typeof loadMetas!=='function') return;
+  var metas=loadMetas();
+  var m=metas[0]||null;
+  var newName=prompt('Nombre de la meta:',m?(m.name||''):'');
   if(newName===null) return;
-  newName=newName.trim()||currentName;
-  var newTargetRaw=prompt('Nuevo monto meta:',String(Math.round(currentTarget)));
+  newName=newName.trim()||(m?(m.name||'Meta'):'Meta');
+  var newTargetRaw=prompt('Monto meta (en '+((typeof currSym==='function')?currSym():'$')+'):',m?String(Math.round((m.goal||0)*_curRate)):'');
   if(newTargetRaw===null) return;
   var newTarget=parseMoneyText(newTargetRaw);
-  if(!(newTarget>0)){ alert('Monto inválido'); return; }
-  updateMainGoalUI(newName,saved,newTarget);
+  if(!(newTarget>0)){ alert('Monto invalido'); return; }
+  if(m){ m.name=newName; m.goal=newTarget; }
+  else metas.unshift({
+    id: Date.now().toString(36)+(Math.random()*0xfffff|0).toString(36),
+    name: newName,
+    goal: newTarget,
+    deadline: null,
+    createdAt: new Date().toISOString()
+  });
+  saveMetas(metas);
+  updateAll();
 }
 function triggerValuePop(sel){
   var els=document.querySelectorAll(sel);
@@ -12327,7 +12366,30 @@ function loadState(){
   if(!out.achDates||typeof out.achDates!=='object'||Array.isArray(out.achDates)) out.achDates={};
   return out;
 }
-function saveState(){ try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){} }
+var _saveQuotaWarned=false;
+function saveState(){
+  // El catch vacio original se tragaba QuotaExceededError: al pasar los ~5MB
+  // TODOS los guardados fallaban en silencio y el usuario perdia ingresos,
+  // gastos y ahorros sin ningun aviso.
+  try{ localStorage.setItem(SK,JSON.stringify(state)); _saveQuotaWarned=false; return true; }
+  catch(e){
+    // Lo mas grande y lo mas prescindible que hay guardado son los respaldos
+    // locales (una copia completa de TODO por cada uno): se tiran y se
+    // reintenta antes de dar el guardado por perdido.
+    try{ localStorage.removeItem('alcancia_data_snapshots_v1'); }catch(e2){}
+    try{ localStorage.setItem(SK,JSON.stringify(state)); _saveQuotaWarned=false; return true; }
+    catch(e3){
+      if(!_saveQuotaWarned){
+        _saveQuotaWarned=true;
+        try{ if(typeof showToast==='function') showToast('No se pudo guardar: memoria llena'); }catch(e4){}
+        setTimeout(function(){
+          alert('Mi Alcancia NO pudo guardar los cambios: el almacenamiento del navegador esta lleno. Abre el menu (...) > Data > Exportar JSON para bajar una copia antes de seguir usando la app. Nota: para poder guardar se han descartado los respaldos locales.');
+        },80);
+      }
+      return false;
+    }
+  }
+}
 var state=loadState();
 
 function loadShopList(){
@@ -13046,10 +13108,14 @@ function renderTodayEntries(){
     var expenseCategory=getEntryExpenseCategory(e);
     var categoryChip=(e.spent||e.source==='shop')?'<span class="entry-chip category">'+getExpenseCategoryEmoji(expenseCategory)+' '+getExpenseCategoryLabel(expenseCategory)+'</span>':'';
     return '<div class="entry-item" style="animation-delay:'+(i*60)+'ms"><div class="entry-num">'+(i+1)+'</div><div class="entry-info"><div class="entry-amounts">'
-      +(e.earned?'<span class="entry-chip earned">+$'+e.earned.toFixed(2)+' ganado</span>':'')
-      +(e.saved?'<span class="entry-chip saved">🐷 $'+e.saved.toFixed(2)+' ahorrado</span>':'')
-      +(e.spent?'<span class="entry-chip spent">-$'+e.spent.toFixed(2)+' gastado</span>':'')
-      +categoryChip+'</div>'+(e.note?'<div class="entry-note">'+e.note+'</div>':'')+'</div>'
+      // Los chips llevaban '$' literal mientras los totales de justo debajo si
+      // convertian: con HNL el chip decia $50.00 y el total L1,225.00.
+      // Y e.note se inyectaba como HTML sin escapar (escapeHtml existe y ya se
+      // usa en Actividad): una nota con '<' rompia la tarjeta entera.
+      +(e.earned?'<span class="entry-chip earned">+'+currSym()+toActiveCurrency(e.earned).toFixed(2)+' ganado</span>':'')
+      +(e.saved?'<span class="entry-chip saved">🐷 '+currSym()+toActiveCurrency(e.saved).toFixed(2)+' ahorrado</span>':'')
+      +(e.spent?'<span class="entry-chip spent">-'+currSym()+toActiveCurrency(e.spent).toFixed(2)+' gastado</span>':'')
+      +categoryChip+'</div>'+(e.note?'<div class="entry-note">'+escapeHtml(e.note)+'</div>':'')+'</div>'
       +'<button class="del-btn" onclick="deleteEntry(\''+TODAY+'\','+i+')">✕</button></div>';
   }).join('');
   var te=entries.reduce(function(a,e){return a+(e.earned||0);},0);
@@ -13073,6 +13139,11 @@ function updateAll(){
   updateStats(); updatePiggy(); updatePigExpression(); updateLevel(); updateRatio();
   renderTodayEntries(); renderHistory(); renderTimeline(); renderAchievements(); updateStreak(); renderShopList();
   renderInsight(); renderCalendar(); renderHoyDashboard(); renderMetas(); renderWeekSummary();
+  // renderMainGoalCard no existia y renderSpendingOverview solo se disparaba
+  // por hooks sobre addEntry/saveShopSpentHistory: ni al cambiar de moneda ni
+  // al borrar una entrada se refrescaban.
+  try{ renderMainGoalCard(); }catch(e){}
+  try{ if(typeof window.renderSpendingOverview==='function') window.renderSpendingOverview(); }catch(e){}
   try{ renderDailyBrief(); }catch(e){}
   if(_activeTab==='presupuesto') renderBudgetPage();
   checkSpendingAlerts();
@@ -13575,7 +13646,9 @@ function updateStats(){
   var ts=state.days.reduce(function(a,d){return a+daySaved(d);},0);
   var te=state.days.reduce(function(a,d){return a+dayEarned(d);},0);
   var tsp=state.days.reduce(function(a,d){return a+daySpent(d);},0);
-  var tw=state.days.filter(function(x){return x.worked;}).length;
+  // 'Dias activos' contaba x.worked, que solo se marca si tocas el boton
+  // 'Trabaje': normalmente daba 0 aunque llevases meses registrando.
+  var tw=state.days.filter(function(x){return (x.entries&&x.entries.length>0)||x.worked;}).length;
   // statTotalSaved = hero "Saldo actual" = earned - spent
   var saldo=Math.max(0,te-tsp);
   if(saldo!==_prevSaved){
@@ -18789,9 +18862,17 @@ document.addEventListener('DOMContentLoaded', function(){
     if (typeof shopSpentHistory === 'undefined' || !Array.isArray(shopSpentHistory)) return;
 
     var now = Date.now();
-    var weekMs = 7 * 24 * 60 * 60 * 1000;
-    var thisWeekStart = now - weekMs;
-    var lastWeekStart = now - 2 * weekMs;
+    var dayMs = 24 * 60 * 60 * 1000;
+    // it.date SIEMPRE es la cadena 'YYYY-MM-DD' (normalizeShopSpent la fuerza
+    // con regex), asi que compararla con un timestamp daba NaN y TODO este
+    // bloque (Top gasto, Resumen, barra de categorias) salia vacio siempre.
+    // Con claves 'YYYY-MM-DD' la comparacion lexicografica ya es cronologica.
+    function soKey(ms){
+      var dt = new Date(ms), mo = dt.getMonth()+1, dd = dt.getDate();
+      return dt.getFullYear()+'-'+(mo<10?'0':'')+mo+'-'+(dd<10?'0':'')+dd;
+    }
+    var thisWeekStart = soKey(now - 6 * dayMs);
+    var lastWeekStart = soKey(now - 13 * dayMs);
 
     var thisWeekTotal = 0;
     var lastWeekTotal = 0;
@@ -18800,7 +18881,7 @@ document.addEventListener('DOMContentLoaded', function(){
     for (var i = 0; i < shopSpentHistory.length; i++){
       var it = shopSpentHistory[i];
       if (!it) continue;
-      var d = it.date || 0;
+      var d = (it.date || '');
       var price = (typeof toShopPrice === 'function' ? toShopPrice(it.price) : parseFloat(it.price)||0);
       if (d >= thisWeekStart) {
         thisWeekTotal += price;
@@ -18852,7 +18933,9 @@ document.addEventListener('DOMContentLoaded', function(){
       if (barEl) barEl.innerHTML = '<div class="so-bar-empty">Sin gastos esta semana</div>';
       if (legendEl) legendEl.innerHTML = '';
       if (biggestEl) biggestEl.textContent = '—';
-      if (biggestAmtEl) biggestAmtEl.textContent = '$0';
+      if (biggestAmtEl) biggestAmtEl.textContent = fmt(0);
+      var topCatEl0 = document.getElementById('fxTopCatName');
+      if (topCatEl0) topCatEl0.textContent = '—';
       return;
     }
 
@@ -18894,6 +18977,9 @@ document.addEventListener('DOMContentLoaded', function(){
     var topLabel = getCatLabel(topKey);
     if (biggestEl) biggestEl.textContent = (topEmoji ? topEmoji + ' ' : '') + topLabel;
     if (biggestAmtEl) biggestAmtEl.textContent = fmt(catMap[topKey]);
+    // #fxTopCatName ('Top categoria: —') no lo escribia ningun JS del archivo.
+    var topCatEl = document.getElementById('fxTopCatName');
+    if (topCatEl) topCatEl.textContent = (topEmoji ? topEmoji + ' ' : '') + topLabel;
   };
 
   function attachAutoUpdate(){
@@ -19201,7 +19287,20 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   function saveSnapshots(snapshots){
-    try { localStorage.setItem(SNAPSHOT_SK, JSON.stringify(snapshots.slice(0, 5))); } catch (error) {}
+    // Cada snapshot es una copia COMPLETA de los datos, anidada como string
+    // dentro de un JSON (o sea, inflada al escapar las comillas). Guardar 5
+    // multiplicaba por ~6 el uso de localStorage y era lo que reventaba la
+    // cuota, y con ella saveState(). Con 2 hay red de seguridad de sobra.
+    // Ademas ahora se informa si NO se pudo escribir, en vez de mentir.
+    var list = snapshots.slice(0, 2);
+    while (list.length) {
+      try { localStorage.setItem(SNAPSHOT_SK, JSON.stringify(list)); return true; }
+      catch (error) { list = list.slice(0, list.length - 1); }
+    }
+    // Si no cabe ninguno se deja lo que ya hubiera: setItem es atomico, asi
+    // que al fallar el valor viejo sigue intacto. Borrarlo aqui destruia
+    // respaldos buenos justo en el momento de mayor riesgo.
+    return false;
   }
 
   function formatSnapshotTime(iso){
@@ -19257,10 +19356,12 @@ document.addEventListener('DOMContentLoaded', function(){
       reason: options.reason || 'manual',
       payload: payload
     });
-    saveSnapshots(snapshots);
+    var saved = saveSnapshots(snapshots);
     refreshDataVaultStats();
-    if (!options.silent) dataToast('Respaldo local creado');
-    return true;
+    if (!options.silent) dataToast(saved ? 'Respaldo local creado' : 'Sin espacio: exporta un backup a archivo');
+    // Devolver true siempre hacia que maybeCreateAutoSnapshot marcase la fecha
+    // de hoy y el Data vault dijese 'Auto diario: <hoy>' sin haber escrito nada.
+    return saved;
   }
 
   window.createLocalDataSnapshot = function(){
