@@ -2084,6 +2084,17 @@ body::before{
 /* ── Amounts row ── */
 .history-item .history-amounts{
   display:flex !important;
+  align-items:center;
+  gap:0;
+  padding:11px 16px 13px;
+  text-align:left !important;
+  flex-shrink:unset !important;
+}
+
+/* El bloque de Timeline estaba DENTRO de la regla de arriba, que nunca
+   se cerraba, asi que toda esta hoja quedaba en una regla malformada y
+   no se aplicaba: la timeline se pintaba sin rejilla, con el icono a
+   ancho completo y sin la pildora del tipo. Se saca a su propio nivel. */
 .timeline-page-header{margin-bottom:18px;}
 .timeline-page-sub{font-family:'Space Mono',monospace;font-size:11px;color:rgba(140,155,200,.48);margin-top:6px;letter-spacing:.3px;}
 .timeline-groups{display:flex;flex-direction:column;gap:18px;}
@@ -2117,12 +2128,6 @@ body::before{
   .timeline-item{grid-template-columns:44px 1fr;gap:10px;padding:14px;}
   .timeline-item::before{left:21px;}
   .timeline-amount{grid-column:2;justify-self:start;padding-top:0;}
-}
-  align-items:center;
-  gap:0;
-  padding:11px 16px 13px;
-  text-align:left !important;
-  flex-shrink:unset !important;
 }
 .history-item .history-earned{
   font-family:'Space Mono',monospace;
