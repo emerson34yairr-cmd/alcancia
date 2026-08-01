@@ -12894,8 +12894,27 @@ setText('todayDate', fmtDate(TODAY));
 setText('todayTitle', fmtDay(TODAY));
 if(existingToday && existingToday.worked!==null) setWorkedUI(existingToday.worked);
 _initCurrencyPicker();
-updateAll();
 }catch(e){}
+// updateAll() pinta historial, timeline, logros, lista de compras,
+// calendario, metas y resumen semanal. Estaba al final del try de arriba,
+// asi que cualquier fallo previo (setWorkedUI, fmtDay, el selector de
+// moneda...) se lo llevaba por delante y el catch vacio lo ocultaba: la app
+// arrancaba con media interfaz en blanco y sin ningun aviso.
+// El primer pintado se aplaza a que el script termine de parsearse.
+// Aqui, a mitad del parseo, todavia no existen las declaraciones que estan
+// mas abajo: updateAll() llamaba a updateLevel() -> getLevel() -> LEVELS[0],
+// y `var LEVELS` no se inicializa hasta unas 3600 lineas despues, asi que
+// valia undefined y lanzaba. El catch vacio que envolvia esto lo ocultaba,
+// y la app arrancaba SIN ejecutar ninguno de sus catorce renders: historial,
+// timeline, actividad, logros, lista de compras, calendario, metas y resumen
+// quedaban en su estado vacio hasta que algo mas volvia a llamar updateAll().
+function _alcanciaFirstPaint(){
+  try{ updateAll(); }
+  catch(e){ try{ console.error('updateAll fallo al arrancar:', e); }catch(e2){} }
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', _alcanciaFirstPaint, {once:true});
+}else{ _alcanciaFirstPaint(); }
 
 // ── WORK TOGGLE ────────────────────────────────────────────────────
 function setWorked(v){ currentWorked=v; setWorkedUI(v); updateSavingSuggestion(); if(typeof saveEntryDraft==='function') saveEntryDraft(); }
@@ -13137,7 +13156,7 @@ function updateAll(){
     setText('todayTitle', fmtDay(TODAY));
   }
   updateStats(); updatePiggy(); updatePigExpression(); updateLevel(); updateRatio();
-  renderTodayEntries(); renderHistory(); renderTimeline(); renderAchievements(); updateStreak(); renderShopList();
+  renderTodayEntries(); renderHistory(); renderTimeline(); renderActivity(); renderAchievements(); updateStreak(); renderShopList();
   renderInsight(); renderCalendar(); renderHoyDashboard(); renderMetas(); renderWeekSummary();
   // renderMainGoalCard no existia y renderSpendingOverview solo se disparaba
   // por hooks sobre addEntry/saveShopSpentHistory: ni al cambiar de moneda ni
