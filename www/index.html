@@ -10703,6 +10703,15 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
   background:transparent !important;
   border-bottom:1px solid var(--k-line) !important;
 }
+/* --- METAS v1: la linea que dice desde cuando cuenta una meta. Va al
+   final del todo. Misma especificidad que la regla de .mx-deadline
+   (1 id + 2 clases), asi que gana por orden. --- */
+#page-hoy.fx-home .mx-since{
+  font-size:11px;
+  color:rgba(150,180,255,.62) !important;
+  letter-spacing:0;
+  margin-top:-2px;
+}
 </style>
 </head>
 <body>
@@ -12430,13 +12439,19 @@ function parseMoneyText(v){
 function moneyText(v){
   return currSym()+Math.round(toActiveCurrency(v)).toLocaleString('en-US');
 }
-function updateMainGoalUI(name,saved,target){
+function updateMainGoalUI(name,saved,target,sinceKey){
   var pct=target>0?Math.min(100,Math.round((saved/target)*100)):0;
   var left=Math.max(0,target-saved);
+  var since=(typeof mxSinceLabel==='function')?mxSinceLabel(sinceKey):'';
   setText('metaGoalName',name);
   setText('metaGoalSaved',moneyText(saved));
   setText('metaGoalTarget',moneyText(target));
-  setText('metaGoalLeft','Faltan '+moneyText(left)+' para lograrlo');
+  // La tarjeta pegada a esta dice 'Total ahorrado' y cuenta toda la vida.
+  // Si la meta solo cuenta desde su startFrom hay que decirlo aqui o las
+  // dos se contradicen. Medido en pixeles a 393px con la fuente real: en
+  // esa pastilla 'Solo desde el 1 ago' pinta 3 lineas y el texto de hoy
+  // ('Faltan $4,450 para lograrlo') pinta 4. La tarjeta no crece, encoge.
+  setText('metaGoalLeft', since?('Solo desde el '+since):('Faltan '+moneyText(left)+' para lograrlo'));
   setText('metaDonutPct',pct+'%');
   setText('metaProgressPct',pct+'%');
   var pf=$('metaProgressFill'); if(pf) pf.style.width=pct+'%';
@@ -12471,7 +12486,7 @@ function renderMainGoalCard(){
   }
   var m=metas[0];
   var goal=m.goal||0;
-  updateMainGoalUI(m.name||'Meta',Math.min(mxTotalSaved(),goal),goal);
+  updateMainGoalUI(m.name||'Meta',Math.min(mxMetaSaved(m),goal),goal,mxMetaStart(m));
 }
 function editMainGoal(){
   // La tarjeta pinta con moneyText() (moneda activa) pero el prompt pedia y
@@ -12494,6 +12509,7 @@ function editMainGoal(){
     name: newName,
     goal: (_curRate>0?newTarget/_curRate:newTarget),
     deadline: null,
+    startFrom: todayKey(),
     createdAt: new Date().toISOString()
   });
   saveMetas(metas);
@@ -12743,9 +12759,22 @@ function updateExpenseCategoryPreview(){
   preview.textContent=val==='auto'?'✨':getExpenseCategoryEmoji(val);
 }
 function getEntryExpenseCategory(entry){
-  if(entry&&entry.category) return normalizeExpenseCategory(entry.category);
-  var note=entry?(entry.itemName||entry.note||''):'';
-  return inferExpenseCategory(note,entry&&entry.shopCategory);
+  if(!entry) return 'general';
+  // addShopSpentRecord() ya guarda la categoria de gasto resuelta en
+  // expenseCategory; nadie la leia. entry.category, en las compras, es una
+  // categoria de TIENDA (frutas, lacteos...) que normalizeExpenseCategory no
+  // conoce, asi que TODA compra marcada salia como "General".
+  if(entry.expenseCategory) return normalizeExpenseCategory(entry.expenseCategory);
+  var raw=(entry.category||'').toString().trim().toLowerCase();
+  if(raw){
+    var norm=normalizeExpenseCategory(raw);
+    if(norm!=='general'||raw==='general') return norm;
+    // Compra vieja sin expenseCategory: traducir la categoria de tienda SIN
+    // mirar la nota ("Compra: ..." contiene "compra" y caeria en shopping).
+    var fromShop=inferExpenseCategory('',raw);
+    if(fromShop!=='general') return fromShop;
+  }
+  return inferExpenseCategory((entry.itemName||entry.note||''),entry.shopCategory);
 }
 
 function normalizeShopCategory(cat){
@@ -13052,6 +13081,26 @@ function fmtDay(k){ var p=k.split('-').map(Number); return DAYS[new Date(p[0],p[
 function fmtMoney(n){ var s=currSym(); var v=toActiveCurrency(n); var g=(v<=-0.5)?'-':''; var a=Math.abs(v); return a>=1000?g+s+(a/1000).toFixed(1)+'k':g+s+a.toFixed(0); }
 function getYesterdayKey(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 
+// TODAY se calculaba UNA sola vez al cargar. Una PWA instalada no se recarga:
+// se congela y se restaura, asi que al abrirla al dia siguiente la app seguia
+// creyendo que era ayer y la primera entrada de la manana caia en el dia
+// anterior (addEntry busca state.days con el TODAY viejo y solo al FINAL llama
+// a updateAll, que es quien corrige la fecha).
+function syncTodayKey(){
+  var k=todayKey();
+  if(k===TODAY) return false;
+  TODAY=k;
+  setText('todayDate',fmtDate(TODAY));
+  setText('todayTitle',fmtDay(TODAY));
+  return true;
+}
+document.addEventListener('visibilitychange',function(){
+  // Solo si el dia cambio de verdad: updateAll() repinta todo y dispararlo en
+  // cada vuelta a primer plano relanzaria animaciones sin motivo.
+  if(document.hidden) return;
+  if(syncTodayKey()&&typeof updateAll==='function') updateAll();
+});
+
 function dayEarned(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.earned||0);},0); }
 function daySaved(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.saved||0)+(e.savedAdj||0);},0); }
 function daySpent(d){ return (d.entries||[]).reduce(function(a,e){return a+(e.spent||0);},0); }
@@ -13275,6 +13324,7 @@ function focusSpent(){
 
 // ── ADD / DELETE ───────────────────────────────────────────────────
 function addEntry(){
+  syncTodayKey();
   var earned=parseFloat($('earnedInput').value)||0;
   var _savedRaw=$('savedInput').value.trim();
   var saved=(_savedRaw===''||_savedRaw===null)?0:Math.max(0,parseFloat(_savedRaw)||0);
@@ -13425,6 +13475,57 @@ function mxTotalSaved(){
   return total;
 }
 
+// --- METAS: ventana desde que se creo la meta ---------------------
+// Una meta con startFrom se mide contra lo ahorrado DESDE ese dia; las
+// metas guardadas antes no traen startFrom y se siguen midiendo de por
+// vida (decidido, no se toca).
+function mxMetaStart(m){
+  var s=(m&&m.startFrom)||'';
+  return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:'';
+}
+// Cada compra escribe un savedAdj NEGATIVO en el dia de la compra. Si la
+// compra se paga con dinero de ANTES de la meta, ese negativo no puede
+// comerse la ventana. El piso va en 0 por ENTRADA, no al final: un
+// Math.max(0,total) final esconde el signo pero arrastra la deuda y deja
+// la meta clavada en 0% mientras la alcancia sigue subiendo.
+// state.days NO esta ordenado (hay push en varios sitios), asi que se
+// recorre una COPIA ordenada por fecha.
+function mxSavedSince(startFrom){
+  var src=(typeof state==='object'&&state&&state.days)?state.days:[];
+  var days=src.slice().sort(function(a,b){
+    var ka=(a&&a.date)||'', kb=(b&&b.date)||'';
+    return ka<kb?-1:(ka>kb?1:0);
+  });
+  var total=0;
+  for(var i=0;i<days.length;i++){
+    var day=days[i];
+    if(!day) continue;
+    if(startFrom&&(day.date||'')<startFrom) continue;
+    var es=day.entries||[];
+    for(var k=0;k<es.length;k++){
+      var e=es[k]||{};
+      total+=(e.saved||0)+(e.savedAdj||0);
+      if(total<0) total=0;
+    }
+  }
+  return total;
+}
+function mxMetaSaved(m){
+  var s=mxMetaStart(m);
+  return s?mxSavedSince(s):mxTotalSaved();
+}
+// '2026-08-01' -> '1 ago', para el copy de las tarjetas.
+var MX_SINCE_MONTHS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function mxSinceLabel(key){
+  var p=String(key||'').split('-');
+  if(p.length!==3) return '';
+  var mo=MX_SINCE_MONTHS[parseInt(p[1],10)-1];
+  if(!mo) return '';
+  var dd=parseInt(p[2],10);
+  if(!(dd>=1)) return '';
+  return dd+' '+mo;
+}
+
 function mxFmtMoney(n){
   var s=currSym(); var v=toActiveCurrency(n);
   if(v>=1000000) return s+(v/1000000).toFixed(1)+'M';
@@ -13448,6 +13549,40 @@ function mxDaysLeft(deadline){
   return diff;
 }
 
+// Ritmo de ahorro de los ultimos 30 dias. Medido: con ventana de 7 dias la
+// estimacion se dispara con un solo dia bueno; con 30 se estabiliza.
+var MX_RATE_WINDOW=30;
+function mxSaveRate(){
+  var now=new Date(); now.setHours(0,0,0,0);
+  var total=0, daysWithSave=0, oldest=-1;
+  for(var i=0;i<state.days.length;i++){
+    var d=state.days[i];
+    var p=(d.date||'').split('-');
+    if(p.length!==3) continue;
+    var diff=Math.round((now-new Date(+p[0],+p[1]-1,+p[2]))/864e5);
+    if(diff<0||diff>=MX_RATE_WINDOW) continue;
+    if(diff>oldest) oldest=diff;
+    var s=daySaved(d);
+    total+=s;
+    if(s>0) daysWithSave++;
+  }
+  // Con pocos dias de ahorro la estimacion es ruido, y con ritmo <=0 (daySaved
+  // incluye el savedAdj negativo de las compras) no se puede dividir.
+  if(daysWithSave<10||total<=0) return null;
+  // Dividir siempre entre 30 subestima a quien lleva menos de un mes:
+  // 12 dias ahorrando 12/dia daba 4.8/dia y la fecha 95 dias fuera.
+  return total/Math.max(1,Math.min(MX_RATE_WINDOW,oldest+1));
+}
+function mxEtaLabel(remaining,rate){
+  if(!rate||!(remaining>0)) return '';
+  var days=Math.ceil(remaining/rate);
+  if(days<1) days=1;
+  if(days>3650) return 'A este ritmo tardarías más de 10 años';
+  var end=new Date(); end.setHours(0,0,0,0); end.setDate(end.getDate()+days);
+  var key=end.getFullYear()+'-'+pad(end.getMonth()+1)+'-'+pad(end.getDate());
+  return 'A este ritmo llegas el '+mxFmtDate(key)+' ('+days+' días)';
+}
+
 function renderMetas(){
   var list=document.getElementById('mxMetasList');
   if(!list) return;
@@ -13456,14 +13591,17 @@ function renderMetas(){
     list.innerHTML='<div class="mx-empty">Aún no tienes metas.<br>¡Crea una para empezar a ahorrar!</div>';
     return;
   }
-  var totalSaved=mxTotalSaved();
   var html='';
   for(var i=0;i<metas.length;i++){
     var m=metas[i];
-    var saved=Math.min(totalSaved, m.goal);
+    // Cada meta contra SU ventana. mxMetaSaved cae a mxTotalSaved cuando la
+    // meta no trae startFrom (las guardadas antes de hoy).
+    var metaSaved=mxMetaSaved(m);
+    var since=mxSinceLabel(mxMetaStart(m));
+    var saved=Math.min(metaSaved, m.goal);
     var pct=m.goal>0?Math.min(100,Math.round(saved/m.goal*100)):0;
-    var remaining=Math.max(0,m.goal-totalSaved);
-    var done=(totalSaved>=m.goal);
+    var remaining=Math.max(0,m.goal-metaSaved);
+    var done=(metaSaved>=m.goal);
     var fillClass=done?'done':(pct>=75?'near':'progress');
     var daysLeft=mxDaysLeft(m.deadline);
     var deadlineStr='';
@@ -13480,10 +13618,13 @@ function renderMetas(){
     html+='<button class="mx-delete-btn" onclick="mxDeleteMeta(\''+m.id+'\')" type="button" title="Eliminar meta">✕</button>';
     html+='</div>';
     html+='<div class="mx-amounts">';
-    html+='<span class="mx-saved-val">'+mxFmtMoney(Math.min(totalSaved,m.goal))+'</span>';
+    html+='<span class="mx-saved-val">'+mxFmtMoney(saved)+'</span>';
     html+='<span class="mx-of">de</span>';
     html+='<span class="mx-goal-val">'+mxFmtMoney(m.goal)+'</span>';
     html+='</div>';
+    // Arriba, en la misma pantalla, 'Total ahorrado' cuenta toda la vida.
+    // Sin esta linea las dos cifras se contradicen sin explicacion.
+    if(since) html+='<div class="mx-deadline mx-since">Cuenta desde el '+since+', no tu ahorro total</div>';
     html+='<div class="mx-track"><div class="mx-fill '+fillClass+'" id="mxFill'+m.id+'" style="width:0%"></div></div>';
     html+='<div class="mx-bottom">';
     html+='<span class="mx-pct">'+pct+'%</span>';
@@ -13494,6 +13635,10 @@ function renderMetas(){
     }
     html+='</div>';
     if(deadlineStr) html+='<div class="mx-deadline">📅 '+deadlineStr+'</div>';
+    if(!done){
+      var etaStr=mxEtaLabel(remaining,savePace);
+      if(etaStr) html+='<div class="mx-deadline">🚀 '+etaStr+'</div>';
+    }
     html+='</div>';
   }
   list.innerHTML=html;
@@ -13504,7 +13649,7 @@ function renderMetas(){
         var m=metas[i];
         var fill=document.getElementById('mxFill'+m.id);
         if(!fill) continue;
-        var saved=Math.min(totalSaved,m.goal);
+        var saved=Math.min(mxMetaSaved(m),m.goal);
         var pct=m.goal>0?Math.min(100,Math.round(saved/m.goal*100)):0;
         fill.style.width=pct+'%';
       }
@@ -13543,6 +13688,9 @@ function mxSaveMeta(){
     name: name,
     goal: goalRaw,
     deadline: deadline||null,
+    // Clave de dia LOCAL (todayKey), no toISOString: en Honduras (UTC-6)
+    // un toISOString a las 7pm ya cae en el dia siguiente.
+    startFrom: todayKey(),
     createdAt: new Date().toISOString()
   });
   saveMetas(metas);
@@ -15416,6 +15564,7 @@ function shopItemToSpent(id){
 }
 
 function addShopSpentRecord(item,price){
+  syncTodayKey();
   var stamp=Date.now();
   shopSpentHistory.unshift(normalizeShopSpent({
     id:stamp,
@@ -17017,13 +17166,19 @@ function fxBucketForCategory(cat){
   if(c==='entertainment') return 'games';
   if(c==='shopping') return 'shopping';
   if(c==='transport') return 'gas';
+  if(c==='bills') return 'bills';
+  if(c==='home') return 'home';
+  if(c==='health') return 'health';
   return 'other';
 }
 var FX_BUCKETS=[
   {id:'food',     label:'Comida',      emoji:'🍔', color:'#c06840'},
-  {id:'games',    label:'Juegos',      emoji:'🎮', color:'#8b65f0'},
+  {id:'bills',    label:'Facturas',    emoji:'💡', color:'#d9a441'},
+  {id:'home',     label:'Casa',        emoji:'🏠', color:'#5b7cd8'},
+  {id:'games',    label:'Entretenimiento',      emoji:'🎮', color:'#8b65f0'},
   {id:'shopping', label:'Compras',     emoji:'🛍️', color:'#d05878'},
-  {id:'gas',      label:'Gasolina',    emoji:'⛽', color:'#4aaac8'},
+  {id:'gas',      label:'Transporte',  emoji:'⛽', color:'#4aaac8'},
+  {id:'health',   label:'Salud',       emoji:'💊', color:'#7fb84a'},
   {id:'other',    label:'Otros',       emoji:'✨', color:'#3db87c'}
 ];
 
@@ -17040,12 +17195,16 @@ function fxRenderSpendingDonut(){
   var cutoff=new Date(now); cutoff.setDate(cutoff.getDate()-29);
   var cutoffKey=cutoff.getFullYear()+'-'+pad2(cutoff.getMonth()+1)+'-'+pad2(cutoff.getDate());
 
-  var totals={food:0,games:0,shopping:0,gas:0,other:0};
+  // totals se derivan de FX_BUCKETS para que anadir un cubo no deje un
+  // totals[bucket] undefined (undefined + gasto = NaN y el donut desaparece).
+  var totals={}; FX_BUCKETS.forEach(function(b){totals[b.id]=0;});
   (state.days||[]).forEach(function(d){
     if(d.date<cutoffKey) return;
     (d.entries||[]).forEach(function(e){
       var sp=+(e.spent||0); if(!sp) return;
-      var bucket=fxBucketForCategory(e.category);
+      // e.category en las compras es categoria de TIENDA: mandaba el 82% del
+      // gasto medido a "Otros". getEntryExpenseCategory ya resuelve la buena.
+      var bucket=fxBucketForCategory(getEntryExpenseCategory(e));
       totals[bucket]+=sp;
     });
   });
@@ -17120,11 +17279,14 @@ function fxRenderGoalProgress(){
     if(countEl) countEl.textContent='0 metas';
     return;
   }
-  var totalSaved=(typeof mxTotalSaved==='function')?mxTotalSaved():0;
+  // 'Progreso de metas' vive en la MISMA pagina que las otras dos tarjetas:
+  // si siguiera midiendo de por vida serian tres cifras distintas para la
+  // misma meta.
+  var savedOf=function(mm){ return (typeof mxMetaSaved==='function')?mxMetaSaved(mm):0; };
   // sort: incomplete + closer to done first, then complete
   var sorted=metas.slice().sort(function(a,b){
-    var pa=a.goal>0?Math.min(1,totalSaved/a.goal):0;
-    var pb=b.goal>0?Math.min(1,totalSaved/b.goal):0;
+    var pa=a.goal>0?Math.min(1,savedOf(a)/a.goal):0;
+    var pb=b.goal>0?Math.min(1,savedOf(b)/b.goal):0;
     if((pa>=1)!==(pb>=1)) return (pa>=1)?1:-1;
     return pb-pa;
   });
@@ -17133,7 +17295,7 @@ function fxRenderGoalProgress(){
 
   var html='';
   top.forEach(function(m,i){
-    var saved=Math.min(totalSaved,m.goal);
+    var saved=Math.min(savedOf(m),m.goal);
     var pct=m.goal>0?Math.min(100,(saved/m.goal)*100):0;
     var done=pct>=100;
     var fillClass=done?'complete':(pct>=75?'near':'');
