@@ -1264,6 +1264,40 @@ code {
 .catbar__head { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-sub); }
 .catbar__head .grow { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* Gasto medio por día de la semana */
+.dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s1); align-items: end; }
+.dow__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s1);
+  min-width: 0;
+}
+/* La cifra del pico puede ser más ancha que su columna; se deja desbordar sin
+   empujar a las vecinas. */
+.dow__v {
+  height: 0.875rem;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: visible;
+}
+.dow__col { height: 5.5rem; justify-content: flex-end; }
+.dow__bar {
+  width: 100%;
+  border-radius: var(--r-sm) var(--r-sm) 0.125rem 0.125rem;
+  background: var(--surface-3);
+  /* La altura la fija runEnterAnimations con data-grow-h, en porcentaje del
+     alto de la columna, así que crece de abajo hacia arriba. */
+  transition: height 700ms var(--ease);
+}
+.dow__col.is-peak .dow__bar { background: var(--neg); }
+.dow__col.is-peak .dow__v { color: var(--neg); }
+.dow__d { color: var(--ink-3); }
+
+.consejo { display: flex; align-items: flex-start; gap: var(--s2); }
+.consejo .badge { width: 1.75rem; height: 1.75rem; border-radius: var(--r-sm); }
+
 .heat {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -2387,12 +2421,15 @@ function renderStreak() {
    siguiente cuadro. Sin esto la transición CSS no se dispara, porque el
    elemento nace ya con su ancho final. */
 function runEnterAnimations(root) {
-  const bars = $$('[data-grow]', root);
-  if (!bars.length) return;
-  bars.forEach(function (b) { b.style.width = '0%'; });
+  const anchos = $$('[data-grow]', root);
+  const altos = $$('[data-grow-h]', root);
+  if (!anchos.length && !altos.length) return;
+  anchos.forEach(function (b) { b.style.width = '0%'; });
+  altos.forEach(function (b) { b.style.height = '0%'; });
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
-      bars.forEach(function (b) { b.style.width = b.dataset.grow + '%'; });
+      anchos.forEach(function (b) { b.style.width = b.dataset.grow + '%'; });
+      altos.forEach(function (b) { b.style.height = b.dataset.growH + '%'; });
     });
   });
 }
@@ -2995,8 +3032,138 @@ VIEWS.analisis = function () {
       : '<div class="empty"><div class="empty__text">Sin gastos en los últimos 30 días.</div></div>') +
   '</section>' +
 
-  heatmapCard();
+  weekdayCard() +
+  heatmapCard() +
+  consejosCard();
 };
+
+/* Gasto medio por día de la semana. Es la pantalla de Insights que tenías
+   construida en la versión anterior y a la que no llegaba ningún botón: solo
+   se abría con Ctrl+K, que en un teléfono no existe. */
+function weekdayCard() {
+  const w = lastNDays(56);              /* ocho semanas */
+  const suma = [0, 0, 0, 0, 0, 0, 0];
+  const cuenta = [0, 0, 0, 0, 0, 0, 0];
+  const vistos = {};
+  inRange(w.from, w.to).forEach(function (e) {
+    if (e.kind !== 'spend') return;
+    const d = weekday(e.date);
+    suma[d] += e.amount;
+    if (!vistos[e.date]) { vistos[e.date] = true; cuenta[d]++; }
+  });
+  const media = suma.map(function (s, i) { return cuenta[i] ? s / cuenta[i] : 0; });
+  const max = Math.max.apply(null, media);
+  if (max <= 0) return '';
+  const peor = media.indexOf(max);
+
+  return '' +
+  '<section class="card stack-2">' +
+    '<div class="spread">' +
+      '<div class="card__label">Gasto medio por día</div>' +
+      '<span class="t-cap faint">8 semanas</span>' +
+    '</div>' +
+    '<div class="dow">' +
+      /* Solo se rotula el día más caro. Siete importes seguidos no caben en el
+         ancho de un teléfono y se encabalgaban unos con otros; el resto de
+         columnas se leen por su altura, que es para lo que están. */
+      media.map(function (v, i) {
+        return '<div class="dow__col' + (i === peor ? ' is-peak' : '') + '" ' +
+          'title="' + esc(DIAS_C[i]) + ': ' + money(v, { force: true }) + '">' +
+          '<span class="dow__v num">' + (i === peor ? money(v) : '') + '</span>' +
+          '<span class="dow__bar" data-grow-h="' + Math.max(3, Math.round(v / max * 100)) + '"></span>' +
+          '<span class="dow__d t-cap">' + DIAS_C[i] + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<p class="t-cap faint">Tu día más caro es el <b>' +
+      ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'][peor] +
+      '</b>, con ' + money(max) + ' de media.</p>' +
+  '</section>';
+}
+
+/* Consejos. La versión anterior tenía una pantalla entera de reglas escritas a
+   mano que ningún botón abría — ni siquiera el buscador de comandos. Aquí las
+   que aplican salen directamente en Análisis, sin pantalla aparte. */
+function consejosCard() {
+  const m = thisMonth();
+  const mt = totals(inRange(m.from, m.to));
+  const w = lastNDays(7);
+  const wt = totals(inRange(w.from, w.to));
+  const prevW = totals(inRange(addDays(w.from, -7), addDays(w.from, -1)));
+  const cats = byCategory(m.from, m.to);
+  const t = totals();
+  const st = streak();
+  const out = [];
+
+  if (mt.earned > 0) {
+    const tasa = mt.saved / mt.earned;
+    if (tasa < 0) out.push({ t: 'warn', txt: 'Este mes sacaste más de la alcancía de lo que metiste.' });
+    else if (tasa < 0.1) out.push({ t: 'warn', txt: 'Guardas el ' + Math.round(tasa * 100) +
+      '% de lo que ganas. Apartar ' + money(mt.earned * 0.2 / 30) + ' al día serían ' +
+      money(mt.earned * 0.2) + ' al mes.' });
+    else if (tasa >= 0.2) out.push({ t: 'ok', txt: 'Vas guardando el ' + Math.round(tasa * 100) +
+      '% de lo que ganas. Eso está por encima del 20% que se suele recomendar.' });
+  }
+
+  if (mt.spent > mt.earned && mt.earned > 0) {
+    out.push({ t: 'warn', txt: 'Este mes llevas ' + money(mt.spent) + ' de gasto contra ' +
+      money(mt.earned) + ' de ingreso.' });
+  }
+
+  if (cats.length && mt.spent > 0 && cats[0].amount / mt.spent > 0.4) {
+    out.push({ t: 'info', txt: cats[0].cat.name + ' se lleva el ' +
+      pct(cats[0].amount, mt.spent) + '% de tu gasto del mes. Es el sitio con más margen.' });
+  }
+
+  if (prevW.spent > 0 && wt.spent > prevW.spent * 1.3) {
+    out.push({ t: 'warn', txt: 'Esta semana llevas ' + money(wt.spent) + ', un ' +
+      Math.round((wt.spent / prevW.spent - 1) * 100) + '% más que la anterior.' });
+  }
+
+  state.budgets.forEach(function (b) {
+    const u = budgetSpent(b);
+    if (u > b.amount) out.push({ t: 'warn', txt: 'Rebasaste el tope de ' + cat(b.cat).name +
+      ' por ' + money(u - b.amount) + '.' });
+    else if (u >= b.amount * 0.8) out.push({ t: 'info', txt: cat(b.cat).name + ': llevas el ' +
+      pct(u, b.amount) + '% del tope ' + b.period + '.' });
+  });
+
+  state.goals.filter(function (g) { return !g.done && g.due; }).forEach(function (g) {
+    const dias = daysBetween(dayKey(), g.due);
+    const falta = g.target - goalSaved(g);
+    if (dias > 0 && falta > 0) {
+      const ritmoNec = falta / dias;
+      const ritmoReal = wt.saved / 7;
+      if (ritmoReal > 0 && ritmoNec > ritmoReal * 1.5) {
+        out.push({ t: 'warn', txt: 'Al ritmo de esta semana no llegas a "' + g.name +
+          '": necesitas ' + money(ritmoNec) + ' al día y vas por ' + money(ritmoReal) + '.' });
+      }
+    }
+  });
+
+  if (st >= 7) out.push({ t: 'ok', txt: 'Llevas ' + st + ' días seguidos registrando. Eso es lo que hace que los números sirvan.' });
+  else if (st === 0 && state.entries.length) out.push({ t: 'info', txt: 'Se te cortó la racha. Registra algo hoy y vuelve a empezar.' });
+
+  const lv = level();
+  if (lv.next && t.saved > 0) {
+    out.push({ t: 'info', txt: 'Te faltan ' + money(lv.next.min - t.saved) +
+      ' para llegar a ' + lv.next.name + ' ' + lv.next.emoji + '.' });
+  }
+
+  if (!out.length) return '';
+
+  return '' +
+  '<section class="card stack-2">' +
+    '<div class="card__label">Qué dicen tus números</div>' +
+    out.slice(0, 5).map(function (c) {
+      return '<div class="consejo">' +
+        '<span class="badge badge--' + (c.t === 'warn' ? 'warn' : c.t === 'ok' ? 'pos' : 'brand') + '">' +
+          ico(c.t === 'warn' ? 'alert' : c.t === 'ok' ? 'check' : 'sparkles', 16) + '</span>' +
+        '<span class="t-cap grow">' + esc(c.txt) + '</span>' +
+      '</div>';
+    }).join('') +
+  '</section>';
+}
 
 /* Variación contra el periodo anterior. En gastos, subir es malo: el color se
    invierte para que verde signifique siempre "vas bien". */
