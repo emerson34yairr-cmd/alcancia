@@ -1995,6 +1995,11 @@ function toast(msg, kind, ms) {
 let sheetEl = null, sheetBg = null, sheetOnClose = null;
 
 function openSheet(title, bodyHtml, onClose) {
+  /* Si ya había una hoja abierta se reemplaza su contenido sin añadir otra
+     entrada al historial. Sin esto, cambiar de tipo de movimiento tres veces
+     dejaba tres entradas y el botón de retroceso del teléfono había que
+     pulsarlo tres veces para salir. */
+  const yaAbierta = !!sheetEl;
   closeSheet(true);
   sheetOnClose = onClose || null;
 
@@ -2028,7 +2033,7 @@ function openSheet(title, bodyHtml, onClose) {
     });
   });
 
-  try { history.pushState({ sheet: 1 }, ''); } catch (e) {}
+  if (!yaAbierta) { try { history.pushState({ sheet: 1 }, ''); } catch (e) {} }
   const first = sheetEl.querySelector('input,textarea,select');
   if (first && !/iPhone|iPad|Android/i.test(navigator.userAgent)) first.focus();
 }
@@ -3537,14 +3542,16 @@ VIEWS.compras = function () {
     '<h1 class="screen-title grow">Compras</h1>' +
   '</div>' +
 
-  '<form class="addbar" data-act="noop" id="addForm">' +
+  /* Un div, no un <form>: dentro de un formulario sin action, pulsar Intro lo
+     envía y recarga la página entera, perdiendo lo que estabas escribiendo. */
+  '<div class="addbar">' +
     '<input class="input grow" id="shopName" type="text" placeholder="¿Qué necesitas?" ' +
       'maxlength="80" autocomplete="off">' +
     '<input class="input addbar__qty num" id="shopQty" type="text" inputmode="decimal" placeholder="1" ' +
       'aria-label="Cantidad">' +
     '<button class="btn btn--primary addbar__go" type="button" data-act="agregar-item" ' +
       'aria-label="Agregar">' + ico('plus', 20) + '</button>' +
-  '</form>' +
+  '</div>' +
 
   (estimado > 0
     ? '<div class="spread t-cap"><span class="faint">Costo estimado de lo pendiente</span>' +

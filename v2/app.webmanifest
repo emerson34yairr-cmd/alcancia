@@ -5,7 +5,6 @@
   "lang": "es",
   "start_url": "./",
   "scope": "./",
-  "id": "/alcancia/v2/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0B0B12",
