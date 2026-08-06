@@ -451,6 +451,11 @@ svg { display: block; flex: none; }
 
 /* Fila de chips que se desplaza en horizontal sin cortar los bordes del
    scroller: el padding lateral se recupera con márgenes negativos. */
+/* Se desborda hasta el filo de la pantalla para que se note que hay más a la
+   derecha, y recupera el margen con su propio padding.
+   Sin scroll-snap: al arrancar, Chrome alinea el primer elemento con el borde
+   del snapport y se traga justo ese padding inicial, dejando el primer chip
+   pegado al filo. */
 .chiprow {
   display: flex;
   gap: var(--s2);
@@ -458,10 +463,8 @@ svg { display: block; flex: none; }
   scrollbar-width: none;
   padding-inline: var(--s4);
   margin-inline: calc(var(--s4) * -1);
-  scroll-snap-type: x proximity;
 }
 .chiprow::-webkit-scrollbar { display: none; }
-.chiprow > * { scroll-snap-align: start; }
 
 /* Control segmentado — para 2 a 4 opciones excluyentes que caben en el ancho. */
 .seg {
@@ -1005,6 +1008,162 @@ svg { display: block; flex: none; }
 }
 .check:active { transform: scale(0.86); }
 .check.is-on { background: var(--pos); border-color: var(--pos); }
+
+/* — Recetas — */
+.recetas { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
+.receta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s1);
+  padding: var(--s3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  text-align: left;
+  box-shadow: var(--shadow);
+  transition: transform 120ms var(--ease);
+}
+.receta:active { transform: scale(0.97); }
+.receta__emoji {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-md);
+  font-size: 1.5rem;
+  margin-bottom: var(--s1);
+}
+.receta__name { font-size: var(--t-sub); font-weight: 650; line-height: 1.25; }
+
+.receta__hero {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s4);
+  border-radius: var(--r-lg);
+}
+.receta__heroEmoji { font-size: 2.5rem; line-height: 1; }
+
+.ingredientes { margin-top: var(--s2); }
+.ingredientes li {
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--t-sub);
+}
+.ingredientes li:last-child { border-bottom: 0; }
+.ingredientes b { color: var(--brand-2); margin-right: var(--s1); }
+
+.pasos { margin-top: var(--s2); counter-reset: paso; }
+.pasos li {
+  position: relative;
+  padding: var(--s2) 0 var(--s2) var(--s8);
+  font-size: var(--t-sub);
+  line-height: 1.4;
+}
+.pasos li::before {
+  counter-increment: paso;
+  content: counter(paso);
+  position: absolute;
+  left: 0;
+  top: var(--s2);
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  font-size: var(--t-cap);
+  font-weight: 700;
+  color: var(--brand-2);
+}
+.tip {
+  padding: var(--s3);
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  border-radius: var(--r-md);
+  color: var(--ink-2);
+}
+
+/* — Escanear — */
+.scanbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  width: 100%;
+  padding: var(--s8) var(--s4);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
+  color: var(--ink-2);
+  text-align: center;
+  transition: border-color 200ms var(--ease), transform 120ms var(--ease);
+}
+.scanbox:active { transform: scale(0.98); }
+.scanbox:disabled { opacity: 0.6; }
+
+.scanrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--t-sub);
+}
+.scanrow:last-of-type { border-bottom: 0; }
+.scanrow__ck { width: 1.25rem; height: 1.25rem; accent-color: var(--brand); flex: none; }
+
+/* — Asistente — */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  min-height: 9rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--s2) 0;
+}
+.burbuja {
+  max-width: 85%;
+  padding: var(--s3);
+  border-radius: var(--r-lg);
+  font-size: var(--t-sub);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.burbuja--yo {
+  align-self: flex-end;
+  background: var(--grad-brand);
+  color: var(--brand-ink);
+  border-bottom-right-radius: var(--r-sm);
+}
+.burbuja--ella {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: var(--r-sm);
+}
+.burbuja--pensando { display: flex; gap: 0.25rem; padding: var(--s3) var(--s4); }
+.burbuja--pensando i {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: var(--r-full);
+  background: var(--ink-3);
+  animation: pensando 1.2s var(--ease) infinite;
+}
+.burbuja--pensando i:nth-child(2) { animation-delay: 0.16s; }
+.burbuja--pensando i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes pensando {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-0.1875rem); }
+}
+
+.linkbtn {
+  color: var(--brand-2);
+  font: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+}
 
 /* — Interruptor — */
 .switch {
@@ -2128,6 +2287,9 @@ const EXTRAS = [
   { id: 'logros',     name: 'Logros',      icon: 'trophy',   desc: 'Lo que has desbloqueado' },
   { id: 'compras',    name: 'Compras',     icon: 'cart',     desc: 'Lista y precios' },
   { id: 'presupuesto',name: 'Presupuestos',icon: 'wallet',   desc: 'Límites por categoría' },
+  { id: 'escanear',   name: 'Escanear',    icon: 'scan',     desc: 'Un recibo se vuelve gasto' },
+  { id: 'asistente',  name: 'Asistente',   icon: 'sparkles', desc: 'Pregúntale a tu alcancía' },
+  { id: 'recetas',    name: 'Recetas',     icon: 'chef',     desc: 'Cocina y gasta menos' },
   { id: 'datos',      name: 'Tus datos',   icon: 'download', desc: 'Respaldo e importación' },
   { id: 'ajustes',    name: 'Ajustes',     icon: 'settings', desc: 'Moneda, tema, privacidad' },
 ];
@@ -3480,6 +3642,645 @@ function openItemSheet(it) {
   openSheet('Editar artículo', body);
 }
 
+
+/* ── 22. RECETAS ─────────────────────────────────────────────────────────── */
+
+/* Las 30 recetas van escritas dentro del archivo, tal cual estaban en la
+   versión anterior: son tuyas y no dependen de ninguna red, así que la app
+   las muestra igual sin conexión.
+   Campos: emoji, name, cat, time, diff, color, yt (id de YouTube), desc,
+   ingredients [{a: cantidad, n: nombre}], steps[], tip. */
+const RECETAS = [
+
+  {emoji:'🍚',name:'Arroz Blanco Perfecto',cat:'Acompañante',time:'25 min',diff:'Fácil',color:'#ffd60a',yt:'rJENStNAMhw',
+   desc:'El arroz básico de toda cocina latina. Suelto, sabroso y siempre a punto.',
+   ingredients:[{a:'2 tazas',n:'arroz de grano largo'},{a:'3½ tazas',n:'agua caliente'},{a:'3 cdas',n:'aceite vegetal o manteca'},{a:'1 cda',n:'ajo molido'},{a:'1 cda',n:'sal'},{a:'¼ taza',n:'cebolla picada fina (opcional)'}],
+   steps:['Lava el arroz con agua fría hasta que salga casi transparente.','Calienta el aceite, sofríe la cebolla 2 min.','Agrega el ajo 30 seg, luego el arroz. Tuéstalo 3-4 min.','Vierte el agua caliente, añade sal, revuelve una sola vez.','Sube a fuego alto hasta hervor, baja al mínimo y tapa.','Cocina 18 min SIN destapar. Apaga y reposa 5 min más.','Destapa y suelta con tenedor. ¡Listo!'],
+   tip:'💡 No revolver después de tapar, y respetar el reposo final.'},
+  {emoji:'🍗',name:'Pollo Guisado',cat:'Plato fuerte',time:'55 min',diff:'Fácil',color:'#ff7c43',yt:'JiEoys3N1SM',
+   desc:'El clásico pollo de mamá. Jugoso, con salsa espesa y lleno de sabor latino.',
+   ingredients:[{a:'1 kg',n:'muslos o piernas de pollo'},{a:'3 dientes',n:'ajo picado'},{a:'1',n:'cebolla mediana en cubos'},{a:'2',n:'tomates picados o 1 lata'},{a:'1',n:'pimiento verde o rojo picado'},{a:'2 cdas',n:'aceite'},{a:'1 cda',n:'sazón completo'},{a:'1 cdita',n:'comino molido'},{a:'1 cdita',n:'orégano seco'},{a:'al gusto',n:'sal y pimienta'},{a:'½ taza',n:'agua o caldo'},{a:'1',n:'hoja de laurel'}],
+   steps:['Sazona el pollo con sal, pimienta, comino y orégano 15 min.','Dora el pollo en aceite 4 min por lado. Retira.','Sofríe cebolla 3 min, agrega ajo y pimiento 2 min.','Añade tomates y sazón, cocina 5 min hasta formar salsa.','Regresa el pollo, agrega agua y laurel.','Tapa, cocina medio-bajo 30-35 min.','Destapa últimos 10 min para espesar.'],
+   tip:'💡 Usa sofrito casero o añade papa en cubos para más sabor.'},
+  {emoji:'🥩',name:'Picadillo de Res',cat:'Plato fuerte',time:'30 min',diff:'Muy fácil',color:'#e8356b',yt:'xQN3kX8f000',
+   desc:'Carne molida sazonada con verduras. Sirve para tacos, arroz, papas o solo.',
+   ingredients:[{a:'500 g',n:'carne molida de res'},{a:'1',n:'cebolla picada'},{a:'3 dientes',n:'ajo picado'},{a:'2',n:'tomates picados'},{a:'1',n:'pimiento verde o rojo'},{a:'2 cdas',n:'aceite'},{a:'1 cdita',n:'comino'},{a:'1 cdita',n:'orégano'},{a:'al gusto',n:'sal, pimienta, chile'},{a:'2 cdas',n:'salsa de tomate'},{a:'¼ taza',n:'aceitunas (opcional)'}],
+   steps:['Sofríe cebolla y pimiento 3 min.','Añade ajo 1 min.','Agrega carne, rompe grumos hasta dorar 7-8 min.','Escurre grasa si necesario.','Añade tomate, salsa, especias.','Cocina 10 min hasta espesar.','Sirve con arroz, frijoles o tortillas.'],
+   tip:'💡 Agrega cilantro fresco al final para versión dominicana.'},
+  {emoji:'🫘',name:'Frijoles Negros Guisados',cat:'Acompañante',time:'40 min',diff:'Fácil',color:'#b96bff',yt:'gb8VPDqGOR4',
+   desc:'Frijoles cremosos y sazonados. La base de miles de platos latinos.',
+   ingredients:[{a:'2 latas',n:'frijoles negros'},{a:'3 dientes',n:'ajo picado'},{a:'½',n:'cebolla picada'},{a:'¼',n:'pimiento verde'},{a:'2 cdas',n:'aceite de oliva'},{a:'1 cdita',n:'comino'},{a:'1 cdita',n:'orégano'},{a:'½ cdita',n:'azúcar'},{a:'2 cdas',n:'vinagre'},{a:'al gusto',n:'sal y pimienta'},{a:'¼ taza',n:'agua o caldo'}],
+   steps:['Sofríe cebolla y pimiento 3-4 min.','Agrega ajo, comino y orégano 30 seg.','Incorpora frijoles con su líquido.','Aplasta ¼ con tenedor para espesar.','Añade azúcar, vinagre, sal y pimienta.','Cocina bajo 15-20 min.','Sirve sobre arroz o con tostones.'],
+   tip:'💡 El vinagre y azúcar son el secreto cubano. ¡No los omitas!'},
+  {emoji:'🍌',name:'Tostones (Patacones)',cat:'Aperitivo',time:'20 min',diff:'Fácil',color:'#00ff88',yt:'FBNwr7k3Kjc',
+   desc:'Plátano verde frito dos veces. Crujiente por fuera, suave por dentro.',
+   ingredients:[{a:'2',n:'plátanos verdes'},{a:'suficiente',n:'aceite para freír'},{a:'1 taza',n:'agua con sal'},{a:'al gusto',n:'sal gruesa'},{a:'opcional',n:'ajo con aceite'}],
+   steps:['Pela y corta plátanos en rodajas de 3 cm.','Fríe 3-4 min por lado hasta dorados.','Aplana con tostonero o vaso.','Sumerge en agua con sal 10 seg, seca bien.','Fríe nuevamente 2-3 min hasta crujientes.','Escurre y espolvorea sal.','Sirve calientes.'],
+   tip:'💡 El remojo en agua salada da la textura crujiente perfecta.'},
+  {emoji:'🍲',name:'Sopa de Pollo Latina',cat:'Sopa',time:'70 min',diff:'Media',color:'#00e5ff',yt:'xf5TBdvkxmo',
+   desc:'La sopa que cura todo. Caldo dorado, pollo tierno, verduras y fideos.',
+   ingredients:[{a:'1 kg',n:'pollo con hueso'},{a:'2',n:'zanahorias'},{a:'3',n:'ramas de apio'},{a:'1',n:'cebolla entera'},{a:'4 dientes',n:'ajo'},{a:'1',n:'mazorca de maíz (opc.)'},{a:'1',n:'papa en cubos'},{a:'1 taza',n:'fideos o arroz'},{a:'2 litros',n:'agua'},{a:'al gusto',n:'sal, pimienta, comino'},{a:'1 ramo',n:'cilantro'}],
+   steps:['Pon pollo con agua fría, lleva a hervor.','Retira espuma blanca.','Agrega cebolla, ajo, apio, zanahoria, especias.','Tapa parcialmente, cocina 35-40 min.','Retira pollo, deshebra. Descarta cebolla y apio.','Hierve, añade papa y maíz 10 min.','Agrega fideos y carne. Sirve con cilantro.'],
+   tip:'💡 Asa cebolla y ajo en comal seco para caldo más dorado.'},
+  {emoji:'🍛',name:'Arroz con Pollo',cat:'Plato fuerte',time:'60 min',diff:'Media',color:'#ffd60a',yt:'YAr-OxERkU4',
+   desc:'El plato más emblemático. Arroz dorado con pollo en el mismo caldero.',
+   ingredients:[{a:'1 kg',n:'pollo en presas'},{a:'2 tazas',n:'arroz largo'},{a:'3 tazas',n:'caldo caliente'},{a:'1',n:'cebolla picada'},{a:'4 dientes',n:'ajo'},{a:'1',n:'pimiento'},{a:'1 taza',n:'tomate triturado'},{a:'½ taza',n:'arvejas'},{a:'1 cda',n:'sazón con achiote'},{a:'1 cdita',n:'comino · orégano · sal'},{a:'3 cdas',n:'aceite'}],
+   steps:['Sazona pollo, marina 20 min.','Dora en aceite 4 min por lado. Retira.','Sofríe cebolla, pimiento, ajo 4 min.','Añade tomate y sazón 5 min.','Tuesta arroz en sofrito 3 min.','Incorpora caldo, arvejas, pon pollo encima.','Hervor, tapa, mínimo 22 min. Reposa 8 min.'],
+   tip:'💡 NUNCA destapar durante cocción. La paciencia es clave.'},
+  {emoji:'🍠',name:'Plátanos Maduros Fritos',cat:'Acompañante',time:'10 min',diff:'Muy fácil',color:'#ff7c43',
+   desc:'Dulces, caramelizados y suaves. El favorito de toda mesa latina.',
+   ingredients:[{a:'2',n:'plátanos bien maduros (piel negra)'},{a:'3 cdas',n:'aceite o mantequilla'},{a:'opcional',n:'canela y azúcar morena'}],
+   steps:['Pela y corta en diagonal de 1-1.5 cm.','Calienta aceite a fuego medio.','Fríe 2-3 min por lado hasta dorados.','Voltea con cuidado.','Retira sobre papel absorbente.','Espolvorea canela y azúcar si deseas.'],
+   tip:'💡 Entre más negro el plátano, más dulce y delicioso.'},
+
+  {emoji:'🫓',name:'Baleadas Hondureñas',cat:'Plato fuerte',time:'35 min',diff:'Fácil',color:'#f6c65b',
+   desc:'Tortilla de harina suave con frijoles, queso y mantequilla crema.',
+   ingredients:[{a:'3 tazas',n:'harina de trigo'},{a:'1 taza',n:'agua tibia'},{a:'2 cdas',n:'aceite'},{a:'1 cdita',n:'sal'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso rallado'},{a:'1/2 taza',n:'mantequilla crema'}],
+   steps:['Mezcla harina, sal, aceite y agua hasta formar masa suave.','Reposa 20 minutos y divide en bolitas.','Estira tortillas y cocina en comal caliente.','Unta frijoles, agrega queso y mantequilla.','Dobla y sirve caliente.'],
+   tip:'Agrega huevo, aguacate o chorizo para hacerla especial.'},
+  {emoji:'🍲',name:'Sopa de Res Hondureña',cat:'Sopa',time:'95 min',diff:'Media',color:'#60c090',
+   desc:'Caldo completo con carne de res, yuca, elote, repollo, platano y verduras.',
+   ingredients:[{a:'1 kg',n:'costilla o carne de res'},{a:'2',n:'elotes en trozos'},{a:'1',n:'yuca pelada'},{a:'2',n:'zanahorias'},{a:'2',n:'papas'},{a:'1/2',n:'repollo'},{a:'1',n:'platano verde'},{a:'al gusto',n:'cilantro, ajo, sal y comino'}],
+   steps:['Hierve la carne con ajo, sal y comino hasta suavizar.','Agrega elote y yuca, cocina 20 minutos.','Anade papa, zanahoria y platano.','Agrega repollo al final.','Termina con cilantro y sirve con arroz o tortillas.'],
+   tip:'Retira espuma del caldo al inicio para que quede limpio.'},
+  {emoji:'🍗',name:'Tajadas con Pollo',cat:'Plato fuerte',time:'60 min',diff:'Media',color:'#ef9a43',
+   desc:'Pollo servido sobre tajadas de platano verde con repollo, salsa y queso.',
+   ingredients:[{a:'3',n:'platanos verdes'},{a:'1 kg',n:'pollo en piezas'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'salsa de tomate casera'},{a:'1/2 taza',n:'queso rallado'},{a:'suficiente',n:'aceite para freir'}],
+   steps:['Sazona y cocina el pollo hasta dorar o guisar.','Corta platanos en tajadas largas y frie.','Prepara repollo con limon y sal.','Sirve tajadas, pollo, repollo, salsa y queso encima.'],
+   tip:'Las tajadas quedan mejor cortadas delgadas.'},
+  {emoji:'🫘',name:'Catrachas',cat:'Aperitivo',time:'20 min',diff:'Fácil',color:'#d99b52',
+   desc:'Tortillas fritas con frijoles molidos y queso rallado.',
+   ingredients:[{a:'8',n:'tortillas de maiz'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso seco rallado'},{a:'suficiente',n:'aceite'}],
+   steps:['Frie las tortillas hasta dorar.','Calienta los frijoles hasta que esten cremosos.','Unta frijoles sobre cada tortilla.','Termina con queso rallado encima.'],
+   tip:'Sirve de inmediato para que la tortilla siga crujiente.'},
+  {emoji:'🫓',name:'Pupusas Revueltas',cat:'Plato fuerte',time:'55 min',diff:'Media',color:'#f1b653',
+   desc:'Masa de maiz rellena de queso, frijol y chicharron.',
+   ingredients:[{a:'3 tazas',n:'masa harina'},{a:'2 1/2 tazas',n:'agua tibia'},{a:'1 taza',n:'quesillo o mozzarella'},{a:'1 taza',n:'frijoles molidos'},{a:'1 taza',n:'chicharron molido'},{a:'al gusto',n:'sal'}],
+   steps:['Mezcla masa con agua y sal.','Forma bolitas y rellena con queso, frijol y chicharron.','Cierra y aplana con cuidado.','Cocina en comal 4 a 5 minutos por lado.','Sirve con curtido y salsa roja.'],
+   tip:'Moja tus manos con agua y aceite para formar pupusas sin romperlas.'},
+  {emoji:'🫔',name:'Tamales Centroamericanos',cat:'Plato fuerte',time:'150 min',diff:'Difícil',color:'#6fc37c',
+   desc:'Tamales de masa suave con carne, arroz, vegetales y recado en hoja.',
+   ingredients:[{a:'4 tazas',n:'masa de maiz'},{a:'3 tazas',n:'caldo'},{a:'1 taza',n:'manteca o aceite'},{a:'2 tazas',n:'pollo o cerdo cocido'},{a:'1 taza',n:'arroz cocido'},{a:'1 taza',n:'recado o salsa'},{a:'varias',n:'hojas de platano'}],
+   steps:['Prepara masa con caldo y grasa hasta cremosa.','Sofrie el recado y mezcla con la carne.','Pasa hojas por calor para suavizarlas.','Coloca masa, carne, arroz y vegetales.','Envuelve y cocina al vapor 1.5 a 2 horas.'],
+   tip:'La masa debe quedar suave, no seca, antes de envolver.'},
+  {emoji:'🍚',name:'Arroz con Leche',cat:'Postre',time:'45 min',diff:'Fácil',color:'#e8d8a8',
+   desc:'Postre cremoso de arroz, leche, canela y vainilla.',
+   ingredients:[{a:'1 taza',n:'arroz'},{a:'4 tazas',n:'leche'},{a:'1 taza',n:'agua'},{a:'1 raja',n:'canela'},{a:'1/2 taza',n:'azucar'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Cocina arroz con agua y canela hasta suavizar.','Agrega leche y cocina moviendo seguido.','Anade azucar y vainilla.','Cocina hasta cremoso.','Sirve tibio o frio con canela.'],
+   tip:'Mover seguido evita que la leche se pegue al fondo.'},
+  {emoji:'🥤',name:'Horchata Centroamericana',cat:'Bebida',time:'25 min',diff:'Fácil',color:'#d8c08a',
+   desc:'Bebida fresca de arroz, canela, vainilla y leche.',
+   ingredients:[{a:'1 taza',n:'arroz remojado'},{a:'1 raja',n:'canela'},{a:'4 tazas',n:'agua'},{a:'1 taza',n:'leche'},{a:'al gusto',n:'azucar'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Remoja arroz con canela varias horas.','Licua con agua hasta fino.','Cuela bien.','Mezcla con leche, azucar y vainilla.','Sirve con hielo.'],
+   tip:'Tuesta ligeramente el arroz antes de remojar para sabor mas profundo.'},
+  {emoji:'🍅',name:'Chimol Hondureño',cat:'Acompañante',time:'12 min',diff:'Muy fácil',color:'#43c78f',
+   desc:'Pico fresco de tomate, cebolla, chile dulce, cilantro y limon.',
+   ingredients:[{a:'3',n:'tomates picados'},{a:'1/2',n:'cebolla picada'},{a:'1',n:'chile dulce picado'},{a:'1 manojo',n:'cilantro'},{a:'2',n:'limones'},{a:'al gusto',n:'sal'}],
+   steps:['Pica todo en cubitos pequenos.','Mezcla tomate, cebolla, chile y cilantro.','Agrega limon y sal.','Reposa 5 minutos antes de servir.'],
+   tip:'Perfecto para carne asada, tajadas, tacos o catrachas.'},
+  {emoji:'🌮',name:'Enchiladas Hondureñas',cat:'Plato fuerte',time:'50 min',diff:'Media',color:'#e85d75',
+   desc:'Tostadas de maiz con carne molida, repollo, salsa, huevo, queso y vegetales.',
+   ingredients:[{a:'8',n:'tortillas de maiz'},{a:'500 g',n:'carne molida'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'salsa de tomate'},{a:'2',n:'huevos cocidos'},{a:'1 taza',n:'queso rallado'},{a:'1',n:'papa en cubitos'}],
+   steps:['Frie las tortillas hasta tostadas.','Cocina carne con papa, ajo, cebolla y especias.','Prepara repollo con limon y sal.','Arma con tortilla, carne, repollo, salsa, huevo y queso.'],
+   tip:'Arma justo antes de comer para que la tostada no se ablande.'},
+
+  {emoji:'🍗',name:'Pollo Chuco Hondureño',cat:'Plato fuerte',time:'75 min',diff:'Media',color:'#e86f43',country:'HN',
+   desc:'Pollo frito estilo callejero con tajadas, repollo, salsa rosada, chimol y queso.',
+   ingredients:[{a:'1 kg',n:'pollo en piezas'},{a:'3',n:'plátanos verdes'},{a:'2 tazas',n:'repollo rallado'},{a:'1 taza',n:'chimol'},{a:'1/2 taza',n:'salsa rosada'},{a:'1/2 taza',n:'queso rallado'},{a:'al gusto',n:'ajo, comino, sal y pimienta'}],
+   steps:['Sazona el pollo con ajo, comino, sal y pimienta.','Fríe el pollo hasta dorado y bien cocido.','Corta plátanos en tajadas largas y fríe hasta crujientes.','Sirve las tajadas con pollo encima.','Termina con repollo, chimol, salsa rosada y queso.'],
+   tip:'Para sabor de puesto, deja marinar el pollo al menos 1 hora.'},
+  {emoji:'🐚',name:'Sopa de Caracol',cat:'Sopa',time:'80 min',diff:'Media',color:'#44c2c8',country:'HN',
+   desc:'Sopa costeña cremosa con caracol, leche de coco, yuca, plátano y cilantro.',
+   ingredients:[{a:'500 g',n:'caracol limpio'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'yuca en trozos'},{a:'1',n:'plátano verde'},{a:'1',n:'zanahoria'},{a:'1',n:'chile dulce'},{a:'al gusto',n:'cilantro, ajo, sal y achiote'}],
+   steps:['Sofríe ajo, chile dulce y achiote.','Agrega agua, yuca, zanahoria y plátano.','Cuando las verduras estén suaves, añade leche de coco.','Agrega el caracol al final y cocina pocos minutos.','Termina con cilantro fresco.'],
+   tip:'No cocines demasiado el caracol para que no quede duro.'},
+  {emoji:'🥘',name:'Yuca con Chicharrón',cat:'Plato fuerte',time:'55 min',diff:'Media',color:'#d7a451',country:'HN',
+   desc:'Yuca suave con chicharrón crujiente, repollo curtido, salsa y chimol.',
+   ingredients:[{a:'1 kg',n:'yuca pelada'},{a:'500 g',n:'chicharrón'},{a:'2 tazas',n:'repollo curtido'},{a:'1 taza',n:'salsa de tomate'},{a:'1/2 taza',n:'chimol'},{a:'al gusto',n:'sal y limón'}],
+   steps:['Hierve la yuca con sal hasta que esté suave.','Retira la hebra del centro.','Calienta o fríe el chicharrón hasta crujiente.','Sirve yuca, chicharrón, repollo, salsa y chimol.'],
+   tip:'Un chorrito de limón levanta todo el plato.'},
+  {emoji:'🥟',name:'Pastelitos Hondureños',cat:'Aperitivo',time:'65 min',diff:'Media',color:'#f0b44e',country:'HN',
+   desc:'Pastelitos fritos de masa de maíz rellenos de carne, arroz y papa.',
+   ingredients:[{a:'3 tazas',n:'masa de maíz'},{a:'300 g',n:'carne molida'},{a:'1 taza',n:'arroz cocido'},{a:'1',n:'papa en cubitos'},{a:'1 cdita',n:'achiote'},{a:'suficiente',n:'aceite para freír'},{a:'al gusto',n:'repollo y salsa'}],
+   steps:['Cocina carne con papa, achiote y especias.','Mezcla con arroz cocido.','Forma tortillas de masa, rellena y dobla.','Sella los bordes y fríe hasta dorar.','Sirve con repollo y salsa.'],
+   tip:'No sobrellenes para que no se abran al freír.'},
+  {emoji:'🌽',name:'Montucas Hondureñas',cat:'Plato fuerte',time:'130 min',diff:'Difícil',color:'#e8c85a',country:'HN',
+   desc:'Tamales de elote tierno rellenos de pollo o cerdo, envueltos en tusa.',
+   ingredients:[{a:'8',n:'elotes tiernos desgranados'},{a:'2 tazas',n:'pollo guisado desmenuzado'},{a:'1 taza',n:'recado'},{a:'1/2 taza',n:'manteca o aceite'},{a:'al gusto',n:'sal y azúcar'},{a:'varias',n:'tusas de elote'}],
+   steps:['Muele o licúa el maíz tierno.','Mezcla con manteca, sal y un toque de azúcar.','Coloca masa y relleno en tusas.','Envuelve bien y cocina al vapor hasta firme.'],
+   tip:'La masa debe quedar húmeda, no líquida.'},
+  {emoji:'🍲',name:'Tapado Olanchano',cat:'Sopa',time:'110 min',diff:'Difícil',color:'#8fbf5f',country:'HN',
+   desc:'Guiso hondureño potente con carnes, plátano, yuca, chorizo y verduras.',
+   ingredients:[{a:'500 g',n:'costilla de res'},{a:'300 g',n:'cerdo o chorizo'},{a:'1',n:'yuca'},{a:'2',n:'plátanos verdes'},{a:'2',n:'papas'},{a:'1/2',n:'repollo'},{a:'al gusto',n:'culantro, ajo, cebolla y achiote'}],
+   steps:['Hierve las carnes con ajo, cebolla y sal hasta suavizar.','Agrega yuca, plátano y papa.','Añade chorizo y achiote para dar color.','Termina con repollo y culantro.','Sirve bien caliente.'],
+   tip:'El reposo de 10 minutos mejora el sabor del caldo.'},
+  {emoji:'🥣',name:'Sopa Marinera Hondureña',cat:'Sopa',time:'70 min',diff:'Media',color:'#4aaac8',country:'HN',
+   desc:'Caldo de mariscos con leche de coco, pescado, camarón y verduras.',
+   ingredients:[{a:'400 g',n:'pescado en trozos'},{a:'300 g',n:'camarón'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'yuca'},{a:'1',n:'plátano verde'},{a:'1',n:'chile dulce'},{a:'al gusto',n:'cilantro, ajo y sal'}],
+   steps:['Sofríe ajo y chile dulce.','Agrega agua, yuca y plátano hasta suavizar.','Añade leche de coco.','Incorpora pescado y camarón al final.','Cocina hasta que los mariscos estén listos.'],
+   tip:'Agrega los mariscos al final para que queden jugosos.'},
+  {emoji:'☕',name:'Rosquillas en Miel',cat:'Postre',time:'35 min',diff:'Fácil',color:'#c98a4a',country:'HN',
+   desc:'Rosquillas hondureñas bañadas en miel de rapadura con canela.',
+   ingredients:[{a:'10',n:'rosquillas hondureñas'},{a:'2 tazas',n:'agua'},{a:'1 taza',n:'rapadura o panela'},{a:'1 raja',n:'canela'},{a:'3',n:'clavos de olor'}],
+   steps:['Hierve agua con rapadura, canela y clavos.','Cocina hasta formar miel ligera.','Agrega las rosquillas y deja que absorban.','Sirve tibias con café.'],
+   tip:'Déjalas reposar unos minutos para que se impregnen bien.'},
+  {emoji:'🍞',name:'Semitas Hondureñas',cat:'Postre',time:'120 min',diff:'Media',color:'#b77945',country:'HN',
+   desc:'Pan dulce hondureño con relleno de rapadura, perfecto para café.',
+   ingredients:[{a:'4 tazas',n:'harina de trigo'},{a:'1 taza',n:'rapadura rallada'},{a:'1/2 taza',n:'manteca o mantequilla'},{a:'1 taza',n:'leche tibia'},{a:'2 cditas',n:'levadura'},{a:'1 cdita',n:'canela'}],
+   steps:['Activa la levadura con leche tibia.','Mezcla harina, grasa y forma una masa suave.','Reposa hasta duplicar.','Rellena con rapadura y canela.','Hornea hasta dorar.'],
+   tip:'Sirve con café negro para una merienda bien catracha.'},
+  {emoji:'🌽',name:'Atol de Elote Hondureño',cat:'Bebida',time:'30 min',diff:'Fácil',color:'#f0d06a',country:'HN',
+   desc:'Bebida espesa y dulce de maíz tierno, leche, canela y vainilla.',
+   ingredients:[{a:'4',n:'elotes tiernos'},{a:'3 tazas',n:'leche'},{a:'1 taza',n:'agua'},{a:'1/2 taza',n:'azúcar'},{a:'1 raja',n:'canela'},{a:'1 cdita',n:'vainilla'}],
+   steps:['Desgrana y licúa el maíz con agua.','Cuela y cocina con leche y canela.','Mueve constantemente hasta espesar.','Agrega azúcar y vainilla.','Sirve caliente o tibio.'],
+   tip:'Mover todo el tiempo evita grumos y que se pegue.'},
+  {emoji:'🥩',name:'Carne Asada Catracha',cat:'Plato fuerte',time:'50 min',diff:'Fácil',color:'#d45757',country:'HN',
+   desc:'Carne asada con chimol, frijoles, queso, aguacate y tortillas.',
+   ingredients:[{a:'700 g',n:'carne para asar'},{a:'1 taza',n:'chimol'},{a:'2 tazas',n:'frijoles fritos'},{a:'1 taza',n:'queso rallado'},{a:'1',n:'aguacate'},{a:'8',n:'tortillas'},{a:'al gusto',n:'sal, pimienta, naranja agria'}],
+   steps:['Sazona la carne con sal, pimienta y naranja agria.','Asa a fuego alto hasta dorar.','Calienta frijoles y tortillas.','Sirve con chimol, queso y aguacate.'],
+   tip:'La naranja agria le da ese toque de parrillada catracha.'},
+  {emoji:'🍌',name:'Machuca Garífuna',cat:'Plato fuerte',time:'75 min',diff:'Media',color:'#61b985',country:'HN',
+   desc:'Plátano majado servido con sopa de coco y pescado al estilo garífuna.',
+   ingredients:[{a:'4',n:'plátanos verdes'},{a:'500 g',n:'pescado'},{a:'2 tazas',n:'leche de coco'},{a:'1',n:'chile dulce'},{a:'1',n:'cebolla'},{a:'al gusto',n:'cilantro, ajo y sal'}],
+   steps:['Hierve plátanos verdes hasta suavizar.','Maja hasta formar una masa rústica.','Prepara caldo con leche de coco, ajo, chile y cebolla.','Agrega pescado y cocina hasta listo.','Sirve la machuca con la sopa encima.'],
+   tip:'Majar el plátano caliente facilita lograr buena textura.'}
+];
+
+const CATS_RECETA = ['Todas'].concat(
+  RECETAS.map(function (r) { return r.cat; })
+    .filter(function (v, i, a) { return a.indexOf(v) === i; })
+);
+let recetaCat = 'Todas';
+let recetaQ = '';
+
+VIEWS.recetas = function () {
+  const q = recetaQ.trim().toLowerCase();
+  const list = RECETAS.filter(function (r) {
+    if (recetaCat !== 'Todas' && r.cat !== recetaCat) return false;
+    if (!q) return true;
+    return (r.name + ' ' + r.desc + ' ' +
+      r.ingredients.map(function (i) { return i.n; }).join(' ')).toLowerCase().indexOf(q) >= 0;
+  });
+
+  return '' +
+  '<div class="subhead">' +
+    '<button class="iconbtn" type="button" data-act="tab" data-tab="mas" aria-label="Volver">' +
+      ico('left', 18) + '</button>' +
+    '<h1 class="screen-title grow">Recetas</h1>' +
+  '</div>' +
+
+  '<p class="t-cap faint">Cocinar en casa es la forma más rápida de bajar el gasto en comida. ' +
+    'Toca una receta para ver los pasos o mandar los ingredientes a tu lista.</p>' +
+
+  '<div class="searchbox">' +
+    '<span class="searchbox__ico">' + ico('search', 18) + '</span>' +
+    '<input class="input searchbox__in" id="rq" type="search" placeholder="Buscar receta o ingrediente…" ' +
+      'value="' + esc(recetaQ) + '" autocomplete="off">' +
+  '</div>' +
+
+  '<div class="chiprow">' +
+    CATS_RECETA.map(function (c) {
+      return '<button class="chip' + (recetaCat === c ? ' is-on' : '') + '" type="button" ' +
+             'data-act="receta-cat" data-v="' + esc(c) + '">' + esc(c) + '</button>';
+    }).join('') +
+  '</div>' +
+
+  (list.length
+    ? '<div class="recetas">' +
+        list.map(function (r) {
+          const i = RECETAS.indexOf(r);
+          return '<button class="receta" type="button" data-act="ver-receta" data-i="' + i + '">' +
+            '<span class="receta__emoji" style="background:' + r.color + '22">' + r.emoji + '</span>' +
+            '<span class="receta__name">' + esc(r.name) + '</span>' +
+            '<span class="receta__meta t-cap faint">' + esc(r.time) + ' · ' + esc(r.diff) + '</span>' +
+          '</button>';
+        }).join('') +
+      '</div>'
+    : '<section class="card"><div class="empty">' +
+        '<span class="empty__icon">' + ico('chef', 38) + '</span>' +
+        '<div class="empty__title">Sin recetas con esa búsqueda</div>' +
+      '</div></section>');
+};
+
+function openRecetaSheet(i) {
+  const r = RECETAS[i];
+  if (!r) return;
+  const body = '' +
+  '<div class="receta__hero" style="background:' + r.color + '1f">' +
+    '<span class="receta__heroEmoji">' + r.emoji + '</span>' +
+    '<div>' +
+      '<div class="t-cap faint">' + esc(r.cat) + ' · ' + esc(r.time) + ' · ' + esc(r.diff) + '</div>' +
+      '<p class="t-sub">' + esc(r.desc) + '</p>' +
+    '</div>' +
+  '</div>' +
+
+  '<div>' +
+    '<div class="spread">' +
+      '<div class="card__label">Ingredientes</div>' +
+      '<button class="btn btn--soft" type="button" data-act="receta-a-compras" data-i="' + i + '">' +
+        ico('cart', 16) + 'A mi lista</button>' +
+    '</div>' +
+    '<ul class="ingredientes">' +
+      r.ingredients.map(function (g) {
+        return '<li><b class="num">' + esc(g.a) + '</b> ' + esc(g.n) + '</li>';
+      }).join('') +
+    '</ul>' +
+  '</div>' +
+
+  '<div>' +
+    '<div class="card__label">Pasos</div>' +
+    '<ol class="pasos">' +
+      r.steps.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') +
+    '</ol>' +
+  '</div>' +
+
+  (r.tip ? '<p class="t-cap tip">' + esc(r.tip) + '</p>' : '') +
+
+  (r.yt
+    /* Se enlaza al vídeo en vez de incrustarlo: el <iframe> de YouTube carga
+       scripts de terceros y muchos vídeos bloquean la incrustación, así que en
+       la versión anterior a menudo salía un recuadro negro. */
+    ? '<a class="btn btn--soft btn--block" target="_blank" rel="noopener noreferrer" ' +
+      'href="https://www.youtube.com/watch?v=' + esc(r.yt) + '">Ver el video en YouTube</a>'
+    : '');
+
+  openSheet(r.name, body);
+}
+
+/* ── 23. VISTA: ESCANEAR ─────────────────────────────────────────────────── */
+
+/* Lee un recibo con el modelo de visión de Groq. La clave es del usuario, se
+   guarda solo en este teléfono y nunca entra en los respaldos. */
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_VISION = 'meta-llama/llama-4-scout-17b-16e-instruct';
+const GROQ_CHAT = 'llama-3.3-70b-versatile';
+const KEY_GROQ = 'groq_api_key';
+
+function groqKey() {
+  try { return localStorage.getItem(KEY_GROQ) || ''; } catch (e) { return ''; }
+}
+function setGroqKey(v) {
+  try { v ? localStorage.setItem(KEY_GROQ, v) : localStorage.removeItem(KEY_GROQ); } catch (e) {}
+}
+
+let scanItems = null;    /* resultado del último escaneo, sin confirmar */
+let scanBusy = false;
+
+VIEWS.escanear = function () {
+  const key = groqKey();
+  return '' +
+  '<div class="subhead">' +
+    '<button class="iconbtn" type="button" data-act="tab" data-tab="mas" aria-label="Volver">' +
+      ico('left', 18) + '</button>' +
+    '<h1 class="screen-title grow">Escanear recibo</h1>' +
+  '</div>' +
+
+  (!key
+    ? '<section class="card stack">' +
+        '<div>' +
+          '<div class="t-sub" style="font-weight:650">Hace falta una clave de Groq</div>' +
+          '<p class="t-cap faint">La foto del recibo la lee un modelo de Groq. La clave es tuya, ' +
+            'se guarda solo en este teléfono y no entra en los respaldos.</p>' +
+        '</div>' +
+        '<input class="input" id="gk" type="password" placeholder="Pega aquí tu clave" ' +
+          'autocomplete="off" spellcheck="false">' +
+        '<button class="btn btn--primary btn--block" type="button" data-act="guardar-key">Guardar clave</button>' +
+        '<a class="t-cap" target="_blank" rel="noopener noreferrer" ' +
+          'href="https://console.groq.com/keys">Sacar una clave gratis en console.groq.com</a>' +
+      '</section>'
+    : '<section class="card stack">' +
+        '<button class="scanbox" type="button" data-act="scan-foto"' + (scanBusy ? ' disabled' : '') + '>' +
+          ico('camera', 30) +
+          '<span class="t-sub">' + (scanBusy ? 'Leyendo el recibo…' : 'Tomar o elegir foto') + '</span>' +
+          '<span class="t-cap faint">Se detectan los artículos y el total</span>' +
+        '</button>' +
+        '<input id="scanIn" type="file" accept="image/*" hidden>' +
+      '</section>') +
+
+  (scanItems
+    ? '<section class="card stack">' +
+        '<div class="spread">' +
+          '<div class="card__label">Lo que se detectó</div>' +
+          '<span class="t-cap faint">Desmarca lo que no sea tuyo</span>' +
+        '</div>' +
+        scanItems.map(function (it, i) {
+          return '<label class="scanrow">' +
+            '<input type="checkbox" class="scanrow__ck" data-i="' + i + '"' + (it.on ? ' checked' : '') + '>' +
+            '<span class="grow">' + esc(it.name) + '</span>' +
+            '<span class="num">' + money(it.price) + '</span>' +
+          '</label>';
+        }).join('') +
+        '<div class="spread"><b>Total marcado</b>' +
+          '<b class="num neg" id="scanTotal">' +
+            money(scanItems.reduce(function (s, i) { return s + (i.on ? i.price : 0); }, 0)) + '</b></div>' +
+        '<button class="btn btn--primary btn--block btn--lg" type="button" data-act="scan-gasto">' +
+          'Registrar como gasto</button>' +
+        '<button class="btn btn--soft btn--block" type="button" data-act="scan-compras">' +
+          'Mandar a la lista de compras</button>' +
+        '<button class="btn btn--ghost btn--block" type="button" data-act="scan-descartar">Descartar</button>' +
+      '</section>'
+    : '') +
+
+  (key
+    ? '<section class="card card--flush">' +
+        '<button class="row" type="button" data-act="borrar-key">' +
+          '<span class="badge badge--warn">' + ico('trash', 18) + '</span>' +
+          '<span class="row__body">' +
+            '<span class="row__title">Quitar la clave de Groq</span>' +
+            '<span class="row__meta">Se borra de este teléfono</span>' +
+          '</span>' +
+        '</button>' +
+      '</section>'
+    : '');
+};
+
+function leerRecibo(file) {
+  scanBusy = true;
+  render(true);
+  return encogerFoto(file)
+    .then(function (r) {
+      return new Promise(function (res, rej) {
+        const fr = new FileReader();
+        fr.onload = function () { res(String(fr.result)); };
+        fr.onerror = function () { rej(new Error('no se pudo leer la foto')); };
+        fr.readAsDataURL(r.blob);
+      });
+    })
+    .then(function (dataUrl) {
+      return fetch(GROQ_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + groqKey() },
+        body: JSON.stringify({
+          model: GROQ_VISION,
+          temperature: 0,
+          max_tokens: 1200,
+          response_format: { type: 'json_object' },
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text:
+                'Lee este recibo de compra. Devuelve SOLO un objeto JSON con esta forma exacta: ' +
+                '{"items":[{"name":"nombre del artículo","price":0.00}],"total":0.00,"currency":"USD"}. ' +
+                'Usa punto decimal. No inventes artículos que no aparezcan. ' +
+                'Si no distingues un precio, omite ese artículo. Nombres en español, cortos.' },
+              { type: 'image_url', image_url: { url: dataUrl } },
+            ],
+          }],
+        }),
+      });
+    })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.status === 401 ? 'clave inválida' : 'error ' + res.status);
+      return res.json();
+    })
+    .then(function (d) {
+      const raw = d && d.choices && d.choices[0] && d.choices[0].message &&
+                  d.choices[0].message.content;
+      if (!raw) throw new Error('respuesta vacía');
+      let obj;
+      try { obj = JSON.parse(raw); } catch (e) {
+        /* A veces el modelo envuelve el JSON en texto; se rescata el objeto. */
+        const m = String(raw).match(/\{[\s\S]*\}/);
+        if (!m) throw new Error('respuesta ilegible');
+        obj = JSON.parse(m[0]);
+      }
+      const items = (obj.items || []).map(function (it) {
+        return { name: String(it.name || 'Artículo').slice(0, 60), price: Number(it.price) || 0, on: true };
+      }).filter(function (it) { return it.price > 0; });
+      if (!items.length) throw new Error('no se distinguió ningún artículo');
+      /* El recibo está en la moneda que ves; se convierte a la base al guardar. */
+      scanItems = items.map(function (it) { return { name: it.name, price: toBase(it.price), on: true }; });
+      scanBusy = false;
+      render(true);
+      toast(items.length + ' artículo' + (items.length === 1 ? '' : 's') + ' detectado' +
+            (items.length === 1 ? '' : 's'), 'ok');
+    })
+    .catch(function (err) {
+      scanBusy = false;
+      scanItems = null;
+      render(true);
+      toast('No se pudo leer el recibo: ' + (err.message || 'falló la conexión'), 'bad', 5000);
+    });
+}
+
+/* ── 24. VISTA: ASISTENTE ────────────────────────────────────────────────── */
+
+let chat = [];       /* {rol:'yo'|'ella', txt} — solo en memoria */
+let chatBusy = false;
+
+VIEWS.asistente = function () {
+  const key = groqKey();
+  return '' +
+  '<div class="subhead">' +
+    '<button class="iconbtn" type="button" data-act="tab" data-tab="mas" aria-label="Volver">' +
+      ico('left', 18) + '</button>' +
+    '<h1 class="screen-title grow">Asistente</h1>' +
+    (chat.length ? '<button class="btn btn--ghost" type="button" data-act="chat-limpiar">Limpiar</button>' : '') +
+  '</div>' +
+
+  '<div class="chat" id="chatBox">' +
+    (chat.length
+      ? chat.map(function (m) {
+          return '<div class="burbuja burbuja--' + m.rol + '">' + esc(m.txt) + '</div>';
+        }).join('') +
+        (chatBusy ? '<div class="burbuja burbuja--ella burbuja--pensando">' +
+          '<i></i><i></i><i></i></div>' : '')
+      : '<div class="empty">' +
+          '<span class="empty__icon">' + ico('sparkles', 36) + '</span>' +
+          '<div class="empty__title">Pregúntame de tu dinero</div>' +
+          '<div class="empty__text">Veo tus movimientos, tus metas y tus presupuestos. ' +
+            (key ? '' : 'Sin clave de Groq respondo con lo básico, que también sirve.') + '</div>' +
+        '</div>') +
+  '</div>' +
+
+  '<div class="chiprow">' +
+    ['¿Cómo voy este mes?', '¿En qué gasto más?', '¿Cuánto llevo ahorrado?',
+     '¿Llego a mi meta?', 'Dame un consejo'].map(function (s) {
+      return '<button class="chip" type="button" data-act="chat-chip" data-q="' + esc(s) + '">' +
+             esc(s) + '</button>';
+    }).join('') +
+  '</div>' +
+
+  '<div class="addbar">' +
+    '<input class="input grow" id="chatIn" type="text" placeholder="Escribe tu pregunta…" ' +
+      'maxlength="300" autocomplete="off">' +
+    '<button class="btn btn--primary addbar__go" type="button" data-act="chat-enviar" ' +
+      'aria-label="Enviar">' + ico('up', 20) + '</button>' +
+  '</div>' +
+
+  (key
+    ? '<p class="t-cap faint">Con clave de Groq las respuestas son más completas. ' +
+      '<button class="linkbtn" type="button" data-act="borrar-key">Quitar la clave</button></p>'
+    : '<section class="card stack">' +
+        '<p class="t-cap faint">¿Quieres respuestas más completas? Pega una clave de Groq. ' +
+          'Se guarda solo en este teléfono.</p>' +
+        '<input class="input" id="gk" type="password" placeholder="Clave de Groq" autocomplete="off">' +
+        '<button class="btn btn--soft btn--block" type="button" data-act="guardar-key">Guardar clave</button>' +
+      '</section>');
+};
+
+/* Retrato de tus finanzas que se manda como contexto. Son cifras agregadas,
+   nunca notas ni nada que identifique. */
+function retrato() {
+  const t = totals();
+  const m = thisMonth();
+  const mt = totals(inRange(m.from, m.to));
+  const w = lastNDays(7);
+  const wt = totals(inRange(w.from, w.to));
+  const cats = byCategory(m.from, m.to).slice(0, 5);
+  return {
+    moneda: state.currency,
+    total: { ganado: r2(t.earned), ahorrado: r2(t.saved), gastado: r2(t.spent), saldo: r2(t.balance) },
+    este_mes: { ganado: r2(mt.earned), ahorrado: r2(mt.saved), gastado: r2(mt.spent) },
+    ultimos_7_dias: { ahorrado: r2(wt.saved), gastado: r2(wt.spent) },
+    racha_dias: streak(),
+    nivel: level().now.name,
+    top_categorias_mes: cats.map(function (c) { return { categoria: c.cat.name, gastado: r2(c.amount) }; }),
+    metas: state.goals.map(function (g) {
+      return { nombre: g.name, objetivo: r2(g.target), llevo: r2(goalSaved(g)),
+               porcentaje: goalPct(g), cumplida: g.done };
+    }),
+    presupuestos: state.budgets.map(function (b) {
+      return { categoria: cat(b.cat).name, tope: r2(b.amount), usado: r2(budgetSpent(b)), periodo: b.period };
+    }),
+    compras_pendientes: state.shop.filter(function (i) { return !i.done; }).length,
+  };
+}
+function r2(n) { return Math.round(toView(n) * 100) / 100; }
+
+/* Respuestas sin conexión ni clave. En la versión anterior este motor existía
+   pero nunca se llamaba: sin clave la app simplemente no contestaba. */
+function responderLocal(q) {
+  const s = q.toLowerCase();
+  const t = totals();
+  const m = thisMonth();
+  const mt = totals(inRange(m.from, m.to));
+  const cats = byCategory(m.from, m.to);
+
+  if (/gast(o|as|é|e)\b|en qu[eé]|categor/.test(s)) {
+    if (!cats.length) return 'Todavía no tienes gastos registrados este mes.';
+    const top = cats[0];
+    return 'Este mes lo que más te cuesta es ' + top.cat.name + ': ' + money(top.amount) +
+      ' de ' + money(mt.spent) + ' en total, o sea el ' + pct(top.amount, mt.spent) + '%.' +
+      (cats[1] ? ' Después va ' + cats[1].cat.name + ' con ' + money(cats[1].amount) + '.' : '');
+  }
+  if (/ahorr|alcanc[ií]a|guardad/.test(s)) {
+    const lv = level();
+    return 'Llevas ' + money(t.saved) + ' en la alcancía, nivel ' + lv.now.name + '.' +
+      (lv.next ? ' Con ' + money(lv.next.min - t.saved) + ' más llegas a ' + lv.next.name + '.' : '') +
+      ' Este mes has guardado ' + money(mt.saved) + '.';
+  }
+  if (/meta|objetivo|llego/.test(s)) {
+    const abiertas = state.goals.filter(function (g) { return !g.done; });
+    if (!state.goals.length) return 'Todavía no tienes metas. Crea una en la pestaña Metas y le doy seguimiento.';
+    if (!abiertas.length) return '¡Ya cumpliste todas tus metas! Puedes crear otra cuando quieras.';
+    const g = abiertas.sort(function (a, b) { return goalPct(b) - goalPct(a); })[0];
+    const falta = g.target - goalSaved(g);
+    const dias = g.due ? daysBetween(dayKey(), g.due) : null;
+    return 'Tu meta más cerca es "' + g.name + '": vas al ' + goalPct(g) + '%, te faltan ' +
+      money(falta) + '.' + (dias && dias > 0
+        ? ' Con ' + dias + ' días por delante necesitas guardar ' + money(falta / dias) + ' al día.'
+        : '');
+  }
+  if (/presupuest|tope|l[ií]mite/.test(s)) {
+    if (!state.budgets.length) return 'No tienes presupuestos. Ponle un tope a una categoría y te aviso al acercarte.';
+    return state.budgets.map(function (b) {
+      const u = budgetSpent(b);
+      return cat(b.cat).name + ': ' + money(u) + ' de ' + money(b.amount) +
+        (u > b.amount ? ' (te pasaste)' : ' (' + pct(u, b.amount) + '%)');
+    }).join('. ') + '.';
+  }
+  if (/c[oó]mo voy|mes|resumen|balance|saldo/.test(s)) {
+    return 'Este mes: ganaste ' + money(mt.earned) + ', ahorraste ' + money(mt.saved) +
+      ' y gastaste ' + money(mt.spent) + '. Tu saldo es ' + money(t.balance) +
+      ' y llevas ' + streak() + ' días seguidos registrando.';
+  }
+  if (/consejo|ayuda|tip|qu[eé] hago/.test(s)) {
+    if (mt.spent > mt.earned && mt.earned > 0) {
+      return 'Este mes gastaste más de lo que ganaste. Mira la pestaña Análisis: ' +
+        'la categoría de arriba suele ser la más fácil de recortar.';
+    }
+    if (mt.earned > 0 && mt.saved / mt.earned < 0.1) {
+      return 'Estás guardando menos del 10% de lo que ganas. Prueba a apartar ' +
+        money(mt.earned * 0.2 / 30) + ' cada día: en un mes son ' + money(mt.earned * 0.2) + '.';
+    }
+    return 'Vas bien. Lo que más ayuda ahora es no romper la racha: registra algo cada día, ' +
+      'aunque sea un gasto chico.';
+  }
+  return 'Puedo contarte cómo vas este mes, en qué gastas más, cuánto llevas ahorrado, ' +
+    'si llegas a tu meta o cómo van tus presupuestos. Pregúntame cualquiera de esas.';
+}
+
+function chatEnviar(txt) {
+  const q = String(txt || '').trim();
+  if (!q || chatBusy) return;
+  chat.push({ rol: 'yo', txt: q });
+  const key = groqKey();
+
+  if (!key) {
+    chat.push({ rol: 'ella', txt: responderLocal(q) });
+    render(true);
+    scrollChat();
+    return;
+  }
+
+  chatBusy = true;
+  render(true);
+  scrollChat();
+
+  const historial = chat.filter(function (m) { return m.rol !== 'sys'; })
+    .slice(-8).map(function (m) {
+      return { role: m.rol === 'yo' ? 'user' : 'assistant', content: m.txt };
+    });
+
+  fetch(GROQ_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+    body: JSON.stringify({
+      model: GROQ_CHAT,
+      temperature: 0.5,
+      max_tokens: 400,
+      messages: [{
+        role: 'system',
+        content:
+          'Eres el asistente de "Mi Alcancía", una app de ahorro personal. Respondes en ' +
+          'español latinoamericano, de tú, en tono cercano y directo. Máximo 4 frases. ' +
+          'Nunca inventes cifras: usa solo las del JSON. Si te falta un dato, dilo. ' +
+          'Los importes ya vienen en la moneda del usuario.\n' +
+          'Datos del usuario: ' + JSON.stringify(retrato()),
+      }].concat(historial),
+    }),
+  })
+    .then(function (r) {
+      if (!r.ok) throw new Error(r.status === 401 ? 'clave inválida' : 'error ' + r.status);
+      return r.json();
+    })
+    .then(function (d) {
+      const txt = d && d.choices && d.choices[0] && d.choices[0].message &&
+                  d.choices[0].message.content;
+      chatBusy = false;
+      chat.push({ rol: 'ella', txt: (txt || '').trim() || responderLocal(q) });
+      render(true);
+      scrollChat();
+    })
+    .catch(function (err) {
+      /* Sin red o con la clave mala se contesta igual, con el motor local: es
+         mejor una respuesta útil que un mensaje de error. */
+      chatBusy = false;
+      chat.push({ rol: 'ella', txt: responderLocal(q) });
+      render(true);
+      scrollChat();
+      toast('Sin conexión con Groq (' + (err.message || 'falló') + '): respondo con lo local', 'bad', 4000);
+    });
+}
+
+function scrollChat() {
+  const b = $('#chatBox');
+  if (b) b.scrollTop = b.scrollHeight;
+  const sc = $('#scroll');
+  if (sc) sc.scrollTop = sc.scrollHeight;
+}
+
 /* ── 20. VISTA: TUS DATOS ────────────────────────────────────────────────── */
 
 VIEWS.datos = function () {
@@ -4172,6 +4973,151 @@ ACTIONS['borrar-todo-ok'] = function () {
   render();
   toast('Todo borrado');
 };
+
+/* — Recetas — */
+
+ACTIONS['receta-cat'] = function (el) { recetaCat = el.dataset.v; render(true); };
+ACTIONS['ver-receta'] = function (el) { openRecetaSheet(+el.dataset.i); };
+
+ACTIONS['receta-a-compras'] = function (el) {
+  const r = RECETAS[+el.dataset.i];
+  if (!r) return;
+  let nuevos = 0;
+  r.ingredients.forEach(function (g) {
+    const nombre = String(g.n).trim();
+    if (!nombre) return;
+    const ya = state.shop.some(function (i) {
+      return !i.done && i.name.toLowerCase() === nombre.toLowerCase();
+    });
+    if (ya) return;
+    const mem = state.prices.filter(function (p) {
+      return p.name.toLowerCase() === nombre.toLowerCase();
+    })[0];
+    state.shop.push({
+      id: uid(), name: nombre.slice(0, 80), qty: String(g.a || '').slice(0, 20),
+      price: mem ? mem.price : 0, cat: 'food', prio: 'media',
+      done: false, logged: false, ts: Date.now(),
+    });
+    nuevos++;
+  });
+  save(true);
+  closeSheet(true);
+  try { history.back(); } catch (e) {}
+  haptic(12);
+  toast(nuevos
+    ? nuevos + ' ingrediente' + (nuevos === 1 ? '' : 's') + ' a tu lista'
+    : 'Ya tenías todos en la lista', nuevos ? 'ok' : null);
+};
+
+/* — Escanear — */
+
+ACTIONS['guardar-key'] = function () {
+  const v = (($('#gk') || {}).value || '').trim();
+  if (!v) { toast('Pega la clave primero', 'bad'); return; }
+  setGroqKey(v);
+  render(true);
+  toast('Clave guardada en este teléfono', 'ok');
+};
+
+ACTIONS['borrar-key'] = function () {
+  setGroqKey('');
+  render(true);
+  toast('Clave borrada');
+};
+
+ACTIONS['scan-foto'] = function () {
+  const inp = $('#scanIn');
+  if (!inp) return;
+  inp.value = '';
+  inp.onchange = function () {
+    const f = inp.files && inp.files[0];
+    if (f) leerRecibo(f);
+  };
+  inp.click();
+};
+
+ACTIONS['scan-descartar'] = function () { scanItems = null; render(true); };
+
+ACTIONS['scan-gasto'] = function () {
+  const sel = (scanItems || []).filter(function (i) { return i.on; });
+  if (!sel.length) { toast('Marca al menos un artículo', 'bad'); return; }
+  const hoy = dayKey();
+  let total = 0;
+  sel.forEach(function (i, n) {
+    total += i.price;
+    state.entries.push({
+      id: uid(), date: hoy, kind: 'spend', amount: i.price,
+      cat: 'shopping', note: i.name, ts: Date.now() + n, grp: null, src: 'scan',
+    });
+  });
+  state.entries.sort(function (a, b) { return b.ts - a.ts; });
+  const r = reconcile();
+  scanItems = null;
+  save(true);
+  haptic(14);
+  go('actividad');
+  toast(money(total) + ' en ' + sel.length + ' gasto' + (sel.length === 1 ? '' : 's'), 'ok');
+  celebrate(r.nuevos);
+};
+
+ACTIONS['scan-compras'] = function () {
+  const sel = (scanItems || []).filter(function (i) { return i.on; });
+  if (!sel.length) { toast('Marca al menos un artículo', 'bad'); return; }
+  sel.forEach(function (i) {
+    state.shop.push({
+      id: uid(), name: i.name, qty: '', price: i.price, cat: 'shopping',
+      prio: 'media', done: false, logged: false, ts: Date.now(),
+    });
+  });
+  scanItems = null;
+  save(true);
+  go('compras');
+  toast(sel.length + ' artículo' + (sel.length === 1 ? '' : 's') + ' a tu lista', 'ok');
+};
+
+/* — Asistente — */
+
+ACTIONS['chat-enviar'] = function () {
+  const el = $('#chatIn');
+  if (!el) return;
+  const q = el.value;
+  el.value = '';
+  chatEnviar(q);
+};
+ACTIONS['chat-chip'] = function (el) { chatEnviar(el.dataset.q); };
+ACTIONS['chat-limpiar'] = function () { chat = []; render(true); };
+ACTIONS.noop = function () {};
+
+/* Enter envía en el chat y en el buscador de recetas no hace nada raro. */
+document.addEventListener('keydown', function (ev) {
+  if (ev.key !== 'Enter' || !ev.target || ev.target.id !== 'chatIn') return;
+  ev.preventDefault();
+  ACTIONS['chat-enviar']();
+});
+
+/* Buscador de recetas y casillas del escaneo. */
+document.addEventListener('input', function (ev) {
+  const t = ev.target;
+  if (!t) return;
+  if (t.id === 'rq') {
+    const v = t.value;
+    clearTimeout(qTimer);
+    qTimer = setTimeout(function () {
+      recetaQ = v;
+      render(true);
+      const n = $('#rq');
+      if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+    }, 220);
+  }
+  if (t.classList && t.classList.contains('scanrow__ck') && scanItems) {
+    const i = +t.dataset.i;
+    if (scanItems[i]) scanItems[i].on = t.checked;
+    const tot = $('#scanTotal');
+    if (tot) tot.textContent = money(scanItems.reduce(function (s, x) {
+      return s + (x.on ? x.price : 0);
+    }, 0));
+  }
+});
 
 /* Memoria de precios: recuerda lo último que pagaste por cada artículo para
    sugerirlo la próxima vez. Se limita a 300 registros. */
