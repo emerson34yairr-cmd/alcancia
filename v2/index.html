@@ -1717,6 +1717,9 @@ let state = blank();
    recuperar. La versión anterior sí sobrescribía, y ese es el peor fallo
    posible en una app donde el usuario mete meses de registros a mano. */
 let readFailed = false;
+/* True si la lectura principal falló pero se pudo abrir con la copia de
+   seguridad. Se avisa, porque puede faltar lo último que registraste. */
+let recovered = false;
 
 function load() {
   let raw = null;
@@ -1732,8 +1735,23 @@ function load() {
   try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
 
   if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.entries)) {
-    readFailed = true;
+    /* Antes de rendirse se prueba la copia del último guardado bueno. Para eso
+       existe: escribirla en cada guardado y no leerla nunca la hacía inútil. */
     try { localStorage.setItem(KEY_RESCUE, raw); } catch (e2) {}
+    let bak = null;
+    try { bak = JSON.parse(localStorage.getItem(KEY_BAK) || 'null'); } catch (e3) { bak = null; }
+    if (bak && typeof bak === 'object' && Array.isArray(bak.entries) && bak.entries.length) {
+      const base = blank();
+      Object.keys(base).forEach(function (k) {
+        if (bak[k] !== undefined && bak[k] !== null) base[k] = bak[k];
+      });
+      base.v = SCHEMA;
+      state = base;
+      sanitize();
+      recovered = true;
+      return;
+    }
+    readFailed = true;
     return;
   }
 
@@ -1856,17 +1874,29 @@ function save(now) {
 function persistFail(err) {
   lastSaveOk = false;
   const full = err && /quota|exceeded|storage/i.test(String(err.name || err.message || err));
-  toast(full ? 'Sin espacio: borra fotos del calendario' : 'No se pudo guardar', 'bad', 5200);
+  /* Nada de mandar a borrar fotos: viven en IndexedDB y borrarlas no libera ni
+     un byte de localStorage, que es lo que se ha llenado. Lo que sí ayuda es
+     bajar un respaldo y luego borrar movimientos viejos. */
+  toast(full
+    ? 'Sin espacio para guardar. Baja un respaldo desde Más → Tus datos antes de seguir.'
+    : 'No se pudo guardar', 'bad', 6500);
 }
 
 /* Trae los datos de la versión anterior la primera vez que se abre v2.
    SOLO LEE. Jamás borra ni modifica una clave vieja, así la app original sigue
    funcionando exactamente igual y puedes volver a ella cuando quieras. */
-function readJSON(key) {
-  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; }
+/* De dónde se leen las claves de la versión anterior. Por defecto del
+   almacenamiento de este teléfono, pero también sirve para leerlas de un
+   archivo de respaldo antiguo, que guardaba cada clave como texto sin
+   parsear. La misma conversión para los dos casos. */
+function lectorLocal(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
 }
 
-function migrateFromV1() {
+function construirDesdeV1(leer) {
+  function readJSON(key) {
+    try { return JSON.parse(leer(key) || 'null'); } catch (e) { return null; }
+  }
   const out = blank();
   let found = false;
 
@@ -2023,25 +2053,37 @@ function migrateFromV1() {
   }
 
   /* Preferencias. */
-  try {
-    const mon = localStorage.getItem('alcancia_moneda');
-    if (mon && MONEDAS[mon]) out.currency = mon;
-    out.privacy = localStorage.getItem('alcancia_privacy_mode') === '1';
-  } catch (e) {}
+  const mon = leer('alcancia_moneda');
+  if (mon && MONEDAS[mon]) out.currency = mon;
+  out.privacy = leer('alcancia_privacy_mode') === '1';
   const fx = readJSON('alcancia_exchange');
   if (fx && fx.rates) { out.rates = fx.rates; out.ratesAt = fx.date || ''; }
 
-  if (found) {
-    state = out;
-    state.onboarded = true;
-    sanitize();
-    save(true);
-    /* Se avisa después del primer render, para que el aviso caiga sobre una
-       pantalla que ya muestra los datos recuperados. */
-    setTimeout(function () {
-      toast('Datos de tu alcancía anterior importados', 'ok', 4200);
-    }, 900);
-  }
+  return found ? out : null;
+}
+
+/* Lo mismo, pero leyendo del objeto `keys` de un respaldo .json de la versión
+   anterior. Sus valores ya son cadenas de texto, igual que en localStorage. */
+function deV1(keys) {
+  return construirDesdeV1(function (k) {
+    const v = keys[k];
+    return typeof v === 'string' ? v : (v == null ? null : JSON.stringify(v));
+  });
+}
+
+/* Primera apertura de v2 en un teléfono que ya tenía la versión anterior. */
+function migrateFromV1() {
+  const out = construirDesdeV1(lectorLocal);
+  if (!out) return;
+  state = out;
+  state.onboarded = true;
+  sanitize();
+  save(true);
+  /* Se avisa después del primer render, para que el aviso caiga sobre una
+     pantalla que ya muestra los datos recuperados. */
+  setTimeout(function () {
+    toast('Datos de tu alcancía anterior importados', 'ok', 4200);
+  }, 900);
 }
 
 /* ── 3. CHROME ───────────────────────────────────────────────────────────── */
@@ -2066,6 +2108,9 @@ function toast(msg, kind, ms) {
    Una sola instancia viva. Se cierra con el fondo, con la tecla Escape y con
    el botón de retroceso del teléfono (empuja una entrada al historial). */
 let sheetEl = null, sheetBg = null, sheetOnClose = null;
+/* Cuántas entradas de historial hemos empujado por hojas abiertas. Sin llevar
+   la cuenta, un history.back() de más saca al usuario DE LA APP. */
+let sheetPushes = 0;
 
 function openSheet(title, bodyHtml, onClose) {
   /* Si ya había una hoja abierta se reemplaza su contenido sin añadir otra
@@ -2106,7 +2151,9 @@ function openSheet(title, bodyHtml, onClose) {
     });
   });
 
-  if (!yaAbierta) { try { history.pushState({ sheet: 1 }, ''); } catch (e) {} }
+  if (!yaAbierta) {
+    try { history.pushState({ sheet: 1 }, ''); sheetPushes++; } catch (e) {}
+  }
   const first = sheetEl.querySelector('input,textarea,select');
   if (first && !/iPhone|iPad|Android/i.test(navigator.userAgent)) first.focus();
 }
@@ -2121,9 +2168,24 @@ function closeSheet(silent) {
   if (!silent && cb) cb();
 }
 
-window.addEventListener('popstate', function () { if (sheetEl) closeSheet(); });
+/* Cierra la hoja y consume la entrada de historial que abrió, si la hubo.
+   Todas las acciones que terminan cerrando una hoja pasan por aquí en vez de
+   llamar a history.back() a ciegas: hacerlo sin haber empujado nada te saca
+   de la app y pierdes lo que estabas haciendo. */
+function cerrarYVolver() {
+  closeSheet(true);
+  if (sheetPushes > 0) {
+    sheetPushes--;
+    try { history.back(); } catch (e) {}
+  }
+}
+
+window.addEventListener('popstate', function () {
+  if (sheetPushes > 0) sheetPushes--;
+  if (sheetEl) closeSheet();
+});
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape' && sheetEl) { closeSheet(); try { history.back(); } catch (e2) {} }
+  if (e.key === 'Escape' && sheetEl) cerrarYVolver();
 });
 
 /* — Tema — */
@@ -4701,7 +4763,7 @@ const ACTIONS = {
 
   nuevo: function (el) { openEntrySheet(el.dataset.kind); },
 
-  'cerrar-hoja': function () { closeSheet(); try { history.back(); } catch (e) {} },
+  'cerrar-hoja': function () { cerrarYVolver(); },
 
   'cambiar-tipo': function (el) {
     /* Conserva lo ya escrito al cambiar de tipo: volver a teclear la cantidad
@@ -4764,8 +4826,7 @@ const ACTIONS = {
     }
     const nuevos = r.nuevos;
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     haptic(12);
     render();
     if (kind === 'save' && rec.src !== 'retiro') bouncePig();
@@ -4786,8 +4847,7 @@ const ACTIONS = {
     const copia = state.entries[i];
     state.entries.splice(i, 1);
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render();
     /* Deshacer de verdad: la versión anterior ofrecía el botón pero el
        movimiento ya no se podía recuperar. */
@@ -4876,8 +4936,7 @@ const ACTIONS = {
        movimiento. */
     const r = reconcile();
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render();
     toast(prev ? 'Meta actualizada' : 'Meta creada', 'ok');
     celebrate(r.nuevos);
@@ -4889,8 +4948,7 @@ const ACTIONS = {
     const copia = state.goals[i];
     state.goals.splice(i, 1);
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render();
     undoable('Meta borrada', function () {
       state.goals.push(copia); save(true); render();
@@ -4931,8 +4989,7 @@ const ACTIONS = {
     const i = state.budgets.findIndex(function (b) { return b.id === rec.id; });
     if (i >= 0) state.budgets[i] = rec; else state.budgets.push(rec);
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render();
     toast('Presupuesto guardado', 'ok');
   },
@@ -4943,8 +5000,7 @@ const ACTIONS = {
     const copia = state.budgets[i];
     state.budgets.splice(i, 1);
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render();
     undoable('Presupuesto borrado', function () {
       state.budgets.push(copia); save(true); render();
@@ -5062,8 +5118,7 @@ const ACTIONS = {
     i.prio = pri ? pri.dataset.v : 'media';
     recordarPrecio(i);
     save(true);
-    closeSheet(true);
-    try { history.back(); } catch (e) {}
+    cerrarYVolver();
     render(true);
     toast('Artículo actualizado', 'ok');
   },
@@ -5074,7 +5129,7 @@ const ACTIONS = {
     const copia = state.shop[idx];
     state.shop.splice(idx, 1);
     save(true);
-    if (sheetEl) { closeSheet(true); try { history.back(); } catch (e) {} }
+    if (sheetEl) cerrarYVolver();
     render(true);
     undoable('"' + copia.name + '" quitado', function () {
       state.shop.push(copia); save(true); render(true);
@@ -5178,20 +5233,46 @@ ACTIONS.importar = function () {
         toast('Ese archivo no es un respaldo válido', 'bad', 4000);
         return;
       }
-      /* Acepta tanto el envoltorio {app, state} como un estado suelto. */
-      const incoming = parsed && parsed.state ? parsed.state : parsed;
+      /* Tres formas aceptadas: el envoltorio de v2 {app, state}, un estado
+         suelto, y el respaldo de la versión ANTERIOR {app, version, keys:{…}},
+         que guardaba cada clave de localStorage como texto sin parsear. Ese
+         último se rechazaba, y era justo el que la gente ya tiene guardado. */
+      let incoming = null;
+      if (parsed && parsed.state) incoming = parsed.state;
+      else if (parsed && Array.isArray(parsed.entries)) incoming = parsed;
+      else if (parsed && parsed.keys && typeof parsed.keys === 'object') {
+        incoming = deV1(parsed.keys);
+        if (!incoming) {
+          toast('Ese respaldo de la versión anterior no traía datos', 'bad', 4500);
+          return;
+        }
+      }
+
       if (!incoming || !Array.isArray(incoming.entries)) {
-        toast('El archivo no contiene movimientos', 'bad', 4000);
+        toast('Ese archivo no es un respaldo de Mi Alcancía', 'bad', 4500);
         return;
       }
+
+      /* Se arma y se limpia APARTE. Solo cuando el resultado es utilizable se
+         reemplaza lo que tienes: si el archivo estaba bien formado pero vacío
+         de contenido válido, adoptarlo habría borrado tu historial. */
+      const previo = state;
       const base = blank();
       Object.keys(base).forEach(function (k) {
         if (incoming[k] !== undefined && incoming[k] !== null) base[k] = incoming[k];
       });
       base.v = SCHEMA;
+
       state = base;
+      try { sanitize(); } catch (err) { state = previo; toast('El archivo está dañado', 'bad', 4500); return; }
+
+      if (!state.entries.length && !state.goals.length && !state.shop.length) {
+        state = previo;
+        toast('El respaldo no traía ningún movimiento. No se cambió nada.', 'bad', 5000);
+        return;
+      }
+
       readFailed = false;                 /* el archivo es legible: se puede guardar */
-      sanitize();
       reconcile();
       save(true);
       applyTheme();
@@ -5216,41 +5297,67 @@ ACTIONS['reimportar-v1'] = function () {
 };
 
 ACTIONS['reimportar-v1-ok'] = function () {
+  /* Se trabaja sobre una copia y solo se adopta si de verdad vino algo.
+     Antes se vaciaba el estado ANTES de leer, así que si la versión anterior
+     no tenía nada —o ya no está en este teléfono— te quedabas sin lo tuyo. */
+  const respaldo = state;
+  const eraFallo = readFailed;
   state = blank();
   readFailed = false;
   migrateFromV1();
-  if (!state.entries.length && !state.goals.length) {
-    toast('No se encontraron datos que traer', 'bad');
+
+  if (!state.entries.length && !state.goals.length && !state.shop.length) {
+    state = respaldo;
+    readFailed = eraFallo;
+    cerrarYVolver();
+    render();
+    toast('No se encontraron datos de la versión anterior. No se cambió nada.', 'bad', 4500);
+    return;
   }
+
   reconcile();
   save(true);
-  closeSheet(true);
-  try { history.back(); } catch (e) {}
+  cerrarYVolver();
+  applyPrivacy();
   render();
+  toast('Traídos ' + state.entries.length + ' movimientos', 'ok');
 };
 
 ACTIONS['borrar-todo'] = function () {
+  const nFotos = Object.keys(fotoSet).length;
   openSheet('Borrar todo',
     '<p class="t-sub">Se van a borrar <b>' + state.entries.length + ' movimientos</b>, ' +
-      state.goals.length + ' metas, ' + state.shop.length + ' artículos y ' +
-      Object.keys(fotoSet).length + ' fotos.</p>' +
+      state.goals.length + ' metas y ' + state.shop.length + ' artículos de esta versión.</p>' +
     '<p class="t-cap faint">Esto no se puede deshacer. Si no has bajado un respaldo, ' +
       'ciérralo y hazlo antes.</p>' +
+    /* Las fotos son la MISMA base que usa la app anterior. Borrarlas aquí se
+       las quita también allá, así que no van en el borrado por defecto: se
+       piden aparte y diciendo exactamente lo que pasa. */
+    (nFotos
+      ? '<label class="scanrow">' +
+          '<input type="checkbox" class="scanrow__ck" id="borrarFotos">' +
+          '<span class="grow t-cap">Borrar también las ' + nFotos + ' fotos del calendario. ' +
+            '<b>Ojo:</b> son las mismas que usa tu alcancía anterior y también ' +
+            'desaparecerán de allí.</span>' +
+        '</label>'
+      : '') +
     '<button class="btn btn--danger btn--lg btn--block" type="button" ' +
-      'data-act="borrar-todo-ok">Sí, borrar todo</button>' +
+      'data-act="borrar-todo-ok">Sí, borrar</button>' +
     '<button class="btn btn--soft btn--block" type="button" data-act="cerrar-hoja">Mejor no</button>');
 };
 
 ACTIONS['borrar-todo-ok'] = function () {
-  Object.keys(fotoSet).forEach(function (k) { fotoDel(k).catch(function () {}); });
-  fotoSet = {};
+  const ck = $('#borrarFotos');
+  if (ck && ck.checked) {
+    Object.keys(fotoSet).forEach(function (k) { fotoDel(k).catch(function () {}); });
+    fotoSet = {};
+  }
   state = blank();
   state.onboarded = true;
   readFailed = false;
   try { localStorage.removeItem(KEY_BAK); } catch (e) {}
   save(true);
-  closeSheet(true);
-  try { history.back(); } catch (e) {}
+  cerrarYVolver();
   applyTheme();
   applyPrivacy();
   render();
@@ -5284,8 +5391,7 @@ ACTIONS['receta-a-compras'] = function (el) {
     nuevos++;
   });
   save(true);
-  closeSheet(true);
-  try { history.back(); } catch (e) {}
+  cerrarYVolver();
   haptic(12);
   toast(nuevos
     ? nuevos + ' ingrediente' + (nuevos === 1 ? '' : 's') + ' a tu lista'
@@ -5447,25 +5553,36 @@ function bouncePig() {
   p.classList.add('is-happy');
 }
 
-/* Aviso con deshacer. Mantiene una sola acción pendiente a la vez. */
-let undoFn = null;
+/* Aviso con deshacer.
+   Cada aviso lleva SU propia acción colgada del elemento. Con una variable
+   única compartida, dos avisos en pantalla a la vez hacían que pulsar
+   «Deshacer» en el primero ejecutara lo del segundo: borrabas dos cosas
+   seguidas y te volvía la que no era. */
+let undoSeq = 0;
+const undoAcciones = {};
+
 function undoable(msg, fn) {
-  undoFn = fn;
+  const id = 'u' + (++undoSeq);
+  undoAcciones[id] = fn;
   const host = $('#toasts');
   const el = document.createElement('div');
   el.className = 'toast';
   el.style.pointerEvents = 'auto';
   el.innerHTML = '<span>' + esc(msg) + '</span>' +
-    '<button class="btn btn--ghost toast__undo" type="button" data-act="deshacer">Deshacer</button>';
+    '<button class="btn btn--ghost toast__undo" type="button" data-act="deshacer" ' +
+    'data-undo="' + id + '">Deshacer</button>';
   host.appendChild(el);
   setTimeout(function () {
-    if (undoFn === fn) undoFn = null;
+    delete undoAcciones[id];
     el.classList.add('is-out');
     setTimeout(function () { el.remove(); }, 260);
   }, 5000);
 }
+
 ACTIONS.deshacer = function (el) {
-  if (undoFn) { undoFn(); undoFn = null; toast('Restaurado', 'ok'); }
+  const id = el.dataset.undo;
+  const fn = undoAcciones[id];
+  if (fn) { delete undoAcciones[id]; fn(); toast('Restaurado', 'ok'); }
   const t = el.closest('.toast');
   if (t) t.remove();
 };
@@ -5510,6 +5627,11 @@ function boot() {
       toast('No se pudieron leer tus datos guardados. La app abre vacía y no ' +
             'guardará nada para no perderlos.', 'bad', 9000);
     }, 700);
+  } else if (recovered) {
+    setTimeout(function () {
+      toast('Tus datos estaban dañados y se recuperaron del último respaldo. ' +
+            'Revisa si falta lo más reciente.', 'bad', 8000);
+    }, 700);
   }
 
   /* Pone al día metas y logros con los datos que ya existen: sin esto, quien
@@ -5532,7 +5654,10 @@ function boot() {
      repintar o la pantalla sigue mostrando el día anterior. */
   let lastDay = dayKey();
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState !== 'visible') return;
+    /* Al pasar a segundo plano hay que volcar YA lo que esté pendiente: en
+       iOS el evento pagehide no siempre llega, y con el guardado retrasado se
+       perdía el último movimiento al cerrar la app deslizando. */
+    if (document.visibilityState === 'hidden') { save(true); return; }
     if (dayKey() !== lastDay) {
       lastDay = dayKey();
       calMes = monthKey(lastDay);
