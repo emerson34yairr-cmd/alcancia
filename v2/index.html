@@ -1169,6 +1169,17 @@ svg { display: block; flex: none; }
   30%           { opacity: 1;   transform: translateY(-0.1875rem); }
 }
 
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: var(--s3);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  color: var(--ink-2);
+}
+.aviso svg { color: var(--warn); margin-top: 0.0625rem; }
+
 .linkbtn {
   color: var(--brand-2);
   font: inherit;
@@ -1526,19 +1537,32 @@ const MONEDAS = {
   PEN: { sym: 'S/', loc: 'es-PE', name: 'Sol' },
 };
 
-/* Tasa activa: cuántas unidades de la moneda mostrada vale 1 USD. */
+/* Tasa activa: cuántas unidades de la moneda mostrada vale 1 USD.
+   Devuelve 0 cuando la moneda no es el dólar y NO hay tipo de cambio. Ese cero
+   es deliberado: si devolviera 1, teclear 500 lempiras guardaría 500 dólares y
+   el error quedaría escrito en los datos para siempre. Quien convierte tiene
+   que comprobarlo. */
 function rate() {
   if (state.currency === 'USD') return 1;
   const r = state.rates && state.rates[state.currency];
-  return (typeof r === 'number' && r > 0) ? r : 1;
+  return (typeof r === 'number' && r > 0) ? r : 0;
 }
-function toView(usd) { return (Number(usd) || 0) * rate(); }
-function toBase(shown) { return (Number(shown) || 0) / rate(); }
+/* ¿Se puede convertir ahora mismo? */
+function hayTasa() { return rate() > 0; }
+/* Símbolo de la unidad en la que se captura y se muestra AHORA. Sin tipo de
+   cambio esa unidad es el dólar, aunque tengas otra moneda elegida. */
+function simbolo() {
+  return (hayTasa() ? (MONEDAS[state.currency] || MONEDAS.USD) : MONEDAS.USD).sym;
+}
+/* Sin tasa se muestra y se captura en dólares, no en la moneda elegida: es
+   preferible enseñar la unidad real a inventar una conversión. */
+function toView(usd) { return (Number(usd) || 0) * (hayTasa() ? rate() : 1); }
+function toBase(shown) { return (Number(shown) || 0) / (hayTasa() ? rate() : 1); }
 
 function money(usd, opts) {
   const o = opts || {};
   if (state.privacy && !o.force) return '••••';
-  const cur = MONEDAS[state.currency] || MONEDAS.USD;
+  const cur = hayTasa() ? (MONEDAS[state.currency] || MONEDAS.USD) : MONEDAS.USD;
   const v = toView(usd);
   const abs = Math.abs(v);
   /* Sin centavos cuando la cifra es redonda: '$1,200' se lee mejor que
@@ -2427,8 +2451,12 @@ VIEWS.hoy = function () {
   const dayEntries = ofDay(today);
   const dt = totals(dayEntries);
   const worked = state.days[today] ? state.days[today].worked : null;
-  const ratio = t.saved + t.spent;
-  const pctSaved = ratio > 0 ? Math.round(t.saved / ratio * 100) : 0;
+  /* La barra compara ahorro contra gasto. Los retiros pueden dejar el ahorro
+     en negativo, y entonces el porcentaje se salía de 0–100 (llegaba a marcar
+     «Ahorras −40%»). Se toma el ahorro sin signo para el reparto. */
+  const savedPos = Math.max(0, t.saved);
+  const ratio = savedPos + t.spent;
+  const pctSaved = ratio > 0 ? clamp(Math.round(savedPos / ratio * 100), 0, 100) : 0;
 
   return '' +
   /* — Héroe: saldo, cerdito, nivel — */
@@ -2601,7 +2629,7 @@ function openEntrySheet(kind, existing) {
   const k = KINDS[kind] ? kind : 'spend';
   const conf = KINDS[k];
   const ed = existing || null;
-  const sym = (MONEDAS[state.currency] || MONEDAS.USD).sym;
+  const sym = simbolo();
   const val = ed ? String(Math.round(toView(ed.amount) * 100) / 100) : '';
   const selCat = ed ? ed.cat : (k === 'earn' ? 'trabajo' : k === 'spend' ? 'food' : null);
   const date = ed ? ed.date : dayKey();
@@ -2859,9 +2887,14 @@ VIEWS.actividad = function () {
 function lineChart(points, tone) {
   if (points.length < 2) return '';
   const W = 320, H = 120, pad = 6;
-  const max = Math.max.apply(null, points) || 1;
+  /* La escala arranca en el mínimo real, no en cero: con retiros el acumulado
+     puede bajar de cero, y midiendo solo contra el máximo la línea se salía
+     por debajo del recuadro. */
+  const max = Math.max.apply(null, points);
+  const min = Math.min.apply(null, [0].concat(points));
+  const span = (max - min) || 1;
   const xs = function (i) { return pad + (W - pad * 2) * (i / (points.length - 1)); };
-  const ys = function (v) { return H - pad - (H - pad * 2) * (v / max); };
+  const ys = function (v) { return H - pad - (H - pad * 2) * ((v - min) / span); };
   let d = 'M' + xs(0).toFixed(1) + ' ' + ys(points[0]).toFixed(1);
   for (let i = 1; i < points.length; i++) {
     /* Curva suave: el punto de control va a media distancia en X, lo que
@@ -2898,11 +2931,16 @@ VIEWS.analisis = function () {
     serie.push(acc);
   }
 
-  /* Semana actual contra la anterior, ambas de lunes a domingo. */
+  /* Semana actual contra la anterior, comparando el MISMO número de días.
+     Antes se enfrentaba una semana a medias contra una completa, así que un
+     martes las tres filas salían siempre en rojo con caídas del 40–60% que no
+     existían. Ahora, si hoy es martes, se comparan lunes y martes de esta
+     semana contra lunes y martes de la anterior. */
   const lun = startOfWeek(dayKey());
+  const diaSemana = weekday(dayKey());          /* 0 = lunes */
   const lunPrev = addDays(lun, -7);
   const cur = totals(inRange(lun, dayKey()));
-  const prev = totals(inRange(lunPrev, addDays(lun, -1)));
+  const prev = totals(inRange(lunPrev, addDays(lunPrev, diaSemana)));
 
   const cats = byCategory(w30.from, w30.to);
   const maxCat = cats.length ? cats[0].amount : 0;
@@ -2922,6 +2960,9 @@ VIEWS.analisis = function () {
 
   '<section class="card stack">' +
     '<div class="card__label">Esta semana vs. la anterior</div>' +
+    '<p class="t-cap faint">Van ' + (diaSemana + 1) + (diaSemana === 0 ? ' día' : ' días') +
+      ' de semana, comparados contra los ' + (diaSemana + 1) +
+      (diaSemana === 0 ? ' primer día' : ' primeros días') + ' de la anterior.</p>' +
     [['Ingresos', cur.earned, prev.earned, 'pos'],
      ['Ahorros',  cur.saved,  prev.saved,  'sav'],
      ['Gastos',   cur.spent,  prev.spent,  'neg']].map(function (r) {
@@ -2961,7 +3002,10 @@ VIEWS.analisis = function () {
    invierte para que verde signifique siempre "vas bien". */
 function deltaLabel(cur, prev, lowerIsBetter) {
   if (!prev && !cur) return '<span class="faint">Sin datos</span>';
-  if (!prev) return '<span class="pos">Nuevo</span>';
+  /* Sin nada con qué comparar no hay variación que colorear. Antes se pintaba
+     «Nuevo» en verde también en la fila de Gastos, dando por buena una semana
+     en la que empezaste a gastar. */
+  if (!prev) return '<span class="' + (lowerIsBetter ? 'faint' : 'pos') + '">Nuevo</span>';
   const d = (cur - prev) / prev * 100;
   if (Math.abs(d) < 0.5) return '<span class="faint">Igual</span>';
   const up = d > 0;
@@ -2982,9 +3026,13 @@ function heatmapCard() {
   });
   const max = Math.max.apply(null, [1].concat(Object.keys(saved).map(function (k) { return saved[k]; })));
 
+  /* El orden del bucle tiene que coincidir con grid-auto-flow: column, que
+     rellena la primera columna entera antes de pasar a la segunda. Recorrerlo
+     por filas dibujaba el mapa transpuesto: los lunes salían repartidos por
+     toda la primera semana en vez de formar la fila de arriba. */
   let cells = '';
-  for (let row = 0; row < 7; row++) {
-    for (let col = 0; col < 12; col++) {
+  for (let col = 0; col < 12; col++) {
+    for (let row = 0; row < 7; row++) {
       const k = addDays(inicio, col * 7 + row);
       const futuro = k > hoy;
       const v = saved[k] || 0;
@@ -3071,10 +3119,12 @@ function goalCard(g) {
   /* Ritmo necesario: cuánto habría que guardar al día para llegar a tiempo.
      Es el dato que de verdad orienta, y la versión anterior no lo daba. */
   let ritmo = '';
-  if (!g.done && dias !== null && dias > 0 && falta > 0) {
-    ritmo = money(falta / dias) + ' al día para llegar';
-  } else if (!g.done && dias !== null && dias <= 0 && falta > 0) {
-    ritmo = 'La fecha ya pasó';
+  if (!g.done && dias !== null && falta > 0) {
+    /* dias === 0 es el día del vencimiento, no un día vencido: antes ese día
+       la meta ya decía «La fecha ya pasó». */
+    if (dias > 0) ritmo = money(falta / dias) + ' al día para llegar';
+    else if (dias === 0) ritmo = 'Hoy es la fecha límite';
+    else ritmo = 'La fecha ya pasó';
   }
 
   return '' +
@@ -3109,7 +3159,7 @@ function goalCard(g) {
 }
 
 function openGoalSheet(g) {
-  const sym = (MONEDAS[state.currency] || MONEDAS.USD).sym;
+  const sym = simbolo();
   const body = '' +
   '<div class="field">' +
     '<label class="field__label" for="gName">¿Para qué es?</label>' +
@@ -3279,7 +3329,7 @@ VIEWS.presupuesto = function () {
 };
 
 function openBudgetSheet(b) {
-  const sym = (MONEDAS[state.currency] || MONEDAS.USD).sym;
+  const sym = simbolo();
   const sel = b ? b.cat : 'food';
   const body = '' +
   '<div class="field">' +
@@ -3393,6 +3443,9 @@ function cargarFotoKeys() {
 let calMes = monthKey(dayKey());   /* 'YYYY-MM' que se está viendo */
 
 VIEWS.calendario = function () {
+  /* Si la app se quedó abierta y cambió el mes, calMes apuntaría a un mes ya
+     pasado o —peor— al futuro respecto de hoy. Se reajusta al pintar. */
+  if (calMes > monthKey(dayKey())) calMes = monthKey(dayKey());
   const y = +calMes.slice(0, 4), m = +calMes.slice(5, 7) - 1;
   const primero = new Date(y, m, 1);
   const offset = (primero.getDay() + 6) % 7;      /* lunes = 0 */
@@ -3422,8 +3475,11 @@ VIEWS.calendario = function () {
        lo que gastaste, rojo al revés, ámbar si empataste. */
     let tono = '';
     if (r && (r.saved || r.spent || r.earned)) {
-      tono = r.saved > 0 && r.saved >= r.spent ? 'is-good'
-           : r.spent > r.saved ? 'is-bad' : 'is-mid';
+      /* Un día de solo ingresos, sin ahorro ni gasto, es un buen día: antes
+         caía en el caso final y se pintaba ámbar de «parejo». */
+      tono = r.spent > 0 && r.spent > r.saved ? 'is-bad'
+           : (r.saved > 0 || r.earned > 0) && r.saved >= r.spent ? 'is-good'
+           : 'is-mid';
     }
     celdas +=
       '<button class="cal__c ' + tono + (k === hoy ? ' is-today' : '') +
@@ -3536,6 +3592,17 @@ function pintarFoto(k) {
 
 /* ── 19. VISTA: COMPRAS ──────────────────────────────────────────────────── */
 
+/* Cuántas unidades representa el campo de cantidad.
+   Solo cuenta como multiplicador si es un número limpio. `parseFloat` sobre
+   texto libre convertía "500 g" en 500 y multiplicaba el precio por quinientos;
+   ahora ese caso vale 1 y el texto se queda como etiqueta, que es lo que es. */
+function cantidadDe(qty) {
+  const t = String(qty == null ? '' : qty).trim().replace(',', '.');
+  if (!/^\d+(\.\d+)?$/.test(t)) return 1;
+  const n = parseFloat(t);
+  return isFinite(n) && n > 0 ? n : 1;
+}
+
 const PRIOS = {
   alta:  { name: 'Urgente',      tint: '#FB7185', orden: 0 },
   media: { name: 'Normal',       tint: '#FBBF24', orden: 1 },
@@ -3546,9 +3613,9 @@ VIEWS.compras = function () {
   const pend = state.shop.filter(function (i) { return !i.done; })
     .sort(function (a, b) { return PRIOS[a.prio].orden - PRIOS[b.prio].orden || b.ts - a.ts; });
   const listos = state.shop.filter(function (i) { return i.done; });
-  const estimado = pend.reduce(function (s, i) { return s + i.price * (parseFloat(i.qty) || 1); }, 0);
+  const estimado = pend.reduce(function (s, i) { return s + i.price * (cantidadDe(i.qty)); }, 0);
   const gastable = listos.filter(function (i) { return !i.logged && i.price > 0; });
-  const totalGastable = gastable.reduce(function (s, i) { return s + i.price * (parseFloat(i.qty) || 1); }, 0);
+  const totalGastable = gastable.reduce(function (s, i) { return s + i.price * (cantidadDe(i.qty)); }, 0);
 
   return '' +
   '<div class="subhead">' +
@@ -3598,7 +3665,7 @@ VIEWS.compras = function () {
 
 function shopRow(i) {
   const p = PRIOS[i.prio];
-  const cant = parseFloat(i.qty) || 1;
+  const cant = cantidadDe(i.qty);
   return '' +
   '<div class="row shoprow' + (i.done ? ' is-done' : '') + '">' +
     '<button class="check' + (i.done ? ' is-on' : '') + '" type="button" data-act="marcar-item" ' +
@@ -3622,7 +3689,7 @@ function shopRow(i) {
 }
 
 function openItemSheet(it) {
-  const sym = (MONEDAS[state.currency] || MONEDAS.USD).sym;
+  const sym = simbolo();
   /* Precio sugerido a partir de lo que pagaste la última vez. */
   const memoria = state.prices.filter(function (p) {
     return p.name.toLowerCase() === it.name.toLowerCase();
@@ -4401,13 +4468,18 @@ VIEWS.ajustes = function () {
       }).join('') +
     '</div>' +
     '<p class="t-cap faint">Todo se guarda en dólares y se convierte al mostrar, así que ' +
-      'cambiar de moneda nunca altera tus cifras. ' +
-      (state.currency === 'USD' ? '' :
-        (state.rates && state.rates[state.currency]
-          ? 'Tipo de cambio: 1 USD = ' + (Math.round(state.rates[state.currency] * 100) / 100) + ' ' + state.currency +
-            (state.ratesAt ? ' (' + esc(fmtDate(state.ratesAt)) + ')' : '')
-          : 'Sin conexión no hay tipo de cambio: se muestra en dólares.')) +
-    '</p>' +
+      'cambiar de moneda nunca altera tus cifras.</p>' +
+    (state.currency === 'USD' ? ''
+      : hayTasa()
+        ? '<p class="t-cap faint">Tipo de cambio: 1 USD = ' +
+          (Math.round(rate() * 100) / 100) + ' ' + esc(state.currency) +
+          (state.ratesAt ? ' · ' + esc(fmtDate(state.ratesAt)) : '') + '</p>'
+        /* Se avisa a las claras: mientras no haya tasa, todo lo que veas y
+           todo lo que teclees está en dólares, no en la moneda elegida. */
+        : '<div class="aviso">' + ico('alert', 18) +
+          '<span class="t-cap">Todavía no hay tipo de cambio para ' + esc(state.currency) +
+          '. Mientras tanto la app <b>muestra y captura en dólares</b>, para no ' +
+          'guardar cifras equivocadas. Conéctate un momento y se actualiza solo.</span></div>') +
   '</section>' +
 
   '<section class="card stack">' +
@@ -4466,11 +4538,23 @@ const ACTIONS = {
 
   'cambiar-tipo': function (el) {
     /* Conserva lo ya escrito al cambiar de tipo: volver a teclear la cantidad
-       porque elegiste mal el botón es una molestia evitable. */
+       porque elegiste mal el botón es una molestia evitable.
+       Y conserva el movimiento que se está EDITANDO: sin esto se perdía el id
+       y al guardar se creaba uno nuevo en vez de convertir el existente, así
+       que corregir un gasto mal clasificado dejaba los dos apuntados. */
     const amount = ($('#mAmount') || {}).value || '';
     const note = ($('#mNote') || {}).value || '';
     const date = ($('#mDate') || {}).value || dayKey();
-    openEntrySheet(el.dataset.kind);
+    const editandoId = (($('[data-act="guardar-mov"]') || {}).dataset || {}).id || null;
+    const previo = editandoId
+      ? state.entries.find(function (e) { return e.id === editandoId; })
+      : null;
+
+    openEntrySheet(el.dataset.kind, previo
+      ? { id: previo.id, date: date, kind: el.dataset.kind, amount: previo.amount,
+          cat: null, note: note, ts: previo.ts, grp: previo.grp, src: null }
+      : null);
+
     setTimeout(function () {
       if ($('#mAmount')) $('#mAmount').value = amount;
       if ($('#mNote')) $('#mNote').value = note;
@@ -4849,7 +4933,7 @@ const ACTIONS = {
     const hoy = dayKey();
     let total = 0;
     items.forEach(function (i) {
-      const cant = parseFloat(i.qty) || 1;
+      const cant = cantidadDe(i.qty);
       const monto = i.price * cant;
       total += monto;
       state.entries.push({
@@ -4866,6 +4950,12 @@ const ACTIONS = {
     render(true);
     toast(money(total) + ' registrado como gasto', 'ok');
     celebrate(r.nuevos);
+    /* El aviso de presupuesto también tiene que saltar por esta vía: antes
+       solo se comprobaba al capturar un gasto a mano, así que vaciar una lista
+       de compras grande podía rebasar el tope sin decir nada. */
+    const cats = {};
+    items.forEach(function (i) { cats[i.cat || 'shopping'] = true; });
+    Object.keys(cats).forEach(function (c) { checkBudgets({ kind: 'spend', cat: c }); });
   },
 };
 
@@ -5276,7 +5366,11 @@ function boot() {
   let lastDay = dayKey();
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState !== 'visible') return;
-    if (dayKey() !== lastDay) { lastDay = dayKey(); render(); }
+    if (dayKey() !== lastDay) {
+      lastDay = dayKey();
+      calMes = monthKey(lastDay);
+      render();
+    }
   });
 
   /* Guarda de inmediato antes de que la pestaña se cierre. */
