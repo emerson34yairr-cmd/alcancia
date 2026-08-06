@@ -1,6 +1,6 @@
 # Pruebas de Mi Alcancía v2
 
-94 comprobaciones contra Chromium a tamaño de iPhone 13. No hay marco de
+106 comprobaciones contra Chromium a tamaño de iPhone 13. No hay marco de
 pruebas: cada archivo es un script de Playwright que abre la app, la usa como
 la usarías tú y comprueba el resultado.
 
@@ -15,7 +15,7 @@ npm i playwright
 
 # 3. Correr (CHROME apunta al navegador; vacío usa el que trae Playwright)
 export CHROME=""
-for f in e2e estado bugs migra movil inter; do node $f.js; done
+for f in e2e estado bugs migra movil inter pwa; do node $f.js; done
 ```
 
 Cada script imprime una línea por comprobación y un resumen al final.
@@ -31,6 +31,7 @@ Si cambias el puerto, ajústalo en la constante del principio de cada archivo.
 | `inter.js` | Iconos de la cabecera, botón de atrás, doble toque, hojas que se reemplazan, buscadores, vistas que fallan |
 | `estado.js` | Los caminos por los que se podía perder información: importar, traer datos de la v1, deshacer, respaldo de rescate, cuota llena |
 | `movil.js` | Comportamiento en iPhone: zoom al enfocar campos, áreas táctiles, botones anidados, desplazamiento horizontal, áreas seguras, rutas relativas |
+| `pwa.js` | Lo que solo se ve con datos grandes o navegadores limitados: cifras de siete dígitos en pesos colombianos a 390 y 320 px, el respaldo cuando el navegador no puede descargar, y que cambiar de pestaña aterrice arriba al instante |
 
 ## Nota sobre la semilla
 

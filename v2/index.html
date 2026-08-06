@@ -6,7 +6,12 @@
 <meta name="theme-color" content="#0B0B12" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F6F6FA" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- "default", no "black-translucent": con translúcida iOS dibuja la barra de
+     estado con glifos BLANCOS sobre el fondo de la app, y en tema claro la
+     hora, la cobertura y la batería desaparecían sobre el fondo casi blanco.
+     Con "default" la vista web queda bajo la barra, los glifos se adaptan al
+     tema y el diseño aguanta porque --sa-top pasa a valer 0. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mi Alcancía">
 <meta name="description" content="Mi Alcancía — controla tus ingresos, gastos y metas de ahorro.">
 <title>Mi Alcancía</title>
@@ -304,7 +309,10 @@ svg { display: block; flex: none; }
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
+  /* Sin `scroll-behavior: smooth`: render() pone scrollTop a 0 al cambiar de
+     pestaña, y con desplazamiento suave esa asignación se convertía en una
+     animación de más de medio segundo. Aterrizabas a media pantalla y la app
+     se deslizaba sola mientras intentabas leer. */
   padding:
     var(--s4)
     calc(var(--s4) + var(--sa-right))
@@ -583,9 +591,16 @@ svg { display: block; flex: none; }
 .bar__fill--warn { background: var(--warn); }
 .bar__fill--neg  { background: var(--neg); }
 
-/* Rejilla de estadísticas. */
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+/* Rejilla de estadísticas.
+   `minmax(0, 1fr)` en vez de `1fr`, y `min-width: 0` en la tarjeta: por defecto
+   un elemento de rejilla no encoge por debajo de su contenido, así que un total
+   largo ensanchaba su columna y empujaba la tercera tarjeta fuera de la
+   pantalla. Y como .scroll recorta el desbordamiento horizontal, esa cifra ya
+   no había forma de leerla. Con pesos colombianos —$2.296.000— pasaba con
+   cualquier cantidad corriente. */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
 .stat {
+  min-width: 0;
   padding: var(--s3);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -599,7 +614,17 @@ svg { display: block; flex: none; }
   text-transform: uppercase;
   color: var(--ink-3);
 }
-.stat__v { font-size: var(--t-head); font-weight: 800; letter-spacing: -0.03em; margin-top: var(--s1); }
+/* La cifra se encoge con la pantalla antes que desbordar, y si aun así no cabe
+   se parte en dos líneas dentro de su tarjeta. Partir un número es feo, pero
+   perderlo por el borde de la pantalla lo es más. */
+.stat__v {
+  font-size: clamp(0.9375rem, 4.4vw, 1.3125rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-top: var(--s1);
+  overflow-wrap: anywhere;
+}
 
 /* Estado vacío. Un solo componente para las nueve pantallas. */
 .empty {
@@ -4620,7 +4645,7 @@ function chatEnviar(txt) {
   if (!key) {
     chat.push({ rol: 'ella', txt: responderLocal(q) });
     render(true);
-    scrollChat();
+    scrollChat(true);
     return;
   }
 
@@ -4662,7 +4687,7 @@ function chatEnviar(txt) {
       chatBusy = false; chatEnVuelo = false;
       chat.push({ rol: 'ella', txt: (txt || '').trim() || responderLocal(q) });
       render(true);
-      scrollChat();
+      scrollChat(true);
     })
     .catch(function (err) {
       /* Sin red o con la clave mala se contesta igual, con el motor local: es
@@ -4670,7 +4695,7 @@ function chatEnviar(txt) {
       chatBusy = false; chatEnVuelo = false;
       chat.push({ rol: 'ella', txt: responderLocal(q) });
       render(true);
-      scrollChat();
+      scrollChat(true);
       toast('Sin conexión con Groq (' + (err.message || 'falló') + '): respondo con lo local', 'bad', 4000);
     });
 }
@@ -5308,26 +5333,100 @@ ACTIONS.tema = function (el) {
   render(true);
 };
 
+/* Bajar el respaldo.
+
+   Dentro de la app de iPhone el truco de siempre —un <a download> apuntando a
+   una URL blob:— NO descarga nada: WKWebView solo materializa descargas si la
+   app nativa implementa un delegado que este proyecto no tiene. Y el aviso de
+   éxito se daba igual, así que creías tener respaldo y no lo tenías. Con el
+   README diciendo que lo bajes antes de cambiar de teléfono, eso es lo peor
+   que podía fallar en silencio.
+
+   Ahora se intenta primero la hoja de compartir de iOS, que sí funciona ahí y
+   deja guardar en Archivos; si no está, se cae al <a download> del escritorio;
+   y si tampoco, se enseña el JSON en pantalla para copiarlo a mano. El aviso
+   de éxito solo se da en el camino que de verdad terminó. */
 ACTIONS.exportar = function () {
-  const payload = {
+  const nombre = 'mi-alcancia-' + dayKey() + '.json';
+  const texto = JSON.stringify({
     app: 'Mi Alcancía',
     version: 2,
     exportedAt: new Date().toISOString(),
     state: state,
-  };
-  let url;
+  }, null, 1);
+
+  let blob;
+  try { blob = new Blob([texto], { type: 'application/json' }); }
+  catch (e) { return mostrarRespaldoEnPantalla(texto, nombre); }
+
+  /* 1. Compartir (iPhone, y Android moderno). */
   try {
-    const blob = new Blob([JSON.stringify(payload, null, 1)], { type: 'application/json' });
-    url = URL.createObjectURL(blob);
-  } catch (e) { toast('No se pudo crear el archivo', 'bad'); return; }
+    const file = new File([blob], nombre, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: nombre })
+        .then(function () { toast('Respaldo guardado', 'ok'); })
+        .catch(function (err) {
+          /* Cancelar la hoja no es un fallo: no se dice nada. */
+          if (err && err.name === 'AbortError') return;
+          descargarRespaldo(blob, nombre, texto);
+        });
+      return;
+    }
+  } catch (e) {}
+
+  descargarRespaldo(blob, nombre, texto);
+};
+
+function descargarRespaldo(blob, nombre, texto) {
+  /* 2. Descarga clásica. Solo se intenta donde puede funcionar: si la etiqueta
+     <a> no soporta `download`, este camino no baja nada. */
   const a = document.createElement('a');
+  if (typeof a.download === 'undefined') return mostrarRespaldoEnPantalla(texto, nombre);
+
+  let url;
+  try { url = URL.createObjectURL(blob); }
+  catch (e) { return mostrarRespaldoEnPantalla(texto, nombre); }
+
   a.href = url;
-  a.download = 'mi-alcancia-' + dayKey() + '.json';
+  a.download = nombre;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-  toast('Respaldo descargado', 'ok');
+  /* Aquí sí se puede afirmar que el navegador se hizo cargo del archivo. */
+  toast('Respaldo descargado', 'ok', 3200);
+}
+
+/* 3. Último recurso: el respaldo a la vista, para copiarlo y pegarlo donde
+   quieras. Feo, pero es la diferencia entre tener tus datos y no tenerlos. */
+function mostrarRespaldoEnPantalla(texto, nombre) {
+  openSheet('Tu respaldo',
+    '<p class="t-sub">Este navegador no deja guardar el archivo por sí solo. ' +
+      'Copia todo este texto y pégalo en una nota o en un correo para ti.</p>' +
+    '<p class="t-cap faint">Para volver a cargarlo, guárdalo como <code>' + esc(nombre) +
+      '</code> y úsalo en <b>Restaurar</b>.</p>' +
+    '<button class="btn btn--primary btn--block" type="button" data-act="copiar-respaldo">' +
+      ico('download', 18) + 'Copiar al portapapeles</button>' +
+    '<textarea class="textarea" id="respaldoTxt" readonly rows="10" ' +
+      'style="min-height:12rem;font-family:ui-monospace,Menlo,monospace;font-size:var(--t-cap)">' +
+      esc(texto) + '</textarea>');
+}
+
+ACTIONS['copiar-respaldo'] = function () {
+  const t = $('#respaldoTxt');
+  if (!t) return;
+  const hecho = function () { toast('Respaldo copiado', 'ok'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t.value).then(hecho).catch(function () {
+      t.select(); toast('Selecciónalo y cópialo a mano', 'bad', 4000);
+    });
+    return;
+  }
+  t.select();
+  try {
+    if (document.execCommand('copy')) hecho();
+    else toast('Selecciónalo y cópialo a mano', 'bad', 4000);
+  } catch (e) { toast('Selecciónalo y cópialo a mano', 'bad', 4000); }
 };
 
 ACTIONS.importar = function () {

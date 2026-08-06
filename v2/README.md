@@ -134,8 +134,8 @@ Con Node y Playwright instalados:
 python3 -m http.server 8000     # o cualquier servidor estático
 ```
 
-Las pruebas de esta reconstrucción son 94, escritas contra Chromium a tamaño de
-iPhone 13, repartidas en seis suites:
+Las pruebas de esta reconstrucción son 106, escritas contra Chromium a tamaño de
+iPhone, repartidas en siete suites:
 
 | Suite | Qué cubre |
 |---|---|
@@ -144,4 +144,5 @@ iPhone 13, repartidas en seis suites:
 | 13 de defectos | una por cada bug que encontró la revisión, para que no vuelvan |
 | 12 de interacción | iconos, botón de atrás, doble toque, hojas, buscadores, vistas que fallan |
 | 10 de datos | los caminos por los que se podía perder información |
+| 12 de PWA | cifras largas a 390 y 320 px, el respaldo sin descargas, el aterrizaje al cambiar de pestaña |
 | 8 de móvil | zoom de iOS, áreas táctiles, botones anidados, áreas seguras, rutas relativas |
