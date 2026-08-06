@@ -99,7 +99,8 @@ contra el nuevo.
 
 ## Tus datos
 
-Viven en tu teléfono y no salen de ahí.
+Viven en tu teléfono: no hay servidor ni cuenta. Las dos llamadas a internet que
+sí existen están detalladas más abajo.
 
 | Dónde | Qué |
 |---|---|
@@ -111,9 +112,20 @@ Viven en tu teléfono y no salen de ahí.
 La primera vez que abras v2 se traen solos los datos de la versión anterior.
 Puedes volver a traerlos cuando quieras desde **Más → Tus datos**.
 
-En esa misma pantalla puedes bajar un respaldo `.json` con todo tu historial.
+En esa misma pantalla puedes sacar un respaldo `.json` con todo tu historial.
 Hazlo antes de cambiar de teléfono: las fotos del calendario no caben en el
 archivo y son lo único que no viaja.
+
+Según dónde estés, el respaldo sale por un camino u otro, y la app te dice cuál:
+
+- **En el iPhone** se abre la hoja de compartir y lo guardas en Archivos, lo
+  mandas por correo o donde quieras. Un `<a download>` no sirve ahí: dentro de
+  la app envuelta con Capacitor no descarga nada.
+- **En el escritorio** se baja como archivo, sin más.
+- **Si el navegador no puede ninguna de las dos**, el respaldo se enseña en
+  pantalla con un botón para copiarlo.
+
+El aviso de "listo" solo aparece en el camino que de verdad terminó.
 
 Las únicas dos llamadas a internet que hace la app:
 
