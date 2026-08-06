@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Versión enmascarable: el sistema puede recortar hasta un círculo, así que
+       todo lo importante queda dentro del 80% central y el fondo llega al borde. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A1730"/>
+      <stop offset="1" stop-color="#0B0B12"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FDE68A"/>
+    </linearGradient>
+    <clipPath id="body">
+      <ellipse cx="245" cy="281" rx="105" ry="81"/>
+      <ellipse cx="355" cy="278" rx="33" ry="27"/>
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="256" cy="180" r="170" fill="#7C6BFF" opacity="0.16"/>
+
+  <g transform="translate(0,8)">
+    <path d="M186 218 L174 163 L232 200 Z" fill="#F3A8C4"/>
+    <path d="M304 201 L343 168 L334 224 Z" fill="#F3A8C4"/>
+    <rect x="171" y="336" width="30" height="45" rx="12" fill="#F3A8C4"/>
+    <rect x="216" y="339" width="30" height="42" rx="12" fill="#F3A8C4"/>
+    <rect x="261" y="339" width="30" height="42" rx="12" fill="#F3A8C4"/>
+    <rect x="306" y="336" width="30" height="45" rx="12" fill="#F3A8C4"/>
+    <path d="M142 265c-15-6-21 9-11 15s18-9 6-18" fill="none" stroke="#F3A8C4" stroke-width="8" stroke-linecap="round"/>
+
+    <ellipse cx="245" cy="281" rx="105" ry="81" fill="#F3A8C4"/>
+    <ellipse cx="355" cy="278" rx="33" ry="27" fill="#F3A8C4"/>
+
+    <g clip-path="url(#body)">
+      <rect x="0" y="281" width="512" height="90" fill="url(#coin)" opacity="0.9"/>
+    </g>
+
+    <rect x="208" y="221" width="67" height="14" rx="7" fill="#3B1E2C" opacity="0.6"/>
+    <circle cx="316" cy="252" r="8" fill="#3B1E2C"/>
+    <ellipse cx="347" cy="278" rx="6" ry="9" fill="#D9789C"/>
+    <ellipse cx="365" cy="278" rx="6" ry="9" fill="#D9789C"/>
+  </g>
+</svg>

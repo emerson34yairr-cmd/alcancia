@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A1730"/>
+      <stop offset="1" stop-color="#0B0B12"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FDE68A"/>
+    </linearGradient>
+    <clipPath id="body">
+      <ellipse cx="243" cy="286" rx="150" ry="116"/>
+      <ellipse cx="400" cy="282" rx="47" ry="39"/>
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" rx="114" fill="url(#bg)"/>
+  <circle cx="256" cy="150" r="210" fill="#7C6BFF" opacity="0.16"/>
+
+  <!-- orejas -->
+  <path d="M158 200 L141 122 L223 174 Z" fill="#F3A8C4"/>
+  <path d="M326 176 L382 128 L369 208 Z" fill="#F3A8C4"/>
+  <!-- patas -->
+  <rect x="136" y="368" width="43" height="64" rx="17" fill="#F3A8C4"/>
+  <rect x="200" y="372" width="43" height="60" rx="17" fill="#F3A8C4"/>
+  <rect x="264" y="372" width="43" height="60" rx="17" fill="#F3A8C4"/>
+  <rect x="328" y="368" width="43" height="64" rx="17" fill="#F3A8C4"/>
+  <!-- colita -->
+  <path d="M96 264c-21-9-30 13-15 21s26-13 9-26" fill="none" stroke="#F3A8C4" stroke-width="11" stroke-linecap="round"/>
+
+  <!-- cuerpo y hocico -->
+  <ellipse cx="243" cy="286" rx="150" ry="116" fill="#F3A8C4"/>
+  <ellipse cx="400" cy="282" rx="47" ry="39" fill="#F3A8C4"/>
+
+  <!-- monedas hasta media alcancía -->
+  <g clip-path="url(#body)">
+    <rect x="0" y="286" width="512" height="130" fill="url(#coin)" opacity="0.9"/>
+  </g>
+
+  <!-- ranura, ojo y hocico -->
+  <rect x="192" y="204" width="96" height="20" rx="10" fill="#3B1E2C" opacity="0.6"/>
+  <circle cx="346" cy="248" r="11" fill="#3B1E2C"/>
+  <ellipse cx="389" cy="282" rx="9" ry="13" fill="#D9789C"/>
+  <ellipse cx="415" cy="282" rx="9" ry="13" fill="#D9789C"/>
+</svg>
