@@ -1839,7 +1839,17 @@ function sanitize() {
       };
     });
 
-  state.prices = (state.prices || []).slice(0, 300);
+  /* La memoria de precios también se sanea. Una fila mal formada aquí hacía
+     reventar la sugerencia de precio al abrir un artículo. */
+  state.prices = (state.prices || []).filter(function (p) {
+    return p && typeof p === 'object' && p.name && isFinite(Number(p.price));
+  }).map(function (p) {
+    return {
+      name: String(p.name).slice(0, 80),
+      price: Math.max(0, Number(p.price) || 0),
+      date: DATE_RE.test(p.date || '') ? p.date : '',
+    };
+  }).slice(0, 300);
   if (!MONEDAS[state.currency]) state.currency = 'USD';
   if (['auto', 'dark', 'light'].indexOf(state.theme) < 0) state.theme = 'auto';
 }
@@ -2118,7 +2128,7 @@ function openSheet(title, bodyHtml, onClose) {
      dejaba tres entradas y el botón de retroceso del teléfono había que
      pulsarlo tres veces para salir. */
   const yaAbierta = !!sheetEl;
-  closeSheet(true);
+  closeSheet(true, true);          /* la saliente se va en el acto, ver closeSheet */
   sheetOnClose = onClose || null;
 
   sheetBg = document.createElement('div');
@@ -2143,11 +2153,14 @@ function openSheet(title, bodyHtml, onClose) {
   document.body.appendChild(sheetEl);
   paintIcons(sheetEl);
 
-  /* Dos cuadros: el navegador necesita ver el estado inicial antes de animar. */
+  /* Dos cuadros: el navegador necesita ver el estado inicial antes de animar.
+     Se usan las referencias locales, no las del módulo: si la hoja se cierra
+     antes de que llegue el cuadro, las del módulo ya son null y esto reventaba. */
+  const elLocal = sheetEl, bgLocal = sheetBg;
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
-      sheetBg.classList.add('is-open');
-      sheetEl.classList.add('is-open');
+      bgLocal.classList.add('is-open');
+      elLocal.classList.add('is-open');
     });
   });
 
@@ -2158,12 +2171,33 @@ function openSheet(title, bodyHtml, onClose) {
   if (first && !/iPhone|iPad|Android/i.test(navigator.userAgent)) first.focus();
 }
 
-function closeSheet(silent) {
+function closeSheet(silent, inmediato) {
   if (!sheetEl) return;
   const el = sheetEl, bg = sheetBg, cb = sheetOnClose;
   sheetEl = sheetBg = sheetOnClose = null;
+
+  if (inmediato) {
+    /* Se quita en el acto, sin animación. Es lo que hace falta cuando una hoja
+       REEMPLAZA a otra: mientras la saliente seguía en el documento sus id
+       chocaban con los de la nueva, y $('#mAmount') devolvía el campo de la
+       hoja moribunda. Por eso cambiar de tipo parecía borrar lo escrito y
+       dejaba el campo sin su filtro de dígitos. */
+    el.remove();
+    if (bg) bg.remove();
+    if (!silent && cb) cb();
+    return;
+  }
+
   el.classList.remove('is-open');
   if (bg) bg.classList.remove('is-open');
+  /* Se apagan los toques YA, no cuando termina la animación: durante esos
+     280 ms de desvanecido el fondo seguía capturando el toque siguiente, así
+     que tocar justo después de guardar disparaba otro cierre. */
+  el.style.pointerEvents = 'none';
+  if (bg) bg.style.pointerEvents = 'none';
+  /* Y se le quitan los identificadores, para que ninguna búsqueda por id
+     alcance a la hoja que se está yendo. */
+  $$('[id]', el).forEach(function (n) { n.removeAttribute('id'); });
   setTimeout(function () { el.remove(); if (bg) bg.remove(); }, 280);
   if (!silent && cb) cb();
 }
@@ -2173,16 +2207,26 @@ function closeSheet(silent) {
    llamar a history.back() a ciegas: hacerlo sin haber empujado nada te saca
    de la app y pierdes lo que estabas haciendo. */
 function cerrarYVolver() {
-  closeSheet(true);
   if (sheetPushes > 0) {
-    sheetPushes--;
-    try { history.back(); } catch (e) {}
+    /* La contabilidad la lleva ENTERA el manejador de popstate. Descontar aquí
+       además hacía que el retroceso se apuntara a la pestaña en vez de a la
+       hoja, y guardar un artículo te sacaba de la lista de compras. */
+    try { history.back(); } catch (e) { sheetPushes = 0; closeSheet(true); }
+  } else {
+    closeSheet(true);
   }
 }
 
+/* Cada retroceso consume exactamente una entrada. Una hoja siempre es lo último
+   que se empujó —con una hoja abierta no se puede cambiar de pestaña—, así que
+   si hay hojas pendientes el retroceso es suyo; si no, es de la pestaña. */
 window.addEventListener('popstate', function () {
-  if (sheetPushes > 0) sheetPushes--;
-  if (sheetEl) closeSheet();
+  if (sheetPushes > 0) {
+    sheetPushes--;
+    closeSheet(true);
+    return;
+  }
+  goBackTab();
 });
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape' && sheetEl) cerrarYVolver();
@@ -2448,12 +2492,32 @@ function renderTabbar() {
   paintIcons($('#tabbar'));
 }
 
+/* Pila de pestañas visitadas, para que el botón de atrás del teléfono vuelva a
+   la pantalla anterior en vez de salir de la app. Antes, entrar en Calendario
+   desde "Más" y pulsar atrás te sacaba directamente. */
+let tabStack = [];
+
 function go(tab, keepScroll) {
   if (!VIEWS[tab]) tab = 'hoy';
   const changed = state.tab !== tab;
+  if (changed) {
+    tabStack.push(state.tab);
+    if (tabStack.length > 30) tabStack.shift();
+    try { history.pushState({ tab: tab }, ''); } catch (e) {}
+  }
   state.tab = tab;
   save();
   render(keepScroll || !changed);
+}
+
+/* Igual que go(), pero sin empujar historial: es la vuelta atrás. */
+function goBackTab() {
+  const prev = tabStack.pop();
+  if (!prev || !VIEWS[prev]) return false;
+  state.tab = prev;
+  save();
+  render();
+  return true;
 }
 
 /* Repinta la vista activa. Guardar la posición del scroll importa: sin eso,
@@ -2463,7 +2527,21 @@ function render(keepScroll) {
   const sc = $('#scroll');
   const y = sc ? sc.scrollTop : 0;
   const host = $('#view');
-  host.innerHTML = VIEWS[state.tab]();
+  /* Si una vista falla, la app no se queda muerta: se enseña el fallo y la
+     barra de pestañas se pinta igual, para poder salir de ahí. Antes, un error
+     dentro de una vista dejaba la pantalla en blanco y sin navegación. */
+  try {
+    host.innerHTML = VIEWS[state.tab]();
+  } catch (err) {
+    host.innerHTML =
+      '<section class="card"><div class="empty">' +
+        '<div class="empty__title">Esta pantalla no se pudo dibujar</div>' +
+        '<div class="empty__text">Tus datos están a salvo. Prueba otra pestaña, ' +
+          'y si se repite baja un respaldo desde Más → Tus datos.</div>' +
+        '<div class="t-cap faint" style="margin-top:var(--s3)">' +
+          esc(String((err && err.message) || err)) + '</div>' +
+      '</div></section>';
+  }
   paintIcons(host);
   renderTabbar();
   renderStreak();
@@ -3457,7 +3535,7 @@ VIEWS.mas = function () {
     }).join('') +
   '</section>' +
 
-  '<p class="t-cap faint" style="text-align:center">Mi Alcancía · todo se guarda en tu teléfono</p>';
+  '<p class="t-cap faint" style="text-align:center">Mi Alcancía · tus datos viven en este teléfono</p>';
 };
 
 /* ── 15. VISTA: LOGROS ───────────────────────────────────────────────────── */
@@ -4385,9 +4463,13 @@ function leerRecibo(file) {
 
 let chat = [];       /* {rol:'yo'|'ella', txt} — solo en memoria */
 let chatBusy = false;
+let chatEnVuelo = false;   /* hay una petición a Groq realmente en marcha */
 
 VIEWS.asistente = function () {
   const key = groqKey();
+  /* Si saliste de la pantalla con una respuesta en vuelo, al volver no debe
+     seguir el globo de "escribiendo" para siempre. */
+  if (chatBusy && !chatEnVuelo) chatBusy = false;
   return '' +
   '<div class="subhead">' +
     '<button class="iconbtn" type="button" data-act="tab" data-tab="mas" aria-label="Volver">' +
@@ -4543,6 +4625,7 @@ function chatEnviar(txt) {
   }
 
   chatBusy = true;
+  chatEnVuelo = true;
   render(true);
   scrollChat();
 
@@ -4576,7 +4659,7 @@ function chatEnviar(txt) {
     .then(function (d) {
       const txt = d && d.choices && d.choices[0] && d.choices[0].message &&
                   d.choices[0].message.content;
-      chatBusy = false;
+      chatBusy = false; chatEnVuelo = false;
       chat.push({ rol: 'ella', txt: (txt || '').trim() || responderLocal(q) });
       render(true);
       scrollChat();
@@ -4584,7 +4667,7 @@ function chatEnviar(txt) {
     .catch(function (err) {
       /* Sin red o con la clave mala se contesta igual, con el motor local: es
          mejor una respuesta útil que un mensaje de error. */
-      chatBusy = false;
+      chatBusy = false; chatEnVuelo = false;
       chat.push({ rol: 'ella', txt: responderLocal(q) });
       render(true);
       scrollChat();
@@ -4592,11 +4675,14 @@ function chatEnviar(txt) {
     });
 }
 
-function scrollChat() {
+function scrollChat(devolverFoco) {
   const b = $('#chatBox');
   if (b) b.scrollTop = b.scrollHeight;
   const sc = $('#scroll');
   if (sc) sc.scrollTop = sc.scrollHeight;
+  /* Sin esto había que volver a tocar el campo para escribir la siguiente
+     pregunta, y en el teléfono eso significa que el teclado se cierra. */
+  if (devolverFoco) { const i = $('#chatIn'); if (i) i.focus(); }
 }
 
 /* ── 20. VISTA: TUS DATOS ────────────────────────────────────────────────── */
@@ -4740,8 +4826,26 @@ VIEWS.ajustes = function () {
     '</button>' +
   '</section>' +
 
-  '<p class="t-cap faint" style="text-align:center">Mi Alcancía · ' + esc(cur.name) + '<br>' +
-    'Nada sale de tu teléfono.</p>';
+  /* Redacción exacta a propósito: la app SÍ hace dos llamadas a internet, y
+     decir "nada sale de tu teléfono" a secas sería mentira en cuanto pongas
+     una clave de Groq. */
+  '<section class="card stack-2">' +
+    '<div class="card__label">Qué sale de tu teléfono</div>' +
+    '<p class="t-cap muted">Tus movimientos, metas y fotos se quedan aquí: no hay ' +
+      'servidor ni cuenta. Solo se hacen dos llamadas a internet:</p>' +
+    '<p class="t-cap faint"><b>Tipos de cambio</b> — una vez al día a open.er-api.com. ' +
+      'No se manda ningún dato tuyo.</p>' +
+    '<p class="t-cap faint"><b>Groq</b> — solo si guardaste una clave. Al escanear un ' +
+      'recibo se envía esa foto; al preguntarle al asistente se envían tus <b>totales</b> ' +
+      '(cuánto llevas ganado, ahorrado y gastado, tus metas y tus presupuestos). ' +
+      'No se envían tus notas. Sin clave, no se llama a Groq nunca.</p>' +
+    (groqKey()
+      ? '<button class="btn btn--soft btn--block" type="button" data-act="borrar-key">' +
+        'Quitar la clave de Groq</button>'
+      : '') +
+  '</section>' +
+
+  '<p class="t-cap faint" style="text-align:center">Mi Alcancía · ' + esc(cur.name) + '</p>';
 };
 
 /* ── 9. ACCIONES ─────────────────────────────────────────────────────────── */
@@ -5037,7 +5141,13 @@ const ACTIONS = {
             bytes: r.bytes, type: r.type, addedAt: new Date().toISOString(),
           });
         })
-        .then(function () { fotoSet[k] = true; pintarFoto(k); toast('Foto guardada', 'ok'); })
+        .then(function () {
+          fotoSet[k] = true;
+          pintarFoto(k);
+          /* La cuadrícula de detrás también lleva la marca de cámara. */
+          if (state.tab === 'calendario') render(true);
+          toast('Foto guardada', 'ok');
+        })
         .catch(function () {
           toast('No se pudo guardar la foto', 'bad');
           pintarFoto(k);
@@ -5051,6 +5161,7 @@ const ACTIONS = {
     fotoDel(k).then(function () {
       delete fotoSet[k];
       pintarFoto(k);
+      if (state.tab === 'calendario') render(true);
       toast('Foto quitada');
     }).catch(function () { toast('No se pudo quitar', 'bad'); });
   },
@@ -5241,7 +5352,9 @@ ACTIONS.importar = function () {
       if (parsed && parsed.state) incoming = parsed.state;
       else if (parsed && Array.isArray(parsed.entries)) incoming = parsed;
       else if (parsed && parsed.keys && typeof parsed.keys === 'object') {
-        incoming = deV1(parsed.keys);
+        /* La conversión va dentro de su propio try: un respaldo antiguo con
+           una clave corrompida lanzaba aquí y el botón parecía no hacer nada. */
+        try { incoming = deV1(parsed.keys); } catch (err) { incoming = null; }
         if (!incoming) {
           toast('Ese respaldo de la versión anterior no traía datos', 'bad', 4500);
           return;
@@ -5490,12 +5603,13 @@ document.addEventListener('input', function (ev) {
   if (!t) return;
   if (t.id === 'rq') {
     const v = t.value;
+    const pos = t.selectionStart;
     clearTimeout(qTimer);
     qTimer = setTimeout(function () {
       recetaQ = v;
       render(true);
       const n = $('#rq');
-      if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+      if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} }
     }, 220);
   }
   if (t.classList && t.classList.contains('scanrow__ck') && scanItems) {
@@ -5534,14 +5648,16 @@ let qTimer = null;
 document.addEventListener('input', function (ev) {
   if (!ev.target || ev.target.id !== 'fq') return;
   const v = ev.target.value;
+  const pos = ev.target.selectionStart;
   clearTimeout(qTimer);
   qTimer = setTimeout(function () {
     state.filters.q = v;
     save();
     render(true);
-    /* Devuelve el cursor al buscador para poder seguir escribiendo. */
+    /* Devuelve el foco DONDE ESTABA el cursor. Mandarlo siempre al final hacía
+       imposible corregir una letra en medio de lo escrito. */
     const n = $('#fq');
-    if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+    if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} }
   }, 220);
 });
 
@@ -5605,13 +5721,35 @@ function checkBudgets(rec) {
   });
 }
 
+/* Acciones que crean o borran algo y no deben ejecutarse dos veces si el toque
+   se repite: en un teléfono es fácil que un botón reciba dos golpes seguidos
+   antes de que la hoja termine de cerrarse, y eso apuntaba el mismo gasto dos
+   veces. Se ignora la repetición durante medio segundo. */
+const UNA_VEZ = {
+  'guardar-mov': 1, 'borrar-mov': 1, 'guardar-meta': 1, 'borrar-meta': 1,
+  'guardar-presupuesto': 1, 'borrar-presupuesto': 1, 'guardar-item': 1,
+  'borrar-item': 1, 'compras-a-gasto': 1, 'scan-gasto': 1, 'scan-compras': 1,
+  'receta-a-compras': 1, 'agregar-item': 1, 'borrar-todo-ok': 1,
+  'reimportar-v1-ok': 1, 'limpiar-comprados': 1, 'deshacer': 1,
+};
+let ultimaAccion = '', ultimaTs = 0;
+
 /* Delegación. Sube desde el elemento tocado hasta encontrar un data-act. */
 document.addEventListener('click', function (ev) {
   const el = ev.target.closest ? ev.target.closest('[data-act]') : null;
   if (!el) return;
-  const fn = ACTIONS[el.dataset.act];
+  const act = el.dataset.act;
+  const fn = ACTIONS[act];
   if (!fn) return;
   ev.preventDefault();
+
+  if (UNA_VEZ[act]) {
+    const ahora = Date.now();
+    const clave = act + '|' + (el.dataset.id || el.dataset.kind || '');
+    if (clave === ultimaAccion && ahora - ultimaTs < 500) return;
+    ultimaAccion = clave;
+    ultimaTs = ahora;
+  }
   fn(el, ev);
 });
 
@@ -5620,6 +5758,11 @@ document.addEventListener('click', function (ev) {
 function boot() {
   load();
   applyTheme();
+
+  /* Los iconos de la cabecera están escritos en el HTML y no pasan por render(),
+     así que hay que pintarlos a mano una vez. Sin esto el botón de Ajustes sale
+     vacío y la racha pierde su llama. */
+  paintIcons(document);
 
   if (readFailed) {
     /* Se abre vacía y se dice por qué, sin escribir nada encima. */
