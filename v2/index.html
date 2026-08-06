@@ -830,15 +830,17 @@ svg { display: block; flex: none; }
   border-radius: var(--r-lg);
 }
 .amount__sym { font-size: var(--t-head); font-weight: 700; color: var(--ink-3); }
+/* Alineado a la izquierda y pegado al símbolo: centrado, el número quedaba
+   flotando lejos del "$" y se leía como dos cosas distintas. */
 .amount__in {
   width: 100%;
-  max-width: 11rem;
+  max-width: 9.5rem;
   border: 0;
   background: none;
   font-size: 2.75rem;
   font-weight: 800;
   letter-spacing: -0.04em;
-  text-align: center;
+  text-align: left;
   padding: 0;
 }
 .amount__in:focus { outline: none; }
@@ -849,6 +851,10 @@ svg { display: block; flex: none; }
   display: flex;
   align-items: center;
   gap: var(--s2);
+  /* Sin esto, un elemento de rejilla no encoge por debajo de su contenido:
+     con `white-space: nowrap` dentro, la columna se ensancha y la rejilla se
+     sale de la tarjeta en vez de recortar el texto. */
+  min-width: 0;
   min-height: 2.75rem;
   padding: 0 var(--s3);
   background: var(--surface-3);
@@ -861,7 +867,12 @@ svg { display: block; flex: none; }
   transition: border-color 160ms var(--ease), color 160ms var(--ease),
               background 160ms var(--ease);
 }
-.catopt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catopt span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catopt b { flex: none; }
+.catgrid--1 { grid-template-columns: 1fr; }
+.catopt__sym { width: 1.5rem; text-align: center; color: var(--ink-3); }
+.catopt.is-on .catopt__sym { color: var(--brand-2); }
+.catopt__code { flex: none; letter-spacing: 0.04em; }
 .catopt.is-on {
   border-color: var(--brand);
   background: color-mix(in srgb, var(--brand) 15%, transparent);
@@ -1401,6 +1412,10 @@ const ICONS = {
   camera:   '<path d="M3 9a2 2 0 0 1 2-2h1.8l1.2-2h8l1.2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><circle cx="12" cy="13" r="3.5"/>',
   filter:   '<path d="M3 5.5h18M6.5 12h11M10 18.5h4"/>',
   bag:      '<path d="M5 8h14l1 12H4L5 8Z"/><path d="M8.5 8V6a3.5 3.5 0 0 1 7 0v2"/>',
+  bus:      '<rect x="4" y="3.5" width="16" height="13" rx="3"/><path d="M4 10.5h16"/><path d="M7.5 16.5V19M16.5 16.5V19"/><circle cx="8" cy="13.5" r="1.1"/><circle cx="16" cy="13.5" r="1.1"/>',
+  heart:    '<path d="M12 20S3.5 14.6 3.5 9.2A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.5 2.8C20.5 14.6 12 20 12 20Z"/>',
+  music:    '<path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  zap:      '<path d="M13.5 2 4 13.5h6.5L10 22l9.5-11.5H13L13.5 2Z"/>',
   clock:    '<circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.3 2"/>',
   book:     '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v18H6.5A1.5 1.5 0 0 1 5 19.5v-15Z"/><path d="M5 17.5h14"/>',
 };
@@ -1570,11 +1585,11 @@ const SCHEMA = 1;
 const CATS = [
   { id: 'food',          name: 'Comida',     icon: 'chef',     tint: '#F59E0B' },
   { id: 'shopping',      name: 'Compras',    icon: 'cart',     tint: '#22C55E' },
-  { id: 'transport',     name: 'Transporte', icon: 'right',    tint: '#38BDF8' },
+  { id: 'transport',     name: 'Transporte', icon: 'bus',      tint: '#38BDF8' },
   { id: 'home',          name: 'Casa',       icon: 'home',     tint: '#A78BFA' },
-  { id: 'health',        name: 'Salud',      icon: 'alert',    tint: '#FB7185' },
-  { id: 'entertainment', name: 'Ocio',       icon: 'sparkles', tint: '#818CF8' },
-  { id: 'bills',         name: 'Servicios',  icon: 'wallet',   tint: '#2DD4BF' },
+  { id: 'health',        name: 'Salud',      icon: 'heart',    tint: '#FB7185' },
+  { id: 'entertainment', name: 'Ocio',       icon: 'music',    tint: '#818CF8' },
+  { id: 'bills',         name: 'Servicios',  icon: 'zap',      tint: '#2DD4BF' },
   { id: 'general',       name: 'Otro',       icon: 'grid',     tint: '#94A3B8' },
 ];
 const CAT_BY_ID = {};
@@ -4372,13 +4387,17 @@ VIEWS.ajustes = function () {
 
   '<section class="card stack">' +
     '<div class="card__label">Moneda</div>' +
-    '<div class="catgrid">' +
+    /* A una sola columna: a dos, "Peso mexicano" y "Peso colombiano" se cortan.
+       Se enseña también el código porque el dólar, el peso mexicano y el
+       colombiano comparten el símbolo $ y el nombre solo no basta. */
+    '<div class="catgrid catgrid--1">' +
       Object.keys(MONEDAS).map(function (code) {
         const m = MONEDAS[code];
         return '<button class="catopt' + (code === state.currency ? ' is-on' : '') + '" type="button" ' +
                'data-act="moneda" data-v="' + code + '">' +
-               '<b style="width:1.75rem">' + esc(m.sym) + '</b>' +
-               '<span>' + esc(m.name) + '</span></button>';
+               '<b class="catopt__sym">' + esc(m.sym) + '</b>' +
+               '<span class="grow">' + esc(m.name) + '</span>' +
+               '<span class="catopt__code t-cap faint">' + esc(code) + '</span></button>';
       }).join('') +
     '</div>' +
     '<p class="t-cap faint">Todo se guarda en dólares y se convierte al mostrar, así que ' +
