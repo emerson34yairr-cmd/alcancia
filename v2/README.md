@@ -117,10 +117,12 @@ archivo y son lo único que no viaja.
 
 Las únicas dos llamadas a internet que hace la app:
 
-- `open.er-api.com` — tipos de cambio, una vez al día. Sin esto todo se muestra
-  en dólares y nada más.
-- `api.groq.com` — solo si pusiste una clave, y solo al escanear un recibo o
-  preguntarle algo al asistente.
+- `open.er-api.com` — tipos de cambio, una vez al día. **No se manda ningún dato
+  tuyo.** Sin tipo de cambio la app muestra y captura en dólares, y lo avisa.
+- `api.groq.com` — **solo si guardaste una clave**. Al escanear un recibo se
+  envía esa foto; al preguntarle al asistente se envían tus **totales**
+  (ganado, ahorrado, gastado, metas y presupuestos). Tus notas no se envían.
+  Sin clave, el asistente responde igual con las reglas que lleva dentro.
 
 ---
 
@@ -132,8 +134,14 @@ Con Node y Playwright instalados:
 python3 -m http.server 8000     # o cualquier servidor estático
 ```
 
-Las pruebas de esta reconstrucción (35 de extremo a extremo, 16 de migración y
-8 de comportamiento en móvil) se escribieron contra Chromium a tamaño de
-iPhone 13 y cubren altas y bajas de movimientos, metas, presupuestos, lista de
-compras, respaldo y restauración, el camino de datos corruptos y la migración
-completa desde la versión anterior.
+Las pruebas de esta reconstrucción son 94, escritas contra Chromium a tamaño de
+iPhone 13, repartidas en seis suites:
+
+| Suite | Qué cubre |
+|---|---|
+| 35 de extremo a extremo | altas, ediciones y bajas de movimientos, validación, metas, lista de compras a gasto, presupuestos, privacidad, moneda, recarga, respaldo y restauración, recetas, asistente y escáner |
+| 16 de migración | conversión desde datos con la forma exacta de la v1, y que la v1 queda byte a byte igual |
+| 13 de defectos | una por cada bug que encontró la revisión, para que no vuelvan |
+| 12 de interacción | iconos, botón de atrás, doble toque, hojas, buscadores, vistas que fallan |
+| 10 de datos | los caminos por los que se podía perder información |
+| 8 de móvil | zoom de iOS, áreas táctiles, botones anidados, áreas seguras, rutas relativas |
