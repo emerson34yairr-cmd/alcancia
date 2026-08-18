@@ -10712,6 +10712,35 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
   letter-spacing:0;
   margin-top:-2px;
 }
+/* --- MES CONTRA MES: segunda seccion dentro de #weekSummaryCard.
+   Reusa .ws-compare/.ws-compare-row (hairline superior y colores
+   up/down/flat de las reglas de 7711-7724, contraste de H4).
+   Aqui solo lo nuevo, con la misma especificidad (1 id + 2 clases)
+   y al final de la hoja para ganar por orden. --- */
+#page-hoy.fx-home .wsm-range{
+  font-size:10px;font-weight:600;color:rgba(180,196,238,.45);
+  letter-spacing:.4px;margin-top:-4px;
+}
+#page-hoy.fx-home .wsm-right{display:inline-flex;align-items:center;gap:8px;}
+#page-hoy.fx-home .wsm-amt{
+  font-size:12px;font-weight:700;color:rgba(220,230,255,.82);
+  font-variant-numeric:tabular-nums;
+}
+/* Es dinero: mismo blur que la lista de privacy-mode (8860). */
+body.privacy-mode .wsm-amt{
+  filter:blur(8px);opacity:.62;user-select:none;
+}
+/* --- LOTE C: alerta de precios propios en Compras. Clases nuevas
+   (ninguna regla vieja las nombra) espejando .shop-suggested-card pero
+   en ambar de aviso. Al final de la hoja: gana por orden. --- */
+#page-compras .shop-price-alerts-section{margin-bottom:18px;}
+#page-compras .shop-price-alerts-list{display:flex;flex-direction:column;gap:9px;}
+#page-compras .shop-price-alert-card{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:1px solid rgba(255,159,67,.22);border-radius:17px;padding:12px 13px;background:radial-gradient(circle at 10% 0%,rgba(255,159,67,.15),transparent 38%),linear-gradient(155deg,rgba(26,20,12,.96),rgba(13,10,7,.98));color:#ffefdd;font-family:'Syne',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.05) inset;}
+#page-compras .shop-price-alert-icon{font-size:18px;}
+#page-compras .shop-price-alert-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+#page-compras .shop-price-alert-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-compras .shop-price-alert-meta{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,206,160,.60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-compras .shop-price-alert-pct{font-family:'Space Mono',monospace;font-size:13px;font-weight:800;color:#ff9f43;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -11461,6 +11490,22 @@ body.privacy-mode .photo-lb-img{ filter:blur(16px); }
       <div class="ws-compare-row">
         <span class="ws-compare-lbl">Gastado</span>
         <span class="ws-compare-val flat is-spent" id="wsCmpSpent"><span class="ws-arrow">→</span><span>—</span></span>
+      </div>
+    </div>
+    <div class="ws-compare" id="wsMonthBlock" style="display:none">
+      <div class="ws-compare-title">Comparación con el mes anterior</div>
+      <div class="wsm-range" id="wsMonthRange">—</div>
+      <div class="ws-compare-row">
+        <span class="ws-compare-lbl">Ganado</span>
+        <span class="wsm-right"><span class="wsm-amt" id="wsmEarnedAmt">—</span><span class="ws-compare-val flat" id="wsmCmpEarned"><span class="ws-arrow">→</span><span>—</span></span></span>
+      </div>
+      <div class="ws-compare-row">
+        <span class="ws-compare-lbl">Ahorrado</span>
+        <span class="wsm-right"><span class="wsm-amt" id="wsmSavedAmt">—</span><span class="ws-compare-val flat" id="wsmCmpSaved"><span class="ws-arrow">→</span><span>—</span></span></span>
+      </div>
+      <div class="ws-compare-row">
+        <span class="ws-compare-lbl">Gastado</span>
+        <span class="wsm-right"><span class="wsm-amt" id="wsmSpentAmt">—</span><span class="ws-compare-val flat is-spent" id="wsmCmpSpent"><span class="ws-arrow">→</span><span>—</span></span></span>
       </div>
     </div>
   </section>
@@ -13760,6 +13805,52 @@ function wsDiff(curr,prev){
   if(d>0) return {pct:d,arrow:'↑',cls:'up',label:'+'+Math.round(d)+'%'};
   return {pct:d,arrow:'↓',cls:'down',label:Math.round(d)+'%'};
 }
+// ── MES CONTRA MES ──────────────────────────────────────────────────
+// Corta el mes anterior en el MISMO dia: con hoy=18-jul se compara
+// 1-18 jul contra 1-18 jun, no contra junio completo (la version
+// ingenua exagera la caida: -45% en vez de -10% con datos reales).
+function wsMonthCompare(now){
+  var day=now.getDate();
+  // Dias 1-3 del mes: un solo dia flojo pinta -80% sin significar nada.
+  if(day<=3) return null;
+  var y=now.getFullYear(), m=now.getMonth();
+  var prevRef=new Date(y,m-1,1);
+  var py=prevRef.getFullYear(), pm=prevRef.getMonth();
+  // min(dia, dias del mes anterior): el 31 contra un mes de 30.
+  var cut=Math.min(day,new Date(py,pm+1,0).getDate());
+  return {
+    curr:wsTotalsBetween(wsKeyOf(new Date(y,m,1)),wsKeyOf(new Date(y,m,day))),
+    prev:wsTotalsBetween(wsKeyOf(new Date(py,pm,1)),wsKeyOf(new Date(py,pm,cut))),
+    day:day, cut:cut, m:m, pm:pm
+  };
+}
+function renderMonthCompare(){
+  var block=document.getElementById('wsMonthBlock');
+  if(!block) return;
+  var mc=wsMonthCompare(new Date());
+  // Sin mes anterior que comparar (cuenta nueva) las tres filas dirian
+  // 'Nuevo': mejor no ensenar la seccion.
+  var hasPrev=mc&&(mc.prev.earned!==0||mc.prev.saved!==0||mc.prev.spent!==0);
+  if(!mc||!hasPrev){ block.style.display='none'; return; }
+  block.style.display='';
+  var months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  setText('wsMonthRange','1–'+mc.day+' '+months[mc.m]+' vs 1–'+mc.cut+' '+months[mc.pm]);
+  setText('wsmEarnedAmt',moneyText(mc.curr.earned));
+  setText('wsmSavedAmt',moneyText(mc.curr.saved));
+  setText('wsmSpentAmt',moneyText(mc.curr.spent));
+  var rows=[
+    {id:'wsmCmpEarned',d:wsDiff(mc.curr.earned,mc.prev.earned),s:false},
+    {id:'wsmCmpSaved', d:wsDiff(mc.curr.saved, mc.prev.saved), s:false},
+    {id:'wsmCmpSpent', d:wsDiff(mc.curr.spent, mc.prev.spent), s:true}
+  ];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var badge=document.getElementById(r.id);
+    if(!badge) continue;
+    badge.className='ws-compare-val '+r.d.cls+(r.s?' is-spent':'');
+    badge.innerHTML='<span class="ws-arrow">'+r.d.arrow+'</span><span>'+r.d.label+'</span>';
+  }
+}
 function renderWeekSummary(){
   var rangeEl=document.getElementById('wsRange');
   if(!rangeEl) return;
@@ -13788,6 +13879,7 @@ function renderWeekSummary(){
     el.className=cls;
     el.innerHTML='<span class="ws-arrow">'+p.d.arrow+'</span><span>'+p.d.label+'</span>';
   }
+  renderMonthCompare();
 }
 
 // ── INSIGHTS ───────────────────────────────────────────────────────
@@ -16009,6 +16101,60 @@ function renderShopSuggestions(){
     }).join('')
     +'</div></div>';
 }
+/* --- LOTE C: alerta de precios propios. El historial guarda los precios
+   tal cual se teclean (toShopPrice solo redondea, no convierte moneda),
+   igual que la linea 'Ultima vez: $' y las tarjetas de Sugeridos: se
+   pinta '$' + valor crudo para ser coherente con la pantalla Compras. --- */
+function getShopPriceAlerts(){
+  var MIN_FECHAS=3,MIN_PCT=10,MAX_DIAS=60;
+  var byItem={};
+  loadPriceHistory().forEach(function(it){
+    it=it||{};
+    var key=normPriceName(it.nombreItem);
+    var precio=toShopPrice(it.precio);
+    var fecha=String(it.fecha||'');
+    if(!key||precio<=0||!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return;
+    if(!byItem[key]) byItem[key]={name:String(it.nombreItem||'').trim(),porFecha:{}};
+    /* el historial va con lo mas nuevo PRIMERO (unshift): la primera
+       lectura vista de cada fecha es la ultima de ese dia. Dos lecturas
+       del mismo dia cuentan como UNA fecha (qty no se copia al historial
+       y un cambio de cantidad pareceria subida). */
+    if(byItem[key].porFecha[fecha]===undefined) byItem[key].porFecha[fecha]=precio;
+  });
+  var alerts=[];
+  Object.keys(byItem).forEach(function(k){
+    var reg=byItem[k];
+    var fechas=Object.keys(reg.porFecha).sort();
+    if(fechas.length<MIN_FECHAS) return;
+    var lastDate=fechas[fechas.length-1];
+    if(daysAgoFromDate(lastDate)>MAX_DIAS) return;
+    var first=reg.porFecha[fechas[0]],last=reg.porFecha[lastDate];
+    if(!(first>0)||last<=first) return;
+    var pct=(last-first)/first*100;
+    if(pct<MIN_PCT) return;
+    alerts.push({name:reg.name,firstPrice:first,lastPrice:last,pct:pct,sinceDate:fechas[0]});
+  });
+  return alerts.sort(function(a,b){return b.pct-a.pct;}).slice(0,4);
+}
+function renderShopPriceAlerts(){
+  var alerts=getShopPriceAlerts();
+  if(!alerts.length) return '';
+  return '<div class="shop-section shop-price-alerts-section">'
+    +'<div class="shop-section-hdr pending">Suben de precio <span>'+alerts.length+'</span></div>'
+    +'<div class="shop-price-alerts-list">'
+    +alerts.map(function(a){
+      var desde=mxSinceLabel(a.sinceDate);
+      return '<div class="shop-price-alert-card">'
+        +'<span class="shop-price-alert-icon">📈</span>'
+        +'<span class="shop-price-alert-main">'
+          +'<span class="shop-price-alert-name">'+escapeHtml(a.name)+'</span>'
+          +'<span class="shop-price-alert-meta">$'+a.firstPrice.toFixed(2)+' → $'+a.lastPrice.toFixed(2)+(desde?' · desde el '+desde:'')+'</span>'
+        +'</span>'
+        +'<span class="shop-price-alert-pct">+'+Math.round(a.pct)+'%</span>'
+      +'</div>';
+    }).join('')
+    +'</div></div>';
+}
 function renderShopList(){
   var el=$('shopList'),ctr=$('shopCounter'),clr=$('shopClearBtn');
   if(!el) return;
@@ -16093,9 +16239,9 @@ renderShopList=function(){
   _renderShopListBase();
   var el=$('shopList');
   if(!el||shopFilter!=='all') return;
-  var suggestions=renderShopSuggestions();
-  if(!suggestions) return;
-  el.insertAdjacentHTML(shopList.length?'afterbegin':'beforeend',suggestions);
+  var extras=renderShopPriceAlerts()+renderShopSuggestions();
+  if(!extras) return;
+  el.insertAdjacentHTML(shopList.length?'afterbegin':'beforeend',extras);
 };
 
 var RECIPES=[
@@ -18748,6 +18894,31 @@ function aiSend(){
   _aiGroqSend(text);
 }
 
+/* Fallback local: sin API key o sin red, responde el motor _aiRespond
+   con los datos del dispositivo en vez de colgarse. Mantiene un momento la
+   burbuja de "pensando" y luego pinta la respuesta real. */
+function _aiLocalReply(userMessage, ackId){
+  setTimeout(function(){
+    _aiRemoveAckBubble(ackId);
+    var reply = '';
+    try { reply = _aiRespond(userMessage); }
+    catch(err){
+      console.log('[AI local error]', err);
+      reply = 'No pude revisar tus datos ahora mismo 😅 Intenta preguntarme de otra forma.';
+    }
+    _aiAppendBot(reply);
+    _aiHistory.push({role:'bot', text:reply});
+    _aiTouchMemory();
+  }, 600 + Math.random()*300);
+}
+
+/* Los importes se GUARDAN en USD; el usuario ve la moneda activa (p.ej. L).
+   Todo numero que se le pase al modelo debe ir ya convertido. */
+function _aiCtxMoney(usd){
+  var v = (typeof toActiveCurrency === 'function') ? toActiveCurrency(Number(usd)||0) : (Number(usd)||0);
+  return Math.round(v*100)/100;
+}
+
 function _aiGroqSend(userMessage){
   var ackId = _aiShowAckBubble(_aiAck());
 
@@ -18756,15 +18927,29 @@ function _aiGroqSend(userMessage){
   try { snap = _aiBuildFinanceSnapshot(); } catch(e){ snap = {}; }
   var streak = 0;
   try { streak = calcStreak(); } catch(e){}
+  var _w = snap.week || {};
+  var _t = snap.today || {};
   var finCtx = JSON.stringify({
-    totalSaved: snap.all ? snap.all.totalSaved : 0,
-    totalSpent: snap.all ? snap.all.totalSpent : 0,
-    totalEarned: snap.all ? snap.all.totalEarned : 0,
+    totalSaved: _aiCtxMoney(snap.all ? snap.all.totalSaved : 0),
+    totalSpent: _aiCtxMoney(snap.all ? snap.all.totalSpent : 0),
+    totalEarned: _aiCtxMoney(snap.all ? snap.all.totalEarned : 0),
     streak: streak,
     savingsRate: snap.savingsRate || 0,
-    week: snap.week || {},
-    today: snap.today || {},
-    topCats: snap.topCats || [],
+    week: {
+      totalSpent: _aiCtxMoney(_w.totalSpent),
+      totalSaved: _aiCtxMoney(_w.totalSaved),
+      avgSpent: _aiCtxMoney(_w.avgSpent),
+      avgSaved: _aiCtxMoney(_w.avgSaved),
+      daysWithData: _w.daysWithData || 0
+    },
+    today: {
+      earned: _aiCtxMoney(_t.earned),
+      saved: _aiCtxMoney(_t.saved),
+      spent: _aiCtxMoney(_t.spent)
+    },
+    topCats: (snap.topCats || []).map(function(c){
+      return {label: c.label, amount: _aiCtxMoney(c.amount)};
+    }),
     currency: (typeof currSym === 'function') ? currSym() : '$'
   });
 
@@ -18784,8 +18969,10 @@ function _aiGroqSend(userMessage){
   var groqApiKey = '';
   try{ groqApiKey = localStorage.getItem('groq_api_key') || ''; }catch(e){}
   if(!groqApiKey){
-    _aiTyping(false);
-    aiAddMsg('bot','Configura tu API key de Groq en localStorage.groq_api_key para usar Alcancia AI.');
+    /* Estado por defecto de la app (la key solo se pone desde el escaner).
+       Antes esta rama llamaba dos funciones inexistentes y el chat quedaba
+       colgado en la burbuja eterna. Ahora responde el motor local. */
+    _aiLocalReply(userMessage, ackId);
     return;
   }
 
@@ -18807,7 +18994,7 @@ function _aiGroqSend(userMessage){
     _aiRemoveAckBubble(ackId);
     if(!r.ok){
       console.log('[Groq error] status:', r.status, 'body:', JSON.stringify(r.data));
-      _aiAppendBot('No pude conectarme, intenta de nuevo.');
+      _aiLocalReply(userMessage, ackId);
       return;
     }
     var reply = '';
@@ -18818,8 +19005,7 @@ function _aiGroqSend(userMessage){
     _aiTouchMemory();
   }).catch(function(err){
     console.log('[Groq fetch error]', err);
-    _aiRemoveAckBubble(ackId);
-    _aiAppendBot('No pude conectarme, intenta de nuevo.');
+    _aiLocalReply(userMessage, ackId);
   });
 }
 
@@ -18997,7 +19183,7 @@ function _aiRespond(q){
       msg += '\nEl promedio diario te está quedando en '+fmtMoney(Math.round(week.avgSpent))+'.';
     if(weekSaved > 0)
       msg += '\nY ya ahorraste '+fmtMoney(Math.round(weekSaved))+' 👍 ¡Bien hecho!';
-    if(totalThisWeek > week.avgSpent * 5)
+    if(week.daysWithData >= 3 && todaySpent > week.avgSpent * 1.5)
       msg += '\n\n⚠️ Ojo, vas un poco alto esta semana. Trata de frenar un poco los próximos días.';
     msg += '\nActividad reciente: '+snapshot.recent.text;
     return _aiWithInsight(msg, snapshot);
