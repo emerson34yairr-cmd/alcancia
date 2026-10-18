@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-alcancia-v4';
+const CACHE_NAME = 'mi-alcancia-v5';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -36,7 +36,9 @@ self.addEventListener('fetch', (event) => {
   event.respondWith((async () => {
     if (event.request.mode === 'navigate') {
       try {
-        const response = await fetch(event.request);
+        // no-cache: sin esto la cache HTTP de GitHub Pages podia servir el
+        // index.html viejo hasta 10 min despues de publicar.
+        const response = await fetch(event.request, { cache: 'no-cache' });
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
           cache.put(event.request, response.clone());
