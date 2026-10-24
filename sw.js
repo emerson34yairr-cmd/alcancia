@@ -1,10 +1,13 @@
-const CACHE_NAME = 'mi-alcancia-v5';
+const CACHE_NAME = 'mi-alcancia-v6';
 const CORE_ASSETS = [
   './',
   './index.html',
   './index.html.html',
   './app.webmanifest',
-  './assets/app-icon.svg'
+  './assets/app-icon.svg',
+  './assets/apple-touch-icon.png',
+  './assets/icon-192.png',
+  './assets/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
