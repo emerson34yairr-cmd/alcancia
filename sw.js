@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-alcancia-v6';
+const CACHE_NAME = 'mi-alcancia-v7';
 const CORE_ASSETS = [
   './',
   './index.html',

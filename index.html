@@ -10986,6 +10986,129 @@ html body .bud-cat-period{text-transform:none !important;letter-spacing:0 !impor
 #page-hoy .entry-item .entry-note{order:-1 !important;font-size:15px !important;font-weight:600 !important;color:#edf2ff !important;margin:0 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;}
 #page-hoy .entry-item .entry-amounts{display:flex !important;flex-wrap:wrap !important;gap:6px !important;}
 #page-hoy .entry-item .entry-chip{font-size:12px !important;padding:3px 8px !important;}
+
+/* ═══════════════════════════════════════════════════════════════════
+   REDISENO 25-10-2026 — look plano tipo iPhone. Va DESPUES del pase 24-10.
+   Fuera la galaxia, los brillos y los degradados morados: fondo negro,
+   tarjetas gris oscuro lisas, un solo color de accion (verde) y barra de
+   pestanas abajo (la inyecta el script #rNav al final del body).
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --r-bg:#000;--r-card:#1c1c1e;--r-card2:#2c2c2e;--r-line:rgba(84,84,88,.38);
+  --r-t1:#fff;--r-t2:rgba(235,235,245,.62);--r-t3:rgba(235,235,245,.32);
+  --r-green:#32d74b;--r-red:#ff453a;--r-blue:#0a84ff;--r-pink:#ff6b9a;--r-amber:#ffd60a;
+}
+html,html body{background:var(--r-bg) !important;}
+#galaxyBg{display:none !important;}
+.app-shell,.app-frame{background:var(--r-bg) !important;background-image:none !important;}
+
+/* ── Cabecera ── */
+.header{background:rgba(0,0,0,.82) !important;border:0 !important;box-shadow:none !important;}
+.header .logo{color:#fff !important;background:none !important;-webkit-text-fill-color:currentColor !important;}
+.header .logo span{color:var(--r-pink) !important;-webkit-text-fill-color:currentColor !important;background:none !important;}
+.streak-badge,.hdr-more-btn{background:var(--r-card) !important;background-image:none !important;border:0 !important;box-shadow:none !important;color:#fff !important;}
+.app-nudge{background:var(--r-card) !important;background-image:none !important;border:0 !important;box-shadow:none !important;}
+.app-nudge-icon{background:var(--r-card2) !important;border:0 !important;box-shadow:none !important;}
+
+/* ── Pestanas de arriba fuera: van abajo ── */
+.tabs-wrap{display:none !important;}
+.page-stack{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px)) !important;}
+#rNav{position:fixed;left:0;right:0;bottom:0;z-index:400;display:flex;justify-content:space-around;align-items:stretch;
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));background:rgba(18,18,20,.88);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-top:.5px solid var(--r-line);}
+#rNav button{flex:1 1 0;min-width:0;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:none;border:0;color:var(--r-t3);font:600 10.5px var(--f-ui);letter-spacing:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+#rNav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+#rNav button:active{opacity:.6;}
+body[data-tab="hoy"] #rNav [data-t="hoy"],body:not([data-tab]) #rNav [data-t="hoy"],
+body[data-tab="actividad"] #rNav [data-t="actividad"],body[data-tab="compras"] #rNav [data-t="compras"],
+body[data-tab="recetas"] #rNav [data-t="recetas"],
+body[data-tab="logros"] #rNav [data-t="mas"],body[data-tab="calendario"] #rNav [data-t="mas"],body[data-tab="escanear"] #rNav [data-t="mas"],
+body[data-tab="insights"] #rNav [data-t="mas"],body[data-tab="presupuesto"] #rNav [data-t="mas"],body[data-tab="consejos"] #rNav [data-t="mas"],
+body[data-tab="ai"] #rNav [data-t="mas"]{color:var(--r-green);}
+body:has(.command-overlay.show) #rNav,body:has(#aiOverlay.show) #rNav,body:has(#recipeOverlay.show) #rNav,body:has(#shopModeOverlay.open) #rNav,body:has(#shopModeOverlay.show) #rNav{display:none;}
+/* lo flotante sube por encima de la barra */
+#aiFab,.ai-fab{bottom:calc(84px + env(safe-area-inset-bottom,0px)) !important;background:var(--r-card2) !important;background-image:none !important;box-shadow:0 6px 20px rgba(0,0,0,.5) !important;border:0 !important;}
+.bud-fab{bottom:calc(84px + env(safe-area-inset-bottom,0px)) !important;background:var(--r-green) !important;background-image:none !important;color:#000 !important;box-shadow:0 6px 20px rgba(0,0,0,.5) !important;}
+#aiProactiveToast,#aiActionToast{bottom:calc(76px + env(safe-area-inset-bottom,0px)) !important;}
+.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px)) !important;}
+
+/* ── Tarjetas: lisas ── */
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-hero,.daily-brief-card,.fx-dash-card,.ws-card,.fx-chart-card,.mx-card,.day-card,.backup-card,
+  .ach-header-card,.ach-card2,.cal-top,.cal-grid-wrap,.rx-header,.mdb-search-box,.yt-search-box,.shop-total-card,
+  .sx-hero,.sx-key-card,.ins-card,.ins-chart-wrap,.bud-summary-card,.bud-cat-card,.consejo-bubble,.activity-filters,
+  .shop-item,.insight-panel,.cal-sum,.shop-cats,.ai-msg-bubble,.data-vault-card,.command-action,.sx-items-card,.sx-stat,.tip-bubble){
+  background:var(--r-card) !important;background-image:none !important;box-shadow:none !important;border:0 !important;
+  -webkit-backdrop-filter:none !important;backdrop-filter:none !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-hero,.daily-brief-card,.fx-dash-card,.ws-card,.fx-chart-card,.mx-card,.day-card,.backup-card,
+  .ach-header-card,.cal-top,.cal-grid-wrap,.rx-header,.mdb-search-box,.yt-search-box,.shop-total-card,
+  .sx-hero,.sx-key-card,.ins-card,.ins-chart-wrap,.bud-summary-card,.bud-cat-card,.consejo-bubble,.data-vault-card)::before,
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-hero,.daily-brief-card,.fx-dash-card,.ws-card,.fx-chart-card,.mx-card,.day-card,.backup-card,
+  .ach-header-card,.cal-top,.cal-grid-wrap,.rx-header,.mdb-search-box,.yt-search-box,.shop-total-card,
+  .sx-hero,.sx-key-card,.ins-card,.ins-chart-wrap,.bud-summary-card,.bud-cat-card,.consejo-bubble,.data-vault-card)::after{display:none !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-hero,.daily-brief-card,.fx-dash-card,.ws-card,.fx-chart-card,.mx-card,.day-card,.backup-card,.ach-header-card,
+  .cal-top,.cal-grid-wrap,.rx-header,.shop-total-card,.sx-hero,.sx-key-card,.ins-card,.bud-summary-card,.bud-cat-card,.consejo-bubble){border-radius:20px !important;}
+html body:not(#_a):not(#_b):not(#_c) .new-entry-box,html body:not(#_a):not(#_b):not(#_c) .fx-qa,html body:not(#_a):not(#_b):not(#_c) .entry-item{background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;}
+/* listas: filas sobre el fondo, separadas por una linea */
+#page-actividad .activity-item{background:none !important;box-shadow:none !important;border:0 !important;border-bottom:.5px solid var(--r-line) !important;border-radius:0 !important;}
+#page-actividad .activity-icon{background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;}
+#page-compras .shop-item{border-radius:14px !important;margin-bottom:6px !important;}
+#page-compras .shop-item.checked{background:var(--r-card) !important;opacity:.55 !important;}
+#page-compras .shop-item .shop-check::before{border-color:rgba(235,235,245,.3) !important;border-radius:50% !important;}
+#page-compras .shop-item.checked .shop-check::before{background:var(--r-green) !important;}
+#page-compras .shop-item.checked .shop-check{color:#000 !important;}
+
+/* ── Campos ── */
+html body:not(#_a):not(#_b):not(#_c) :is(input[type=text],input[type=number],input[type=search],input:not([type]),textarea,select):not(.r-keep){
+  background:var(--r-card2) !important;background-image:none !important;border:0 !important;box-shadow:none !important;color:#fff !important;border-radius:12px !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.mdb-search-box,.yt-search-box,.sx-key-card,.shop-input-row) :is(input,textarea){background:var(--r-card2) !important;}
+html body:not(#_a):not(#_b):not(#_c) .money-wrap{background:var(--r-bg) !important;background-image:none !important;border:0 !important;box-shadow:none !important;border-radius:12px !important;}
+html body:not(#_a):not(#_b):not(#_c) .money-wrap input{background:transparent !important;}
+html body:not(#_a):not(#_b):not(#_c) .new-entry-box :is(textarea,select){background:var(--r-bg) !important;}
+html body:not(#_a):not(#_b):not(#_c) .entry-category-icon{background:var(--r-bg) !important;border:0 !important;box-shadow:none !important;}
+html body ::placeholder{color:var(--r-t3) !important;}
+
+/* ── Botones: uno principal verde, el resto gris ── */
+html body:not(#_a):not(#_b):not(#_c) :is(.save-btn,.mdb-search-btn,.sx-key-save,.bud-add-btn,.consejos-refresh,.backup-btn.primary,.shop-add-btn,.mx-add-btn,.bud-modal-save,.mx-save-btn,.data-vault-primary,.ai-send-btn,.ai-send,#shopAddBtn){
+  background:var(--r-green) !important;background-image:none !important;color:#000 !important;box-shadow:none !important;border:0 !important;-webkit-text-fill-color:#000 !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-qa,.daily-brief-action,.work-btn,.backup-btn:not(.primary),.activity-filter,.rx-pill,.shop-pri-btn,.shop-cat,.bud-period-btn,
+  .shop-mode-entry,.shop-bulk-btn,.shop-clear-btn,.yt-btn,.rx-card-cta,.cal-nav-btn,.data-vault-close,.command-close,.mx-delete-btn,.bud-cat-edit-btn){
+  background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;color:#fff !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.activity-filter,.rx-pill,.shop-pri-btn,.shop-cat,.bud-period-btn,.work-btn).active{background:#fff !important;color:#000 !important;}
+html body:not(#_a):not(#_b):not(#_c) .rx-card-cta.cook{background:var(--r-green) !important;color:#000 !important;}
+html body:not(#_a):not(#_b):not(#_c) .shop-bulk-btn{background:rgba(50,215,75,.14) !important;color:var(--r-green) !important;}
+html body:not(#_a):not(#_b):not(#_c) .fx-qa :is(.fx-qa-ic,.fx-qa-icon,span:first-child){box-shadow:none !important;}
+
+/* ── Hoy: corto. Saldo, lo de hoy, resumen, tarjetas, metas, respaldo ── */
+#page-hoy #weekSummaryCard,#page-hoy #fxAnalytics{display:none !important;}
+#page-hoy > section,#page-hoy > div{margin-bottom:12px;}
+#page-hoy .fx-hero{padding-bottom:18px !important;}
+.fx-hero-kicker,.daily-brief-kicker,.fx-dash-head,.ws-stat-label,.data-vault-label,.data-vault-kicker{color:var(--r-t2) !important;}
+#statTotalSaved{color:#fff !important;-webkit-text-fill-color:#fff !important;background:none !important;text-shadow:none !important;}
+.fx-dash-icon,.fx-insights-glyph,.backup-card-icon{background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;}
+
+/* ── Hojas (Atajos/Mas, Respaldo, Asistente) ── */
+html body:not(#_a):not(#_b):not(#_c) :is(.command-sheet,.data-vault-sheet,.ai-overlay-sheet,.ai-sheet,.bud-modal,.mx-modal,.recipe-sheet){background:#111113 !important;background-image:none !important;box-shadow:none !important;border:0 !important;}
+.command-action-icon{background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;}
+
+/* ── Colores de estado: los de iOS ── */
+.activity-amount.spent,.ws-stat.spent .ws-stat-val{color:var(--r-red) !important;}
+.activity-amount.earned,.ws-stat.earned .ws-stat-val{color:var(--r-green) !important;}
+.activity-amount.saved,.ws-stat.saved .ws-stat-val{color:var(--r-blue) !important;}
+
+/* ── Restos de la galaxia ── */
+html body:not(#_a):not(#_b):not(#_c) .money-wrap input{background:transparent !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.fx-hero-sub-pct,.hero-badge,.entry-category-row,.day-totals,.mdb-search-input){box-shadow:none !important;border-color:transparent !important;}
+html body:not(#_a):not(#_b):not(#_c) .day-totals{border-top:.5px solid var(--r-line) !important;}
+html body:not(#_a):not(#_b):not(#_c) .ach-card2.ach-unlocked{border:1px solid rgba(50,215,75,.35) !important;}
+html body:not(#_a):not(#_b):not(#_c) .ach2-glow{display:none !important;}
+html body:not(#_a):not(#_b):not(#_c) :is(.ach-hdr-bar,.meta-progress-fill,.mx-fill){background:var(--r-green) !important;background-image:none !important;box-shadow:none !important;}
+html body:not(#_a):not(#_b):not(#_c) .data-vault-action{background:var(--r-card2) !important;background-image:none !important;box-shadow:none !important;border:0 !important;color:#fff !important;}
+html body:not(#_a):not(#_b):not(#_c) .data-vault-action:not(.secondary):not(.warn){background:var(--r-green) !important;color:#000 !important;}
+html body:not(#_a):not(#_b):not(#_c) .data-vault-action.warn{color:var(--r-red) !important;}
+body:has(#dataVaultOverlay.show) #rNav,body:has(#budModalOverlay.open) #rNav,body:has(#mxModalOverlay.open) #rNav,body:has(#calOverlay.show) #rNav{display:none;}
+html body:not(#_a):not(#_b):not(#_c):not(#_d) .new-entry-box :is(textarea,select,.money-wrap,.entry-category-icon){background:#0d0d0f !important;}
+html body:not(#_a):not(#_b):not(#_c):not(#_d) .new-entry-box .money-wrap input{background:transparent !important;}
 </style>
 </head>
 <body>
@@ -20140,6 +20263,8 @@ document.addEventListener('DOMContentLoaded', function(){
     { id:'presupuesto', icon:'📊', label:'Presupuesto', sub:'Límites', tab:'presupuesto', terms:'budget presupuesto limites gastos' },
     { id:'insights', icon:'📈', label:'Insights', sub:'Análisis', tab:'insights', terms:'insights resumen analisis' },
     { id:'data', icon:'💾', label:'Datos', sub:'Respaldo', action:'data', terms:'backup datos exportar importar' },
+    { id:'ai', icon:'🤖', label:'Asistente', sub:'Pregúntale', tab:'ai', terms:'ai asistente chat ayuda' },
+    { id:'consejos', icon:'💡', label:'Consejos', sub:'Tips', tab:'consejos', terms:'consejos tips ayuda' },
     { id:'privacy', icon:'🙈', label:'Privacidad', sub:'Ocultar montos', action:'privacy', terms:'hide show privacidad ocultar montos' }
   ];
 
@@ -20894,5 +21019,36 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+<script>
+/* REDISENO 25-10: barra de pestanas abajo + "Lo de hoy" justo debajo del saldo.
+   El color activo lo pone el CSS con body[data-tab], que ya fija switchTab(). */
+(function(){
+  function ic(d){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+d+'</svg>'; }
+  var items=[
+    ['hoy','Inicio',ic('<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/>')],
+    ['actividad','Movimientos',ic('<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>')],
+    ['compras','Compras',ic('<path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/>')],
+    ['recetas','Recetas',ic('<path d="M7 11V21h10V11"/><path d="M7 11a4 4 0 1 1 2.6-7A4 4 0 0 1 17 5a3.5 3.5 0 0 1 0 6"/><path d="M7 16h10"/>')],
+    ['mas','Más',ic('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')]
+  ];
+  function build(){
+    if(document.getElementById('rNav')) return;
+    var nav=document.createElement('nav'); nav.id='rNav'; nav.setAttribute('aria-label','Secciones');
+    nav.innerHTML=items.map(function(it){ return '<button type="button" data-t="'+it[0]+'">'+it[2]+'<span>'+it[1]+'</span></button>'; }).join('');
+    nav.addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b) return;
+      var t=b.getAttribute('data-t');
+      if(t==='mas'){ if(typeof openCommandCenter==='function') openCommandCenter(); return; }
+      if(t===window._activeTab||document.body.getAttribute('data-tab')===t){ var st=document.querySelector('.page-stack'); if(st) st.scrollTo({top:0,behavior:'smooth'}); return; }
+      try{ switchTab(t); }catch(err){}
+    });
+    document.body.appendChild(nav);
+    var hero=document.querySelector('#page-hoy .fx-hero'), day=document.querySelector('#page-hoy .day-card');
+    if(hero&&day&&hero.nextElementSibling!==day) hero.parentNode.insertBefore(day,hero.nextElementSibling);
+    if(!document.body.getAttribute('data-tab')){ try{ document.body.setAttribute('data-tab',window._activeTab||'hoy'); }catch(err){} }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
 </body>
 </html>
